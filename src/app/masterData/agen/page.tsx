@@ -1,16 +1,12 @@
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Agen from "@/components/Agen/Agen";
+import { ContentLayout } from "@/components/ContentLayout";
 
 export const metadata = {
-  title: "Penyaluran Elpiji PKMU",
+  title: "Agen PKMU",
 };
 
-const PTAgenPage = () => {
-    return (
-        <DefaultLayout>
-            <Agen/>
-        </DefaultLayout>
-    );
+const AgenPage = () => {
+    return <ContentLayout title={"Master Data"} subtitle={"Agen"} children={<Agen/>}/>
 };
 
-export default PTAgenPage;
+export default AgenPage;

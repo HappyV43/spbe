@@ -1,16 +1,12 @@
 import Alokasi from "@/components/Alokasi/Alokasi";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { ContentLayout } from "@/components/ContentLayout";
 
 export const metadata = {
   title: "Alokasi PKMU",
 };
 
 const AlokasiPage = () => {
-  return (
-    <DefaultLayout>
-      <Alokasi/>
-    </DefaultLayout>
-  );
+  return <ContentLayout title={"Dashboard"} subtitle={"Alokasi"} children={<Alokasi/>}/>
 };
 
 export default AlokasiPage;

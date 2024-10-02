@@ -1,14 +1,13 @@
 "use client";
 import React, { useRef, useState } from "react";
-import { Breadcrumb, Typography, Input, Space, Table, Button } from "antd";
+import { Typography, Input, Space, Button, Row, Col } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import Highlighter from "react-highlight-words";
 import type { InputRef, TableColumnsType, TableColumnType } from "antd";
 import type { FilterDropdownProps } from "antd/es/table/interface";
 import { Content } from "antd/es/layout/layout";
-import { createStyles } from 'antd-style'; // Make sure to import this
 import CustomTable from "../Table/CustomTable";
-import { AlokasiDataType, data } from "../data/DataAlokasi";
+import { AlokasiDataType, data } from "../../lib/DataAlokasi";
 
 const { Title } = Typography;
 
@@ -108,13 +107,13 @@ const Alokasi = () => {
       title: "Nama Agen",
       dataIndex: "namaAgen",
       key: "namaAgen",
-      width: "20%",
+      width: "27%",
     },
     {
       title: "Quantity",
       dataIndex: "qty",
       key: "qty",
-      width: "15%",
+      width: "17%",
     },
     {
       title: "Material Name",
@@ -126,7 +125,7 @@ const Alokasi = () => {
       title: "GI Date",
       dataIndex: "GIDate",
       key: "GIDate",
-      width: "15%",
+      width: "18%",
     },
     {
       title: "BPE",
@@ -157,31 +156,46 @@ const Alokasi = () => {
   return (
     <>
       <Content>
-        <div className={`bg-white h-auto p-6 pb-2 rounded-lg`}>
+        <div className="bg-white h-auto p-6 pb-2 rounded-lg">
           <Title>Alokasi {totalData}</Title>
 
           {/* Filter Inputs */}
-          <Space style={{ marginBottom: 16 }}>
-            <Title></Title>
-            <Input
-              placeholder="All Qty"
-              value={qtyFilter}
-              onChange={(e) => setQtyFilter(e.target.value)}
-              style={{ width: 200 }}
-            />
-            <Input
-              placeholder="All GI Date"
-              value={GIDateFilter}
-              onChange={(e) => setGIDateFilter(e.target.value)}
-              style={{ width: 200 }}
-            />
-            <Input
-              placeholder="All Status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              style={{ width: 200 }}
-            />
-          </Space>
+          <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+            <Col span={8}>
+              <Title >asdjh</Title>
+              <Input
+                placeholder="All Quantity"
+                value={qtyFilter}
+                onChange={(e) => setQtyFilter(e.target.value)}
+                style={{ width: "100%" }}
+              >
+                {/* <Dropdown menu={{  }} trigger={['click']}>
+                  <a onClick={(e) => e.preventDefault()}>
+                    <Space>
+                      Click me
+                      <DownOutlined />
+                    </Space>
+                  </a>
+                </Dropdown> */}
+              </Input>
+            </Col>
+            <Col span={8}>
+              <Input
+                placeholder="All GI Date"
+                value={GIDateFilter}
+                onChange={(e) => setGIDateFilter(e.target.value)}
+                style={{ width: "100%" }}
+              />
+            </Col>
+            <Col span={8}>
+              <Input
+                placeholder="All Status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                style={{ width: "100%" }}
+              />
+            </Col>
+          </Row>
 
           {/* TABLE */}
           <div className="pt-6">

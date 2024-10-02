@@ -1,4 +1,4 @@
-const PenyaluranElpiji = () => {
+const Company = () => {
     return (
         <div>
             {/* TODO */}
@@ -6,4 +6,4 @@ const PenyaluranElpiji = () => {
     )
 }
 
-export default PenyaluranElpiji
+export default Company

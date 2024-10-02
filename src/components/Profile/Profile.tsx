@@ -1,4 +1,4 @@
-const PTAgen = () => {
+const Profile = () => {
     return (
         <div>
             {/* TODO */}
@@ -6,4 +6,4 @@ const PTAgen = () => {
     )
 }
 
-export default PTAgen
+export default Profile

@@ -29,47 +29,37 @@ interface CustomTableProps {
 
 
 // Define your styles using createStyles
-const useStyle = createStyles(({ css, token }) => {
-  const { antCls } = token;
-  return {
-    customTable: css`
-      ${antCls}-table {
-        margin-top: 20px; /* Space above the table */
-        border-radius: 8px; /* Rounded corners */
-        overflow: hidden; /* Round corners */
-        
-        /* Add style for alternating row colors */
-        &-body {
-          tr:nth-child(odd) {
-            background-color: #f0f3ff; /* Light gray background for odd rows */
-          }
-        }
-      }
+const useStyle = createStyles(({ css }) => ({
+  customTable: css`
+    .ant-table {
+      margin-top: 20px; /* Space above the table */
+      border-radius: 8px; /* Rounded corners */
+      overflow: hidden; /* Round corners */
+    }
 
-      /* Style for table headers */
-      ${antCls}-table thead > tr > th {
-        background-color: #e6f7ff; /* Light blue background */
-        font-weight: bold; /* Bold text */
-        font-size: 24px; /* Increased font size for headers */
-        text-align: center; /* Center alignment */
-        padding: 16px; /* Add padding */
-      }
+    /* Style for table headers */
+    .ant-table thead > tr > th {
+      background-color: #e6f7ff; /* Light blue background */
+      font-weight: bold; /* Bold text */
+      font-size: 18px; /* Increased font size for headers */
+      text-align: center; /* Center alignment */
+      padding: 16px; /* Add padding */
+    }
 
-      /* Style for table cells */
-      ${antCls}-table td {
-        padding: 12px; /* Padding for table cells */
-        text-align: center; /* Center alignment */
-      }
+    /* Style for table cells */
+    .ant-table td {
+      padding: 12px; /* Padding for table cells */
+      text-align: center; /* Center alignment */
+    }
 
-      /* Make table responsive */
-      @media (max-width: 768px) {
-        ${antCls}-table {
-          font-size: 14px; /* Reduce font size on small screens */
-        }
+    /* Make table responsive */
+    @media (max-width: 768px) {
+      .ant-table {
+        font-size: 14px; /* Reduce font size on small screens */
       }
-    `,
-  };
-});
+    }
+  `,
+}));
 
 const CustomTable: React.FC<CustomTableProps> = ({
   data,
@@ -129,7 +119,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
         dataSource={data}
         scroll={scroll} // Apply the scroll configuration
         sticky={true}
-        // style={styles.customTable}
+        className={styles.customTable}
       />
     </>
   );
