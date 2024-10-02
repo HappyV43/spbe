@@ -10,3 +10,8 @@ export interface Allocation {
   updatedAt: Date;
   createdAt: Date;
 }
+
+export type SignInValues = {
+  username: string;
+  password: string;
+};

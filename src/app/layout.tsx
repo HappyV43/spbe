@@ -3,6 +3,8 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import DefaultLayout from "@/components/Sidebar/DefaultLayout";
+import { cookies } from "next/headers";
+import { LoginForm } from "./auth/login/login";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -25,15 +27,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const authCookies = cookieStore.get("spbe-auth-cookies");
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <DefaultLayout>
-            {children}
-          </DefaultLayout>
+          {authCookies ? (
+            <DefaultLayout>{children}</DefaultLayout>
+          ) : (
+            <LoginForm /> //TODO
+          )}
         </ThemeProvider>
       </body>
     </html>
