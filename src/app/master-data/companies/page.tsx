@@ -1,5 +1,7 @@
-import Company from "@/components/Company/Company";
+import Companies from "@/components/Companies/Companies";
 import { ContentLayout } from "@/components/ContentLayout";
+import { companiesColumns } from "@/lib/Column";
+import { dataCompanies } from "@/lib/DataCompanies";
 
 export const metadata = {
   title: "Company PKMU",
@@ -10,7 +12,7 @@ const CompanyPage = () => {
       <ContentLayout 
         home={"master-data"} 
         mainpage={"companies"} 
-        children={<Company/>}/>
+        children={<Companies columns={companiesColumns} data={dataCompanies}/>}/>
     )
 };
 

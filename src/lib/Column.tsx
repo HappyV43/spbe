@@ -2,9 +2,11 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Allocation } from "@/lib/types";
+import { AgentsDataType } from "./DataAgents";
+import { CompaniesDataType } from "./DataCompanies";
 
 // Definisikan kolom untuk tabel menggunakan TanStack Table
-export const columns: ColumnDef<Allocation>[] = [
+export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "status",
     header: "Status",
@@ -58,4 +60,71 @@ export const columns: ColumnDef<Allocation>[] = [
   //   header: "Created At",
   //   cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(), // Format tanggal
   // },
+];
+
+export const agentColumns: ColumnDef<AgentsDataType>[] = [
+
+  {
+      accessorKey: "id",
+      header: "ID",
+  },
+  {
+      accessorKey: "name",
+      header: "Name",
+  },
+  {
+      accessorKey: "address",
+      header: "Address",
+  },
+  {
+      accessorKey: "city",
+      header: "City",
+  },
+  {
+      accessorKey: "phone",
+      header: "Phone",
+  },
+  {
+      accessorKey: "fax",
+      header: "Fax",
+  },
+  {
+      accessorKey: "associatedCompanyId",
+      header: "Associated Company Id",
+  },
+  {
+      accessorKey: "createdAt",
+      header: "Created At",
+  },
+  {
+      accessorKey: "updatedAt",
+      header: "Updated At",
+  }
+];
+
+export const companiesColumns: ColumnDef<CompaniesDataType>[] = [
+  {
+      accessorKey: 'id',
+      header: 'ID',
+  },
+  {
+      accessorKey: 'company',
+      header: 'Company Name',
+  },
+  {
+      accessorKey: 'address',
+      header: 'Address',
+  },
+  {
+      accessorKey: 'telephone',
+      header: 'Telephone',
+  },
+  {
+      accessorKey: 'createdAt',
+      header: 'Created At',
+  },
+  {
+      accessorKey: 'updatedAt',
+      header: 'Updated At',
+  },
 ];
