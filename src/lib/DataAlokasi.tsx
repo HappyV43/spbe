@@ -1,5 +1,7 @@
 import { TableColumnsType } from "antd";
 
+// DUMMY DATA
+
 // Define the AlokasiDataType interface
 export interface AlokasiDataType {
     key: string;

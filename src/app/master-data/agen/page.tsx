@@ -6,7 +6,12 @@ export const metadata = {
 };
 
 const AgenPage = () => {
-    return <ContentLayout title={"Master Data"} subtitle={"Agen"} children={<Agen/>}/>
+    return (
+      <ContentLayout
+        home={"master-data"} 
+        mainpage={"agen"} 
+        children={<Agen/>}/>
+    )
 };
 
 export default AgenPage;

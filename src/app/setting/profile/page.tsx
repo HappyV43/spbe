@@ -6,7 +6,12 @@ export const metadata = {
 };
 
 const ProfilePage = () => {
-  return <ContentLayout title={"Master Data"} subtitle={"Agen"} children={<Profile/>}/>
+  return (
+    <ContentLayout 
+      home={"setting"} 
+      mainpage={"profile"} 
+      children={<Profile/>}/>
+  )
 };
 
 export default ProfilePage;

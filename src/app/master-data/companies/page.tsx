@@ -6,7 +6,12 @@ export const metadata = {
 };
 
 const CompanyPage = () => {
-    return <ContentLayout title={"Master Data"} subtitle={"Companies"} children={<Company/>}/>
+    return (
+      <ContentLayout 
+        home={"master-data"} 
+        mainpage={"companies"} 
+        children={<Company/>}/>
+    )
 };
 
 export default CompanyPage;

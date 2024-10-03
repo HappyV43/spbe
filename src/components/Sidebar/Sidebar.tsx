@@ -25,15 +25,15 @@ export default function Sidebar ({}) {
   };
 
   useEffect(() => {
-      if (pathname === "/dashboard/penyaluranElpiji") {
+      if (pathname === "/dashboard/penyaluran-elpiji") {
         setSelectedKeys(['2']);
       } else if (pathname === "/dashboard/alokasi") {
         setSelectedKeys(['3']);
-      } else if (pathname === "/dashboard/cetakPenyaluran") {
+      } else if (pathname === "/dashboard/cetak-penyaluran") {
         setSelectedKeys(['4']);
-      } else if (pathname === "/masterData/agen") {
+      } else if (pathname === "/master-data/agen") {
         setSelectedKeys(['6']);
-      } else if (pathname === "/masterData/company") {
+      } else if (pathname === "/master-data/company") {
         setSelectedKeys(['7']);
       } else if (pathname === "/profile") {
         updateSelectedKey("8");
@@ -60,16 +60,16 @@ export default function Sidebar ({}) {
           asChild
         >
           <Link href="/dashboard" className="flex items-center gap-2">
-            <PanelsTopLeft className="w-6 h-6 mr-1" />
+            {/* <PanelsTopLeft className="w-6 h-6 mr-1" /> */}
             <h1
               className={cn(
-                "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300",
+                "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-500",
                 sidebar?.isOpen === false
                   ? "-translate-x-96 opacity-0 hidden"
                   : "translate-x-0 opacity-100"
               )}
             >
-              Brand
+              PKWU
             </h1>
           </Link>
         </Button>

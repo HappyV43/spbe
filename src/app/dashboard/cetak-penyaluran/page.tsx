@@ -6,7 +6,12 @@ export const metadata = {
 };
 
 const CetakPenyaluranPage = () => {
-  return <ContentLayout title={"Dashboard"} subtitle={"Cetak Penyaluran"} children={<CetakPenyaluran/>}/>
+  return( 
+    <ContentLayout 
+      home={"dashboard"}
+      mainpage={"cetak-penyaluran"} 
+      children={<CetakPenyaluran/>}/>
+    )
 };
 
 export default CetakPenyaluranPage;
