@@ -1,7 +1,7 @@
 const PenyaluranElpiji = () => {
     return (
         <div>
-            test
+            {/* TODO */}
         </div>
     )
 }

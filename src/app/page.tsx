@@ -1,8 +1,10 @@
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import DefaultLayout from "@/components/Sidebar/DefaultLayout";
 import React from "react";
 
-export default function Home() {
-  return (
-      <DefaultLayout/>
-  );
+export default function Home({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+  return <DefaultLayout>{children}</DefaultLayout>;
 }

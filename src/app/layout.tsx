@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { AntdRegistry } from "@ant-design/nextjs-registry";
-import { Layout } from "antd";
-import AppHeader from "@/components/Header/page";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import DefaultLayout from "@/components/Sidebar/DefaultLayout";
+import { cookies } from "next/headers";
+import { LoginForm } from "./auth/login/login";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -26,17 +27,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = cookies();
+  const authCookies = cookieStore.get("spbe-auth-cookies");
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AntdRegistry>
-            {children}
-          {/* <Layout>
-            <AppHeader/>
-          </Layout> */}
-        </AntdRegistry>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {authCookies ? (
+            <DefaultLayout>{children}</DefaultLayout>
+          ) : (
+            <LoginForm /> //TODO
+          )}
+        </ThemeProvider>
       </body>
     </html>
   );
