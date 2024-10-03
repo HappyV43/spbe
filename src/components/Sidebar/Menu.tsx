@@ -11,10 +11,11 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
-  TooltipProvider
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 import { getMenuList } from "@/lib/MenuItems";
 import { CollapseMenuButton } from "./ColapseMenuButton";
+import { logOut } from "@/app/actions/auth.actions";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -23,6 +24,13 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
+  const handleClick = async () => {
+    try {
+      await logOut();
+    } catch (error) {
+      console.error("Failed to call action:", error);
+    }
+  };
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -88,7 +96,7 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {}}
+                    onClick={handleClick}
                     variant="outline"
                     className="w-full justify-center h-10 mt-5"
                   >
