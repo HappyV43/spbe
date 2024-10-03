@@ -59,9 +59,9 @@ export function getMenuList(pathname: string): Group[] {
           icon: Database,
           submenus: [
             {
-              href: "/master-data/agen",
-              label: "Agen",
-              active: pathname === "/master-data/agen"
+              href: "/master-data/agents",
+              label: "Agents",
+              active: pathname === "/master-data/agents"
             },
             {
               href: "/master-data/companies",

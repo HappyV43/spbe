@@ -1,8 +1,8 @@
 // import Alokasi from "@/components/Alokasi/Alokasi";
 import { getAllokasiAll } from "@/app/actions/alokasi.action";
 import Alokasi from "@/components/Alokasi/Alokasi";
-import { columns } from "@/lib/Column";
 import { ContentLayout } from "@/components/ContentLayout";
+import { allocationColumns } from "@/lib/Column";
 
 export const metadata = {
   title: "Alokasi PKMU",
@@ -14,7 +14,7 @@ const AlokasiPage = async () => {
     <ContentLayout
       home={"dashboard"}
       mainpage={"alokasi"}
-      children={<Alokasi columns={columns} data={data} />}
+      children={<Alokasi columns={allocationColumns} data={data} />}
     />
   );
 };

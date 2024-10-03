@@ -31,9 +31,9 @@ export default function Sidebar ({}) {
         setSelectedKeys(['3']);
       } else if (pathname === "/dashboard/cetak-penyaluran") {
         setSelectedKeys(['4']);
-      } else if (pathname === "/master-data/agen") {
+      } else if (pathname === "/master-data/agents") {
         setSelectedKeys(['6']);
-      } else if (pathname === "/master-data/company") {
+      } else if (pathname === "/master-data/companies") {
         setSelectedKeys(['7']);
       } else if (pathname === "/profile") {
         updateSelectedKey("8");
