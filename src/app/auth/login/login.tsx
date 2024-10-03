@@ -36,7 +36,7 @@ export function LoginForm() {
   async function onSubmit(values: SignInValues) {
     const result = await signIn(values);
     if (result.success) {
-      router.push("/dashboard/penyaluranElpiji");
+      router.push("/dashboard/penyaluran-elpiji");
     } else {
       router.push("/auth/login");
     }

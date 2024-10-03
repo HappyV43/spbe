@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 const Auth = async () => {
   const user = await getUser();
   if (user) {
-    redirect("/dashboard/penyaluranElpiji");
+    redirect("/dashboard/penyaluran-elpiji");
   }
 
   return <div>403 Forbbiden</div>;
