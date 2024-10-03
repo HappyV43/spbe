@@ -6,7 +6,11 @@ export const metadata = {
 };
 
 const PenyaluranElpijiPage = () => {
-  return <ContentLayout title={"Dashboard"} subtitle={"Penyaluran Elpiji"} children={<PenyaluranElpiji/>}/>
+  return (<ContentLayout  
+    home={"dashboard"}
+    mainpage={"penyaluran-elpiji"}
+    children={<PenyaluranElpiji/>}
+  />)
 };
 
 export default PenyaluranElpijiPage;

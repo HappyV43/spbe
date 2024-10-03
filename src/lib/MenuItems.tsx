@@ -31,9 +31,9 @@ export function getMenuList(pathname: string): Group[] {
           icon: House,
           submenus: [
             {
-              href: "/dashboard/penyaluranElpiji",
+              href: "/dashboard/penyaluran-elpiji",
               label: "Penyaluran Elpiji",
-              active: pathname === "/dashboard/penyaluranElpiji"
+              active: pathname === "/dashboard/penyaluran-elpiji"
             },
             {
               href: "/dashboard/alokasi",
@@ -41,9 +41,9 @@ export function getMenuList(pathname: string): Group[] {
               active: pathname === "/dashboard/alokasi"
             },
             {
-              href: "/dashboard/cetakPenyaluran",
+              href: "/dashboard/cetak-penyaluran",
               label: "Cetak Penyaluran",
-              active: pathname === "/dashboard/cetakPenyaluran"
+              active: pathname === "/dashboard/cetak-penyaluran"
             }
           ]
         }
@@ -53,20 +53,20 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "Master Data",
       menus: [
         {
-          href: "/masterData",
+          href: "/master-data",
           label: "Master Data",
-          active: pathname.includes("/masterData"),
+          active: pathname.includes("/master-data"),
           icon: Database,
           submenus: [
             {
-              href: "/masterData/agen",
+              href: "/master-data/agen",
               label: "Agen",
-              active: pathname === "/masterData/agen"
+              active: pathname === "/master-data/agen"
             },
             {
-              href: "/masterData/company",
-              label: "Company",
-              active: pathname === "/masterData/company"
+              href: "/master-data/companies",
+              label: "Companies",
+              active: pathname === "/master-data/companies"
             }
           ]
         }
@@ -82,9 +82,9 @@ export function getMenuList(pathname: string): Group[] {
           icon: Settings,
           submenus: [
             { 
-              href: "/profile",
+              href: "/setting/profile",
               label: "Profile",
-              active: pathname === "/profile",
+              active: pathname === "/setting/profile",
             }
           ]
         }
