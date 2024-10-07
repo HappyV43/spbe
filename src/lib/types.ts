@@ -6,7 +6,7 @@ export interface Allocation {
   materialName: string;
   bpeNumber?: string | null;
   period?: string | null;
-  alocatedQty: number;
+  allocatedQty: number;
   status: string;
   giDate?: Date | null;
   plannedGiDate: string;
@@ -28,6 +28,24 @@ export interface Agents {
   updatedBy: String;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface LpgDistributions { 
+  id: number;
+  allocationId: number;
+  deliveryNumber: string;
+  bpeNumber: string;
+  giDate: string;  // Assuming giDate is a string in 'YYYY-MM-DD' format
+  shipTo: string;
+  agentName: string;
+  licensePlate: string;
+  allocatedQty: number;
+  distributionQty: number;
+  volume: number; // decimal can be represented as a number in TypeScript
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string;
+  updatedBy: string;
 }
 
 export interface Companies {

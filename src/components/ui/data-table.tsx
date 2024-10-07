@@ -70,7 +70,7 @@ export function DataTable<TData, TValue>({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} className="text-center text-[16px] py-7 font-semibold">
+                    <TableHead key={header.id} className="text-center text-[20px] py-7 font-semibold">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
