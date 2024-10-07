@@ -106,6 +106,7 @@ export const registerAction = async (values: SignInValues) => {
       data: {
         username: values.username,
         password: hashedPassword,
+        role: values.role,
       },
     });
     const session = await lucia.createSession(user.id, {});

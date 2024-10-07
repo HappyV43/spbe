@@ -1,9 +1,9 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Allocation } from "@/lib/types";
-import { AgentsDataType } from "./DataAgents";
-import { CompaniesDataType } from "./DataCompanies";
+import { Allocation, Agents, Companies } from "@/lib/types";
+import { AgentsDataType } from "./dummyData/DataAgents";
+import { CompaniesDataType } from "./dummyData/DataCompanies";
 
 // Definisikan kolom untuk tabel menggunakan TanStack Table
 export const allocationColumns: ColumnDef<Allocation>[] = [
@@ -30,7 +30,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Ship To",
   },
   {
-    accessorKey: "namaAgen",
+    accessorKey: "agentName",
     header: "Agent Name",
   },
   {
@@ -38,9 +38,9 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Material Name",
   },
   {
-    accessorKey: "alocatedQty",
+    accessorKey: "allocatedQty",
     header: "Quantity",
-    cell: ({ row }) => row.original.alocatedQty.toLocaleString(), // Optional: format angka
+    // cell: ({ row }) => row.original.alocatedQty.toLocaleString(), // Optional: format angka
   },
   {
     accessorKey: "giDate",
@@ -62,69 +62,65 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   // },
 ];
 
-export const agentColumns: ColumnDef<AgentsDataType>[] = [
-
+export const agentColumns: ColumnDef<Agents>[] = [
   {
-      accessorKey: "id",
-      header: "ID",
+    accessorKey: "name",
+    header: "Name",
   },
   {
-      accessorKey: "name",
-      header: "Name",
+    accessorKey: "addresses",
+    header: "Address",
   },
   {
-      accessorKey: "address",
-      header: "Address",
+    accessorKey: "city",
+    header: "City",
   },
   {
-      accessorKey: "city",
-      header: "City",
+    accessorKey: "phone",
+    header: "Phone",
   },
   {
-      accessorKey: "phone",
-      header: "Phone",
+    accessorKey: "fax",
+    header: "Fax",
   },
   {
-      accessorKey: "fax",
-      header: "Fax",
+    accessorKey: "associatedCompanyId",
+    header: "Company Name",
   },
   {
-      accessorKey: "associatedCompanyId",
-      header: "Associated Company Id",
+    accessorKey: "createdAt",
+    header: "Created At",
   },
   {
-      accessorKey: "createdAt",
-      header: "Created At",
+    accessorKey: "updatedAt",
+    header: "Updated At",
   },
-  {
-      accessorKey: "updatedAt",
-      header: "Updated At",
-  }
 ];
 
-export const companiesColumns: ColumnDef<CompaniesDataType>[] = [
+export const companiesColumns: ColumnDef<Companies>[] = [
   {
-      accessorKey: 'id',
-      header: 'ID',
+    accessorKey: "company",
+    header: "Company Name",
   },
   {
-      accessorKey: 'company',
-      header: 'Company Name',
+    accessorKey: "addresses",
+    header: "Address",
   },
   {
-      accessorKey: 'address',
-      header: 'Address',
+    accessorKey: "telephone",
+    header: "Telephone",
   },
   {
-      accessorKey: 'telephone',
-      header: 'Telephone',
+    accessorKey: "createdAt",
+    header: "Created At",
   },
   {
-      accessorKey: 'createdAt',
-      header: 'Created At',
+    accessorKey: "updatedAt",
+    header: "Updated At",
   },
-  {
-      accessorKey: 'updatedAt',
-      header: 'Updated At',
-  },
+];
+
+export const Role = [
+  { label: "User", value: "USER" },
+  { label: "Admin", value: "ADMIN" },
 ];

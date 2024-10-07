@@ -17,10 +17,22 @@ model User {
   id        String   @id @default(cuid())
   username  String   @unique
   password  String
+  role      String
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
 
-  session Session[]
+  session          Session[]
+  alokasiCreatedBy Allocations[] @relation("createdByRelation")
+  alokasiUpdatedBy Allocations[] @relation("updatedByRelation")
+
+  lpgCreatedBy LpgDistributions[] @relation("lpgCreatedByRelation")
+  lpgUpdatedBy LpgDistributions[] @relation("lpgUpdatedByRelation")
+
+  agentCreatedBy Agents[] @relation("agentCreatedByRelation")
+  agentUpdatedBy Agents[] @relation("agentUpdatedByRelation")
+
+  companiesCreatedBy Companies[] @relation("companiesCreatedByRelation")
+  companiesUpdatedBy Companies[] @relation("companiesUpdatedByRelation")
 }
 
 model Session {
@@ -35,45 +47,93 @@ model Companies {
   company   String
   addresses String
   telephone String
+  agent     Agents[]
+  createdBy String
+  updatedBy String
   updatedAt DateTime @updatedAt
   createdAt DateTime @default(now())
+
+  creator User @relation("companiesCreatedByRelation", fields: [createdBy], references: [id])
+  updater User @relation("companiesUpdatedByRelation", fields: [updatedBy], references: [id])
 }
 
 model Agents {
-  id        Int    @id
-  name      String
-  addresses String
-  city      String
-  phone     String
-  fax       String
+  id                  Int                @id
+  name                String
+  addresses           String
+  city                String
+  phone               String
+  fax                 String?
+  associatedCompanyId Int
+  createdBy           String
+  updatedBy           String
+  allocations         Allocations[]
+  lpgDistributions    LpgDistributions[]
 
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+  updatedAt DateTime  @updatedAt
+  createdAt DateTime  @default(now())
+  Companies Companies @relation(fields: [associatedCompanyId], references: [id])
+  creator   User      @relation("agentCreatedByRelation", fields: [createdBy], references: [id])
+  updater   User      @relation("agentUpdatedByRelation", fields: [updatedBy], references: [id])
 }
 
 model Allocations {
-  id             Int      @id
-  deliveryNumber String
-  materialName   String
-  giDate         String
-  bpeNumber      String
-  period         String
-  alocatedQty    Int
-  status         String
-  updatedAt      DateTime @updatedAt
-  createdAt      DateTime @default(now())
+  id              Int               @id
+  deliveryNumber  String
+  shipTo          Int
+  agentName       String
+  materialName    String
+  bpeNumber       String?
+  period          String?
+  allocatedQty    Int
+  status          String            @default("Pending")
+  giDate          DateTime?
+  plannedGiDate   String
+  createdBy       String
+  updatedBy       String
+  lpgDistribution LpgDistributions?
+  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime          @default(now())
+  Agent           Agents            @relation(fields: [shipTo], references: [id])
+  creator         User              @relation("createdByRelation", fields: [createdBy], references: [id])
+  updater         User              @relation("updatedByRelation", fields: [updatedBy], references: [id])
 }
 
-model lpgDistributions {
-  id                Int      @id
+model LpgDistributions {
+  id                Int         @id
+  allocationId      Int         @unique
   transactionNumber String
   date              DateTime
-  agentName         BigInt
+  agentsId          Int
+  agentName         String
   licensePlate      String
-  doNumber          String
+  doNumber          String      @unique
   allocatedQty      Int
-  qty               Int
   volume            Decimal
-  updatedAt         DateTime @updatedAt
-  createdAt         DateTime @default(now())
+  updatedAt         DateTime    @updatedAt
+  createdAt         DateTime    @default(now())
+  createdBy         String
+  updatedBy         String
+  Agents            Agents      @relation(fields: [agentsId], references: [id])
+  allocation        Allocations @relation(fields: [allocationId], references: [id])
+  creator           User        @relation("lpgCreatedByRelation", fields: [createdBy], references: [id])
+  updater           User        @relation("lpgUpdatedByRelation", fields: [updatedBy], references: [id])
+}
+
+model RawData {
+  no            Int       @id
+  plant         Int
+  shipTo        String
+  shipToName    String
+  doNumber      String
+  quantity      Int
+  uom           String
+  doStatus      String
+  material      String
+  materialName  String
+  plannedGiDate String
+  giDate        DateTime?
+  bpe           String
+  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime  @default(now())
 }

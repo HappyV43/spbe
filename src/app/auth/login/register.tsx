@@ -6,6 +6,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import React from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -22,6 +34,10 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { SignInValues } from "@/lib/types";
 import { registerAction } from "@/app/actions/auth.actions";
+import { Role } from "@/lib/Column";
+import { cn } from "@/lib/utils";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -36,19 +52,27 @@ const SignUpForm = () => {
   async function onSubmit(values: SignInValues) {
     const res = await registerAction(values);
     if (res.success) {
-      router.push("/");
+      router.push("/dashboard/alokasi");
+      toast({
+        title: "Register has been succesfully",
+      });
     } else {
       router.push("/auth/login");
+      toast({
+        variant: "destructive",
+        title: "Oops something went wrong",
+      });
     }
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
   }
   return (
-    <Card className="min-w-[500px]">
-      <CardHeader>
-        <CardTitle>Begin your journey...</CardTitle>
-        <CardDescription>Create your account to continue.</CardDescription>
+    <Card className="w-screen max-w-lg rounded-lg shadow-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-2xl font-semibold flex justify-between">
+          Welcome back!
+        </CardTitle>
+        <CardDescription className="text-gray-500">
+          Sign in to your account to continue.
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">
         <Form {...form}>
@@ -87,6 +111,62 @@ const SignUpForm = () => {
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="role"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Role</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className={cn(
+                            "w-[200px] justify-between",
+                            !field.value && "text-muted-foreground"
+                          )}
+                        >
+                          {/* Corrected comparison: field.value is compared to role.value */}
+                          {field.value
+                            ? Role.find((role) => role.value === field.value)
+                                ?.label
+                            : "Select Role"}
+                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[200px] p-0">
+                      <Command>
+                        <CommandList>
+                          <CommandEmpty>No Role found.</CommandEmpty>
+                          <CommandGroup>
+                            {Role.map((role) => (
+                              <CommandItem
+                                value={role.label}
+                                key={role.value}
+                                onSelect={() => field.onChange(role.value)}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    role.value === field.value
+                                      ? "opacity-100"
+                                      : "opacity-0"
+                                  )}
+                                />
+                                {role.label}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </FormItem>
               )}
             />

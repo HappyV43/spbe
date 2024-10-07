@@ -1,4 +1,3 @@
-import { TableColumnsType } from "antd";
 
 // DUMMY DATA
 
