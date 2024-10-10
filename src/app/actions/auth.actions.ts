@@ -78,12 +78,16 @@ export const getUser = async () => {
   } catch (error) {
     console.error("error disini", error);
   }
+  if (!user) {
+    console.error("No user found for the provided session.");
+    return null;
+  }
   const dbUser = await prisma.user.findUnique({
     where: {
-      id: user?.id,
+      id: user.id,
     },
     select: {
-      username: true,
+      id: true,
     },
   });
   return dbUser;

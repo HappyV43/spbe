@@ -1,23 +1,24 @@
 export interface Allocation {
-  id: number;
-  deliveryNumber: string;
-  shipTo: number;
-  agentName: string;
-  materialName: string;
+  id?: number;
+  giDate?: Date | null;
   bpeNumber?: string | null;
+  deliveryNumber: string;
+  agentId?: string | null;
+  shipTo: string;
+  materialName: string;
+  agentName: string;
+  plannedGiDate: string;
   period?: string | null;
   allocatedQty: number;
-  status: string;
-  giDate?: Date | null;
-  plannedGiDate: string;
+  status?: "Pending" | "Approved";
   createdBy: string;
   updatedBy: string;
-  updatedAt: Date;
-  createdAt: Date;
+  updatedAt?: Date;
+  createdAt?: Date;
 }
 
 export interface Agents {
-  id: number;
+  id: string;
   name: string;
   addresses: string;
   city: string;
@@ -30,12 +31,12 @@ export interface Agents {
   updatedAt: Date;
 }
 
-export interface LpgDistributions { 
+export interface LpgDistributions {
   id: number;
   allocationId: number;
   deliveryNumber: string;
   bpeNumber: string;
-  giDate: string;  // Assuming giDate is a string in 'YYYY-MM-DD' format
+  giDate: string; // Assuming giDate is a string in 'YYYY-MM-DD' format
   shipTo: string;
   agentName: string;
   licensePlate: string;
@@ -49,15 +50,15 @@ export interface LpgDistributions {
 }
 
 export interface Companies {
-  id: number,
-  company: string,
+  id: number;
+  company: string;
   addresses: string;
   telephone: string;
   createdBy: string;
   updatedBy: string;
   updatedAt: Date;
   createdAt: Date;
-} 
+}
 
 export type SignInValues = {
   username: string;
@@ -65,20 +66,31 @@ export type SignInValues = {
   role: string;
 };
 
-export type RawData = {
+export interface RawData {
   no: number;
-  plant: number;
   shipTo: string;
+  agentId: string;
   shipToName: string;
   doNumber: string;
   quantity: number;
-  uom: string;
-  doStatus: string;
-  material: string;
   materialName: string;
-  plannedGiDate: string; // if it's stored as a string, otherwise Date
-  giDate: Date; // assuming it's a Date object
-  bpe: string;
-  updatedAt: Date;
-  createdAt: Date;
-};
+  plannedGiDate: string;
+  giDate?: Date | null;
+  bpe?: string | null;
+  createdBy: string;
+  updatedBy: string;
+}
+
+export interface RawDataMap {
+  agentId?: string | null;
+  SHIP_TO: string;
+  SHIP_TO_NAME: string;
+  DO_NUMBER: string;
+  QUANTITY: number;
+  MATERIAL_NAME: string;
+  PLANNED_GI_DATE: string;
+  giDate?: Date | null;
+  bpe?: string | null;
+  createdBy: string;
+  updatedBy: string;
+}
