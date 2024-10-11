@@ -15,7 +15,7 @@ const PenyaluranElpiji = () => {
                         <Input type="text" id="text" placeholder="Search..." />
                     </div> */}
                         <Button variant="outline" className="ml-auto" asChild>
-                            <Link href="alokasi/upload">New Penyaluran Elpiji </Link>
+                            <Link href="penyaluran-elpiji/form">New Penyaluran Elpiji </Link>
                         </Button>
                     {/* <div className="flex flex-end align-end items-end">
                     </div> */}
@@ -26,4 +26,4 @@ const PenyaluranElpiji = () => {
     )
 }
 
-export default PenyaluranElpiji
+export default PenyaluranElpiji;

@@ -24,7 +24,7 @@ const Companies = <TData, TValue>({
                         <Input type="text" id="text" placeholder="Search..." />
                     </div> */}
                         <Button variant="outline" className="ml-auto" asChild>
-                            <Link href="">New Company</Link>
+                            <Link href="companies/form">New Company</Link>
                         </Button>
                     {/* <div className="flex flex-end align-end items-end">
                     </div> */}

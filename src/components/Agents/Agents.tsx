@@ -20,7 +20,7 @@ const Agents = <TData, TValue>({columns, data}: AgentsProps<TData, TValue>) => {
                     <Input type="text" id="text" placeholder="Search..." />
                 </div> */}
                     <Button variant="outline" className="ml-auto" asChild>
-                        <Link href="agents/upload">New Agents </Link>
+                        <Link href="agents/form">New Agents </Link>
                     </Button>
                 {/* <div className="flex flex-end align-end items-end">
                 </div> */}
