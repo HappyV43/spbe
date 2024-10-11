@@ -1,11 +1,43 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Allocation, Agents, Companies } from "@/lib/types";
-import { AgentsDataType } from "./dummyData/DataAgents";
-import { CompaniesDataType } from "./dummyData/DataCompanies";
+import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
 
-// Definisikan kolom untuk tabel menggunakan TanStack Table
+export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
+  {
+    accessorKey: "name",
+    header: "Nama",
+  },
+  // {
+  //   accessorKey: "addresses",
+  //   header: "Alamat",
+  // },
+  // {
+  //   accessorKey: "city",
+  //   header: "Kota",
+  // },
+  // {
+  //   accessorKey: "phone",
+  //   header: "No HP",
+  // },
+  // {
+  //   accessorKey: "fax",
+  //   header: "Fax",
+  // },
+  // {
+  //   accessorKey: "associatedCompanyId",
+  //   header: "Nama Perusahaan",
+  // },
+  {
+    accessorKey: "createdAt",
+    header: "Dibuat",
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+  },
+];
+
 export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "status",
@@ -15,7 +47,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
       let statusClass = "";
       if (status === "Pending") {
         statusClass = "text-orange-500";
-      } else if (status === "delivered") {
+      } else if (status === "Approved") {
         statusClass = "text-green-500";
       }
       return <span className={statusClass}>{status}</span>;
@@ -23,7 +55,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   },
   {
     accessorKey: "deliveryNumber",
-    header: "Delivery Number",
+    header: "Nomer DO",
   },
   {
     accessorKey: "shipTo",
@@ -31,15 +63,15 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   },
   {
     accessorKey: "agentName",
-    header: "Agent Name",
+    header: "Nama Agen",
   },
   {
     accessorKey: "materialName",
-    header: "Material Name",
+    header: "Nama Material",
   },
   {
     accessorKey: "allocatedQty",
-    header: "Quantity",
+    header: "Jumlah",
     // cell: ({ row }) => row.original.alocatedQty.toLocaleString(), // Optional: format angka
   },
   {
@@ -48,12 +80,12 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   },
   {
     accessorKey: "bpeNumber",
-    header: "BPE Number",
+    header: "Nomer BPE",
   },
   {
     accessorKey: "updatedAt",
-    header: "Updated At",
-    cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
+    header: "Diperbarui",
+    // cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
   },
   // {
   //   accessorKey: "createdAt",
@@ -65,19 +97,19 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
 export const agentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Nama",
   },
   {
     accessorKey: "addresses",
-    header: "Address",
+    header: "Alamat",
   },
   {
     accessorKey: "city",
-    header: "City",
+    header: "Kota",
   },
   {
     accessorKey: "phone",
-    header: "Phone",
+    header: "No HP",
   },
   {
     accessorKey: "fax",
@@ -85,38 +117,38 @@ export const agentColumns: ColumnDef<Agents>[] = [
   },
   {
     accessorKey: "associatedCompanyId",
-    header: "Company Name",
+    header: "Nama Perusahaan",
   },
   {
     accessorKey: "createdAt",
-    header: "Created At",
+    header: "Dibuat",
   },
   {
     accessorKey: "updatedAt",
-    header: "Updated At",
+    header: "Diperbarui",
   },
 ];
 
 export const companiesColumns: ColumnDef<Companies>[] = [
   {
     accessorKey: "company",
-    header: "Company Name",
+    header: "Nama Perusahaan",
   },
   {
     accessorKey: "addresses",
-    header: "Address",
+    header: "Alamat",
   },
   {
     accessorKey: "telephone",
-    header: "Telephone",
+    header: "No HP",
   },
   {
     accessorKey: "createdAt",
-    header: "Created At",
+    header: "Dibuat",
   },
   {
     accessorKey: "updatedAt",
-    header: "Updated At",
+    header: "Diperbarui",
   },
 ];
 

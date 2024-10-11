@@ -64,6 +64,6 @@ export const uploadBulkExcel = async (datas: Allocation[]) => {
     revalidatePath("/dashboard/alokasi");
   } catch (error) {
     console.error(error);
-    throw new Error("Bulk upload failed");
+    throw new Error("Upload failed");
   }
 };

@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
-import { Allocation, RawData, RawDataMap } from "@/lib/types";
+import { Allocation, RawDataMap } from "@/lib/types";
 import * as XLSX from "xlsx";
 import { uploadBulkExcel } from "@/app/actions/upload-file.action";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // import shadcn table components
 
 interface User {
   id: string;
@@ -19,7 +20,7 @@ interface user {
 export default function Component({ user }: user) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [jsonData, setJsonData] = useState("");
+  const [tableData, setTableData] = useState<Allocation[]>([]);
   const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,13 +36,11 @@ export default function Component({ user }: user) {
         const data = e.target?.result;
         if (data) {
           const workbook = XLSX.read(data, { type: "binary" });
-          // SheetName
           const sheetName = workbook.SheetNames[0];
-          // Worksheet
           const workSheet = workbook.Sheets[sheetName];
-          // Json
           const json = XLSX.utils.sheet_to_json(workSheet);
           const test = json as RawDataMap[];
+          const prev = json as Allocation[];
 
           const transformedData = test.map((row) => {
             return {
@@ -54,16 +53,47 @@ export default function Component({ user }: user) {
                   : row.QUANTITY,
               materialName: String(row.MATERIAL_NAME),
               plannedGiDate: String(row.PLANNED_GI_DATE),
-              giDate:
-                typeof row.giDate === "string" ? new Date(row.giDate) : null,
+              giDate: row.giDate ? new Date(row.giDate) : null,
               createdBy: user.id,
               updatedBy: user.id,
             };
           });
 
-          console.log(transformedData);
+        //   giDate?: Date | null;
+        //   bpeNumber?: string | null;
+        //   deliveryNumber: string;
+        //   agentId?: string | null;
+        //   shipTo: string;
+        //   materialName: string;
+        //   agentName: string;
+        //   plannedGiDate: string;
+        //   period?: string | null;
+        //   allocatedQty: number;
+        //   status?: "Pending" | "Approved";
+        //   createdBy: string;
+        //   updatedBy: string;
+        //   updatedAt?: Date;
+        //   createdAt?: Date;
+        // }
 
-          setJsonData(JSON.stringify(transformedData, null, 2));
+          // const prevData = prev.map((row) => {
+          //   return {
+          //     shipTo: String(row.shipTo),
+          //     agentName: String(row.agentName),
+          //     deliveryNumber: String(row.DO_NUMBER),
+          //     allocatedQty:
+          //       typeof row.QUANTITY === "string"
+          //         ? parseInt(row.QUANTITY)
+          //         : row.QUANTITY,
+          //     materialName: String(row.MATERIAL_NAME),
+          //     plannedGiDate: String(row.plannedGiDate),
+          //     giDate: row.giDate ? new Date(row.giDate) : null,
+          //     createdBy: user.id,
+          //     updatedBy: user.id,
+          //   };
+          // })
+
+          setTableData(transformedData);
 
           try {
             await uploadBulkExcel(transformedData);
@@ -84,7 +114,7 @@ export default function Component({ user }: user) {
           Upload Excel
         </h1>
       </div>
-      <pre>{jsonData}</pre>
+
       <div className="w-full max-w-md">
         <div>
           <label
@@ -112,7 +142,7 @@ export default function Component({ user }: user) {
                 and drop
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                .xlsx, .xls, csv
+                .xlsx, .xls
               </p>
             </div>
             <input
@@ -131,9 +161,43 @@ export default function Component({ user }: user) {
             value={selectedFile ? selectedFile.name : "Upload File"}
             className="text-primary"
           />
-          <Button onClick={uploadExcel}>Import Selected</Button>
+          <Button onClick={uploadExcel}>Impor File</Button>
         </div>
       </div>
+
+      {tableData.length > 0 && (
+        <div className="mt-8 w-full max-w-4xl">
+          <h2 className="text-2xl font-semibold">Pratinjau Excel</h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Ship To</TableHead>
+                <TableHead>Nama Agen</TableHead>
+                <TableHead>Nomer DO</TableHead>
+                <TableHead>Jumlah Tabung</TableHead>
+                <TableHead>Nama Material</TableHead>
+                <TableHead>Planned GI Date</TableHead>
+                <TableHead>GI Date</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {tableData.map((row, index) => (
+                <TableRow key={index} className="my-6">
+                  <TableCell>{row.shipTo}</TableCell>
+                  <TableCell>{row.agentName}</TableCell>
+                  <TableCell>{row.deliveryNumber}</TableCell>
+                  <TableCell>{row.allocatedQty}</TableCell>
+                  <TableCell>{row.materialName}</TableCell>
+                  <TableCell>{row.plannedGiDate}</TableCell>
+                  <TableCell>
+                    {row.giDate ? row.giDate.toLocaleDateString() : ""}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </div>
   );
 }

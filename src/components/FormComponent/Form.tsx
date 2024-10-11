@@ -34,7 +34,7 @@ const Form = ({ page }: Props) => {
     const date = new Date;
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const yy = String(date.getFullYear()).slice(2);
-    return 'BPE-${mm}${yy}-${counter}';
+    return `BPE-${mm}${yy}-${String(counter).padStart(4, '0')}`;
   };
 
   useEffect(() => {
@@ -174,7 +174,7 @@ const Form = ({ page }: Props) => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Pending">Pending</SelectItem>
-                    <SelectItem value="Completed">Completed</SelectItem>
+                    <SelectItem value="Approved">Approved</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
