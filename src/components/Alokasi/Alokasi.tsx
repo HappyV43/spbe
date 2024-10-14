@@ -5,12 +5,9 @@ import { DataTable } from "../ui/data-table";
 import Link from "next/link";
 import { Label } from "../ui/label";
 import ComboBox from "../ComboBoxComponent/ComboBox";
-import { BoxIcon, Printer as PrinterIcon, Search, SearchX, Upload, X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Search, SearchX, Upload } from "lucide-react";
+import { useState } from "react";
 import { DatePickerWithRange } from "../ComboBoxComponent/DateRange";
-import { DateRange } from "react-day-picker"; // Import DateRange type for date filtering
-import { pdf, PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-import CetakPenyaluran from "../CetakPenyaluran/CetakPenyaluran";
 import { toast } from "@/hooks/use-toast";
 
 interface AlokasiProps<TData, TValue> {
