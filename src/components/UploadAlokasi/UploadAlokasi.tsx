@@ -2,12 +2,12 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { redirect } from "next/navigation";
 import { Allocation, RawDataMap } from "@/lib/types";
 import * as XLSX from "xlsx";
 import { uploadBulkExcel } from "@/app/actions/upload-file.action";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // import shadcn table components
+import { toast } from "@/hooks/use-toast";
 
 interface User {
   id: string;
@@ -17,11 +17,10 @@ interface user {
   user: User;
 }
 
-export default function Component({ user }: user) {
+export default function UploadAlokasi({ user }: user) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [tableData, setTableData] = useState<Allocation[]>([]);
-  const { toast } = useToast();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -59,44 +58,14 @@ export default function Component({ user }: user) {
             };
           });
 
-        //   giDate?: Date | null;
-        //   bpeNumber?: string | null;
-        //   deliveryNumber: string;
-        //   agentId?: string | null;
-        //   shipTo: string;
-        //   materialName: string;
-        //   agentName: string;
-        //   plannedGiDate: string;
-        //   period?: string | null;
-        //   allocatedQty: number;
-        //   status?: "Pending" | "Approved";
-        //   createdBy: string;
-        //   updatedBy: string;
-        //   updatedAt?: Date;
-        //   createdAt?: Date;
-        // }
-
-          // const prevData = prev.map((row) => {
-          //   return {
-          //     shipTo: String(row.shipTo),
-          //     agentName: String(row.agentName),
-          //     deliveryNumber: String(row.DO_NUMBER),
-          //     allocatedQty:
-          //       typeof row.QUANTITY === "string"
-          //         ? parseInt(row.QUANTITY)
-          //         : row.QUANTITY,
-          //     materialName: String(row.MATERIAL_NAME),
-          //     plannedGiDate: String(row.plannedGiDate),
-          //     giDate: row.giDate ? new Date(row.giDate) : null,
-          //     createdBy: user.id,
-          //     updatedBy: user.id,
-          //   };
-          // })
-
           setTableData(transformedData);
 
           try {
             await uploadBulkExcel(transformedData);
+            toast({
+              variant:"default",
+              title: "Upload Excel Berhasil"
+            })
             redirect("/dashboard/alokasi");
           } catch (error) {
             console.error(error);

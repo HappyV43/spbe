@@ -3,6 +3,7 @@ import { DataTable } from "../ui/data-table";
 import { companiesColumns } from "@/lib/Column";
 import { Button } from "../ui/button";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 
 interface CompaniesProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -15,25 +16,16 @@ const Companies = <TData, TValue>({
 }: CompaniesProps<TData, TValue>) => {
   return (
     <div className="w-full">
-            <div className=" items-center py-4 mx-4">
-                <div className="flex flex-row justify-between mb-4">
-                    {/* NOTE: when requested */}
-
-                    {/* <div className="grid w-full max-w-sm items-center gap-1.5">
-                        <Label htmlFor="email" className="text-lg">Search</Label>
-                        <Input type="text" id="text" placeholder="Search..." />
-                    </div> */}
-                        <Button variant="outline" className="ml-auto" asChild>
-                            <Link href="companies/form">New Company</Link>
-                        </Button>
-                    {/* <div className="flex flex-end align-end items-end">
-                    </div> */}
-                </div>
-              <DataTable columns={columns} data={data} />
-            </div>
+      <div className=" items-center py-4 mx-4">
+        <div className="justify-start mb-1">
+          <Button variant="outline" className="ml-auto justify-start" asChild>
+              <Link href="agents/form">
+              <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Company</Link> 
+          </Button>
         </div>
-    // <div>
-    // </div>
+        <DataTable columns={columns} data={data} />
+      </div>
+    </div>
   );
 };
 

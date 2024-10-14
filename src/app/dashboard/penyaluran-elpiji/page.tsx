@@ -5,14 +5,12 @@ export const metadata = {
   title: "Penyaluran Elpiji PKMU",
 };
 
-const PenyaluranElpijiPage = async () => {
-  return (
-    <ContentLayout
-      home={"dashboard"}
-      mainpage={"penyaluran-elpiji"}
-      children={<PenyaluranElpiji />}
-    />
-  );
+const PenyaluranElpijiPage = () => {
+  return (<ContentLayout  
+    home={"dashboard"}
+    mainpage={"penyaluran-elpiji"}
+    children={<PenyaluranElpiji columns={[]} data={[]}/>}
+  />)
 };
 
 export default PenyaluranElpijiPage;

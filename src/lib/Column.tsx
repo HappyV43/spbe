@@ -2,11 +2,15 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import { Trash, Printer, Pencil} from 'lucide-react';
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import CetakPenyaluran from "@/components/CetakPenyaluran/CetakPenyaluran";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     accessorKey: "name",
-    header: "Nama",
+    header: "Nama Agen",
   },
   // {
   //   accessorKey: "addresses",
@@ -39,6 +43,46 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
 ];
 
 export const allocationColumns: ColumnDef<Allocation>[] = [
+  {
+    header: "Tindakan",
+    cell: ({ row }) => {
+      
+      // Define actions for edit, delete, and print
+      const handleEdit = () => {
+        console.log("Edit", row.original);
+      };
+      const handleDelete = () => {
+        console.log("Delete", row.original);
+      };
+      const handlePrint = () => {
+        console.log("Print", row.original);
+      };
+  
+      return (
+        <div className="flex justify-center space-x-4">
+          {/* Edit Icon */}
+          <Pencil 
+            className="h-4 w-4 text-blue-500 cursor-pointer"
+            onClick={handleEdit}
+          />
+          {/* Delete Icon */}
+          
+          {/* Print Icon */}
+          <PDFDownloadLink
+            document={<CetakPenyaluran data={row.original} />}
+            fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}>
+            <Printer 
+            className="h-4 w-4 text-green-500 cursor-pointer"
+            />
+          </PDFDownloadLink>
+          <Trash 
+              className="h-4 w-4 text-red-500 cursor-pointer"
+              onClick={handleDelete}
+            />
+        </div>
+      );
+    },
+  },
   {
     accessorKey: "status",
     header: "Status",

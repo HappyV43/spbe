@@ -40,11 +40,11 @@ export function getMenuList(pathname: string): Group[] {
               label: "Alokasi",
               active: pathname === "/dashboard/alokasi"
             },
-            {
-              href: "/dashboard/cetak-penyaluran",
-              label: "Cetak Penyaluran",
-              active: pathname === "/dashboard/cetak-penyaluran"
-            }
+            // {
+            //   href: "/dashboard/cetak-penyaluran",
+            //   label: "Cetak Penyaluran",
+            //   active: pathname === "/dashboard/cetak-penyaluran"
+            // }
           ]
         }
       ]
@@ -82,9 +82,9 @@ export function getMenuList(pathname: string): Group[] {
           icon: Settings,
           submenus: [
             { 
-              href: "/setting/profile",
-              label: "Profile",
-              active: pathname === "/setting/profile",
+              href: "/setting/register",
+              label: "Register",
+              active: pathname === "/setting/register",
             }
           ]
         }
