@@ -9,7 +9,7 @@ const PenyaluranElpijiPage = () => {
   return (<ContentLayout  
     home={"dashboard"}
     mainpage={"penyaluran-elpiji"}
-    children={<PenyaluranElpiji/>}
+    children={<PenyaluranElpiji columns={[]} data={[]}/>}
   />)
 };
 

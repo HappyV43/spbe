@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import { useSidebarToggle } from "@/hooks/useSidebarToggle";
 import { useStore } from "zustand";
 import { cn } from "@/lib/utils";
@@ -35,11 +35,15 @@ export default function Sidebar ({}) {
         setSelectedKeys(['6']);
       } else if (pathname === "/master-data/companies") {
         setSelectedKeys(['7']);
-      } else if (pathname === "/profile") {
+      } else if (pathname === "/register") {
         updateSelectedKey("8");
-      } else if (pathname === "/") {
-        updateSelectedKey("2");
-      }
+      } else {
+        redirect("/dashboard/alokasi");
+      } 
+      // TODO
+      // if (userRole === "admin" && pathname === "/register") {
+      //   updateSelectedKey("8");
+      // }
   }, [pathname]);
 
   return (

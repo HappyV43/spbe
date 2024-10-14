@@ -1,4 +1,4 @@
-const Profile = () => {
+const Register = () => {
     return (
         <div>
             {/* TODO */}
@@ -6,4 +6,4 @@ const Profile = () => {
     )
 }
 
-export default Profile
+export default Register

@@ -1,37 +1,39 @@
 "use client";
 
 import * as React from "react";
-import { addDays, format } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { DateRange } from "react-day-picker";
-
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover";
-import { useState } from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useState, useEffect } from "react";
 
 interface DatePickerWithRangeProps extends React.HTMLAttributes<HTMLDivElement> {
-    onDateChange?: (dateRange: DateRange | undefined) => void;
+    onDateChange?: (dateRange: any) => void;
+    placeholder?: string;
+    value?: any; // Accept null or DateRange
 }
 
 export function DatePickerWithRange({
     className,
-    onDateChange, 
+    placeholder = "Pilih tanggal", // Default placeholder
+    onDateChange,
+    value,
 }: DatePickerWithRangeProps) {
-    const [date, setDate] = useState<DateRange | undefined>({
-        from: new Date(), // today
-        to: addDays(new Date(), -1), // yesterday
-    });
+    const [date, setDate] = useState<any>(value ?? null); // Initialize with value or null
 
-    const handleDateChange = (newDate: DateRange | undefined) => {
+    // Use useEffect to update the date when value changes (e.g., cleared)
+    useEffect(() => {
+        if (value === null) {
+            setDate(null); // Reset to null when value is cleared
+        }
+    }, [value]);
+
+    const handleDateChange = (newDate: any) => {
         setDate(newDate);
         if (onDateChange) {
-            onDateChange(newDate); 
+            onDateChange(newDate); // Trigger onDateChange callback
         }
     };
 
@@ -43,8 +45,7 @@ export function DatePickerWithRange({
                         id="date"
                         variant={"outline"}
                         className={cn(
-                            "w-full sm:w-96 justify-start text-left font-normal", 
-                            !date && "text-muted-foreground"
+                            "w-full sm:w-[300] justify-start text-left font-normal"
                         )}
                     >
                         <CalendarIcon className="mr-2 h-4 w-4" />
@@ -57,7 +58,7 @@ export function DatePickerWithRange({
                                 format(date.from, "dd MMM yyyy")
                             )
                         ) : (
-                            <span>Pick a date</span>
+                            <span>{placeholder}</span>
                         )}
                     </Button>
                 </PopoverTrigger>
@@ -67,6 +68,9 @@ export function DatePickerWithRange({
                         mode="range"
                         defaultMonth={date?.from}
                         selected={date}
+                        disabled={(date) =>
+                            date > new Date() || date < new Date("2000-01-01")
+                        }
                         onSelect={handleDateChange}
                         numberOfMonths={2}
                     />
