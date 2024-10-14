@@ -37,8 +37,6 @@ export default function Sidebar ({}) {
         setSelectedKeys(['7']);
       } else if (pathname === "/register") {
         updateSelectedKey("8");
-      } else {
-        redirect("/dashboard/alokasi");
       } 
       // TODO
       // if (userRole === "admin" && pathname === "/register") {
