@@ -6,7 +6,6 @@ export const getAgentsAll = async () => {
   try {
     return await prisma.agents.findMany();
   } catch (error) {
-    console.error("error", error);
-    return null;
+    throw error;
   }
 };

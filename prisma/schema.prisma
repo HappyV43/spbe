@@ -43,7 +43,7 @@ model Session {
 }
 
 model Companies {
-  id          Int      @id
+  id          Int      @id @default(autoincrement())
   companyName String
   address     String
   telephone   String
@@ -58,24 +58,23 @@ model Companies {
 }
 
 model Agents {
-  id               String             @id
-  CompanyId        Int
-  agentId          String
-  agentName        String
-  address          String
-  city             String
-  phone            String
-  fax              String
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  createdBy        String
-  updatedBy        String
-  allocations      Allocations[]
-  lpgDistributions LpgDistributions[]
+  id        String   @id
+  CompanyId Int
+  agentId   String
+  agentName String
+  address   String
+  city      String
+  phone     String
+  fax       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy String
+  updatedBy String
 
-  Companies Companies @relation(fields: [CompanyId], references: [id])
-  creator   User      @relation("agentCreatedByRelation", fields: [createdBy], references: [id])
-  updater   User      @relation("agentUpdatedByRelation", fields: [updatedBy], references: [id])
+  Companies   Companies     @relation(fields: [CompanyId], references: [id])
+  creator     User          @relation("agentCreatedByRelation", fields: [createdBy], references: [id])
+  updater     User          @relation("agentUpdatedByRelation", fields: [updatedBy], references: [id])
+  Allocations Allocations[]
 }
 
 model Allocations {
@@ -102,29 +101,28 @@ model Allocations {
 }
 
 model LpgDistributions {
-  id             Int         @id
-  allocationId   Int         @unique
-  devlieryNumber String
-  bpeNumber      String
-  giDate         DateTime
-  shipTo         String
-  agentName      String
-  licensePlate   String
-  doNumber       String      @unique
-  allocatedQty   Int
-  driverName     String
-  volume         Decimal
-  bocor          Int?
-  isiKurang      Int?
-  status         String
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  createdBy      String
-  updatedBy      String
-  Agents         Agents      @relation(fields: [shipTo], references: [id])
-  allocation     Allocations @relation(fields: [allocationId], references: [id])
-  creator        User        @relation("lpgCreatedByRelation", fields: [createdBy], references: [id])
-  updater        User        @relation("lpgUpdatedByRelation", fields: [updatedBy], references: [id])
+  id              Int         @id @default(autoincrement())
+  allocationId    Int         @unique
+  deliveryNumber  String
+  bpeNumber       String
+  giDate          DateTime
+  shipTo          String
+  agentName       String
+  licensePlate    String
+  allocatedQty    Int
+  driverName      String
+  distributionQty Int
+  volume          Int
+  bocor           Int?
+  isiKurang       Int?
+  status          String
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  createdBy       String
+  updatedBy       String
+  allocation      Allocations @relation(fields: [allocationId], references: [id])
+  creator         User        @relation("lpgCreatedByRelation", fields: [createdBy], references: [id])
+  updater         User        @relation("lpgUpdatedByRelation", fields: [updatedBy], references: [id])
 }
 
 model RawData {

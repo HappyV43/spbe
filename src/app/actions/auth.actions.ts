@@ -51,15 +51,19 @@ export const logOut = async () => {
 };
 
 export const getUser = async () => {
-  const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value;
   if (!sessionId) {
-    return null;
+    throw new Error("Session ID not found.");
   }
 
-  const { session, user } = await lucia.validateSession(sessionId);
   try {
-    if (session && session.fresh) {
-      // refreshing their session cookie
+    const { session, user } = await lucia.validateSession(sessionId);
+
+    if (!session) {
+      throw new Error("Invalid session.");
+    }
+
+    if (session?.fresh) {
       const sessionCookie = await lucia.createSessionCookie(session.id);
       cookies().set(
         sessionCookie.name,
@@ -67,30 +71,24 @@ export const getUser = async () => {
         sessionCookie.attributes
       );
     }
-    if (!session) {
-      const sessionCookie = await lucia.createBlankSessionCookie();
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
+
+    if (!user) {
+      throw new Error("User not found.");
     }
+
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { id: true },
+    });
+
+    if (!dbUser) {
+      throw new Error("User not found in the database.");
+    }
+
+    return dbUser;
   } catch (error) {
-    console.error("error disini", error);
+    throw error; 
   }
-  if (!user) {
-    console.error("No user found for the provided session.");
-    return null;
-  }
-  const dbUser = await prisma.user.findUnique({
-    where: {
-      id: user.id,
-    },
-    select: {
-      id: true,
-    },
-  });
-  return dbUser;
 };
 
 export const registerAction = async (values: SignInValues) => {

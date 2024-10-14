@@ -18,7 +18,7 @@ export const uploadExcel = async (
       // Jika ada record dengan deliveryNumber yang sama, lakukan update (override)
       const updatedRecord = await prisma.allocations.update({
         where: {
-          id: existingRecord.id, 
+          id: existingRecord.id,
         },
         data: {
           giDate: data.giDate ? new Date(data.giDate) : null,
@@ -27,10 +27,11 @@ export const uploadExcel = async (
           agentName: data.agentName,
           plannedGiDate: data.plannedGiDate,
           allocatedQty: data.allocatedQty,
-          updatedBy: data.updatedBy, 
+          updatedBy: data.updatedBy,
         },
       });
-      console.log("Data updated:", updatedRecord);
+      return updatedRecord;
+      console.log("Data updated:");
     } else {
       // Jika tidak ada, lakukan create
       const newRecord = await prisma.allocations.create({
@@ -46,12 +47,11 @@ export const uploadExcel = async (
           updatedBy: data.updatedBy,
         },
       });
-      console.log("New data created:", newRecord);
+      console.log("New data created:");
+      revalidatePath("/dashboard/alokasi");
+      return newRecord;
     }
-    revalidatePath("/dashboard/alokasi");
-    return existingRecord;
   } catch (error) {
-    console.error(error);
     throw new Error("Failed to upload Excel data");
   }
 };
@@ -64,6 +64,6 @@ export const uploadBulkExcel = async (datas: Allocation[]) => {
     revalidatePath("/dashboard/alokasi");
   } catch (error) {
     console.error(error);
-    throw new Error("Upload failed");
+    throw new Error("Bulk upload failed");
   }
 };

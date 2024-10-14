@@ -36,23 +36,35 @@ export interface LpgDistributions {
   allocationId: number;
   deliveryNumber: string;
   bpeNumber: string;
-  giDate: string; // Assuming giDate is a string in 'YYYY-MM-DD' format
+  giDate: Date;
   shipTo: string;
   agentName: string;
   licensePlate: string;
   allocatedQty: number;
+  driverName: string;
   distributionQty: number;
-  volume: number; // decimal can be represented as a number in TypeScript
+  volume: number;
+  bocor?: number | null;
+  isiKurang?: number | null;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
   createdBy: string;
   updatedBy: string;
 }
 
+export interface LpgDistributionSearch {
+  id: number;
+  deliveryNumber: string;
+  agentName: string;
+  allocatedQty: number;
+  shipTo: string;
+}
+
 export interface Companies {
   id: number;
-  company: string;
-  addresses: string;
+  companyName: string;
+  address: string;
   telephone: string;
   createdBy: string;
   updatedBy: string;
