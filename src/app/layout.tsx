@@ -4,8 +4,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import DefaultLayout from "@/components/Sidebar/DefaultLayout";
 import { cookies } from "next/headers";
-import { LoginForm } from "./auth/login/login";
-import SignUpForm from "./auth/login/register";
 import { Toaster } from "@/components/ui/toaster";
 import AuthLogin from "./auth/login/auth-login";
 

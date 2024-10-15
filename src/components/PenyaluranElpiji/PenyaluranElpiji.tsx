@@ -1,14 +1,12 @@
 "use client"
 
-import { data } from "@/lib/dummyData/DataAlokasi"
 import { Button } from "../ui/button"
 import { DataTable } from "../ui/data-table"
 import Link from "next/link"
-import ComboBox from "../ComboBoxComponent/ComboBox"
+import ComboBox from "../FeatureComponents/ComboBox"
 import { Label } from "../ui/label"
-import { DatePickerWithRange } from "../ComboBoxComponent/DateRange"
+import { DatePickerWithRange } from "../FeatureComponents/DateRange"
 import { useState } from "react"
-import { DateRange } from "react-day-picker"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "@/hooks/use-toast"
 import { Plus, Search, SearchX } from "lucide-react"
@@ -19,9 +17,11 @@ interface DistributionProps<TData, TValue> {
 }
 
 const PenyaluranElpiji = <TData extends {
+    giDate: Date
+    deliveryNumber: string;
     allocatedQty: number;
     agentName: string;
-    notrans: string;
+    bpeNumber: string;
     updatedAt: Date; 
 }, TValue>({
     columns,
@@ -30,15 +30,16 @@ const PenyaluranElpiji = <TData extends {
     const [notrans, setnotrans] = useState("");
     const [agentName, setAgentName] = useState("");
     const [qty, setQty] = useState("");
+    const [doNumber, setDoNumber] = useState("");
     const [dateRange, setDateRange] = useState<any>(""); 
     const [filteredData, setFilteredData] = useState<TData[]>(data);
     const [filtered, setFiltered] = useState<Boolean>(false);
 
     const notransOptions = Array.from(
-        new Set(data.map((item) => item.notrans)) 
-    ).map((notrans) => ({
-        label: notrans,
-        value: notrans,
+        new Set(data.map((item) => item.bpeNumber)) 
+    ).map((bpeNumber) => ({
+        label: bpeNumber,
+        value: bpeNumber,
     }));
 
     const agentNameOptions = Array.from(
@@ -48,8 +49,15 @@ const PenyaluranElpiji = <TData extends {
         value: agentName,
     }));
 
+    const doNumberOptions = Array.from(
+        new Set(data.map((item) => item.deliveryNumber)) 
+    ).map((deliveryNumber) => ({
+        label: deliveryNumber,
+        value: deliveryNumber,
+    }));
+
     const handleSearch = () => {
-        if (!status && !agentName && !dateRange) {
+        if (!notrans && !agentName && !dateRange && !doNumber) {
             toast({
                 duration: 1500,
                 variant:"destructive",
@@ -59,8 +67,9 @@ const PenyaluranElpiji = <TData extends {
         }
         
         const filtered = data.filter((item) => {
-            // const matchesStatus = status ? item.status === status : true;
+            const matchesNoTrans = notrans ? item.bpeNumber === notrans : true;
             const matchesAgentName = agentName ? item.agentName === agentName : true;
+            const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
     
             const normalizeDateFrom = (date: Date) => {
                 const normalized = new Date(date);
@@ -77,17 +86,17 @@ const PenyaluranElpiji = <TData extends {
             const matchesDate = dateRange?.from ? (
                 dateRange?.to ? (
                     // For Range Dates
-                    item.updatedAt >= normalizeDateFrom(dateRange.from) &&
-                    item.updatedAt <= normalizeDateTo(dateRange.to)
+                    item.giDate >= normalizeDateFrom(dateRange.from) &&
+                    item.giDate <= normalizeDateTo(dateRange.to)
                 ) : (
                     // For Single Dates
-                    item.updatedAt >= normalizeDateFrom(dateRange.from) &&
-                    item.updatedAt <= normalizeDateTo(dateRange.from)
+                    item.giDate >= normalizeDateFrom(dateRange.from) &&
+                    item.giDate <= normalizeDateTo(dateRange.from)
                 )
             ) : true; 
     
             setFiltered(true);
-            return matchesAgentName && matchesDate;
+            return matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber;
         });
     
         setFilteredData(filtered);
@@ -95,7 +104,8 @@ const PenyaluranElpiji = <TData extends {
 
     const handleClearSearch = () => {
         setAgentName("");
-        setQty("");
+        setDoNumber("");
+        setnotrans("");
         setDateRange(null);
     
         setFilteredData(data);
@@ -113,7 +123,7 @@ const PenyaluranElpiji = <TData extends {
                             data={notransOptions} 
                             value={notrans}
                             setValue={setnotrans}
-                            placeholder="Pilih nomer transaksi..."
+                            placeholder="Pilih nomer BPE..."
                         />
                     </div>
                     <div>
@@ -126,19 +136,20 @@ const PenyaluranElpiji = <TData extends {
                         />
                     </div>
                     <div>
-                        <Label htmlFor="notrans-search" className="text-lg">Nomer Transaksi</Label>
+                        <Label htmlFor="do-search" className="text-lg">Nomer DO</Label>
                         <ComboBox
-                            data={notransOptions} 
-                            value={notrans}
-                            setValue={setnotrans}
-                            placeholder="Pilih nomer transaksi..."
+                            data={doNumberOptions} 
+                            value={doNumber}
+                            setValue={setDoNumber}
+                            placeholder="Pilih delivery number..."
                         />
                     </div>
                     <div>
                         <Label htmlFor="date-search" className="text-lg">Tanggal</Label>
                         <DatePickerWithRange
-                            onDateChange={setDateRange} 
-                            // Pass date range to DatePicker component
+                            value={dateRange}
+                            onDateChange={setDateRange}
+                            placeholder="Pilih tanggal..."
                         />
                     </div>
                 </div>
@@ -161,7 +172,7 @@ const PenyaluranElpiji = <TData extends {
                         )}
                     </div>
                 </div>
-                {/* <DataTable columns={columns} data={data} />         */}
+                <DataTable columns={columns} data={filteredData} />        
             </div>
         </div>
     )

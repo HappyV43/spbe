@@ -12,28 +12,27 @@ import { useState, useEffect } from "react";
 interface DatePickerWithRangeProps extends React.HTMLAttributes<HTMLDivElement> {
     onDateChange?: (dateRange: any) => void;
     placeholder?: string;
-    value?: any; // Accept null or DateRange
+    value?: any; 
 }
 
 export function DatePickerWithRange({
     className,
-    placeholder = "Pilih tanggal", // Default placeholder
+    placeholder = "Pilih tanggal",
     onDateChange,
     value,
 }: DatePickerWithRangeProps) {
-    const [date, setDate] = useState<any>(value ?? null); // Initialize with value or null
+    const [date, setDate] = useState<any>(value ?? null); 
 
-    // Use useEffect to update the date when value changes (e.g., cleared)
     useEffect(() => {
         if (value === null) {
-            setDate(null); // Reset to null when value is cleared
+            setDate(null); 
         }
     }, [value]);
 
     const handleDateChange = (newDate: any) => {
         setDate(newDate);
         if (onDateChange) {
-            onDateChange(newDate); // Trigger onDateChange callback
+            onDateChange(newDate); 
         }
     };
 

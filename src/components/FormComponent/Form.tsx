@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-
+import { format } from "date-fns";
 import {
   redirect,
   usePathname,
@@ -139,11 +139,10 @@ const Form = ({ page, data }: Props) => {
     term ? params.set("query", term) : params.delete("query");
     replace(`${pathName}?${params.toString()}`);
   }, 400);
-
   const ref = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const { pending } = useFormStatus();
-
+  const nonReq = "cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
     try {
@@ -185,7 +184,7 @@ const Form = ({ page, data }: Props) => {
                   Nomor Transaksi
                 </Label>
                 <Input
-                  className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
+                  className={nonReq}
                   placeholder="Nomor Transaksi bpe-bbyy-autoinc"
                   name="nomorTransaksi"
                   value={generateNomorTransaksi()}
@@ -211,7 +210,7 @@ const Form = ({ page, data }: Props) => {
               <div className="flex flex-col my-2">
                 <Label className="font-bold text-xs my-2">Nama Agen</Label>
                 <Input
-                  className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
+                  className={nonReq}
                   placeholder="Nama agen"
                   name="namaAgen"
                   value={data.length > 0 ? data[0].agentName : ""}
@@ -224,10 +223,11 @@ const Form = ({ page, data }: Props) => {
                   Waktu Pengambilan
                 </Label>
                 <Input
-                  className="outline outline-2 outline-gray-200 bg-gray-200"
+                  className={nonReq}
                   placeholder="Waktu pengambilan"
-                  type="date"
                   name="waktuPengambilan"
+                  value={format(new Date(),"dd MMMM yyyy")}
+                  readOnly
                 />
               </div>
 
@@ -258,7 +258,7 @@ const Form = ({ page, data }: Props) => {
                 <Label className="font-bold text-xs my-2">Jumlah Tabung</Label>
                 <Input
                   type="number"
-                  className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
+                  className={nonReq}
                   placeholder="Jumlah tabung"
                   name="jumlahTabung"
                   value={data.length > 0 ? data[0].allocatedQty : ""}
@@ -266,11 +266,11 @@ const Form = ({ page, data }: Props) => {
                 />
               </div>
 
-              <div className="hidden my-2">
+              <div className="my-2">
                 <Label className="font-bold text-xs my-2">Id alokasi</Label>
                 <Input
                   type="number"
-                  className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
+                  className={nonReq}
                   placeholder="alokasi id"
                   name="allocationid"
                   value={data.length > 0 ? data[0].id : ""}
@@ -278,11 +278,11 @@ const Form = ({ page, data }: Props) => {
                 />
               </div>
 
-              <div className="hidden my-2">
+              <div className="my-2">
                 <Label className="font-bold text-xs my-2">Ship To</Label>
                 <Input
                   type="number"
-                  className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
+                  className={nonReq}
                   placeholder="shipTo"
                   name="shipTo"
                   value={data.length > 0 ? data[0].shipTo.trim() : ""}
@@ -294,7 +294,7 @@ const Form = ({ page, data }: Props) => {
                 <Label className="font-bold text-xs my-2">Volume Tabung</Label>
                 <Input
                   type="number"
-                  className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
+                  className={nonReq}
                   placeholder="Volume tabung"
                   name="volumeTabung"
                   value={data.length > 0 ? data[0].allocatedQty * 3 : ""}
@@ -318,8 +318,8 @@ const Form = ({ page, data }: Props) => {
               </div>
             </div>
 
-            <div className="flex justify-end m-11">
-              <Button type="submit" className="px-9" disabled={loading}>
+            <div className="flex justify-end px-11 pb-11">
+              <Button type="submit" className="mx-9 px-9" disabled={loading}>
                 {pending ? "Menambahkan.. " : "Submit"}
               </Button>
             </div>
