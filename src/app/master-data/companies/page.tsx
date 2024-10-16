@@ -13,7 +13,7 @@ const CompanyPage = async () => {
     <ContentLayout
       home={"master-data"}
       mainpage={"companies"}
-      children={<Companies columns={companiesColumns} data={data || []} />}
+      children={<Companies columns={companiesColumns} data={data} />}
     />
   );
 };

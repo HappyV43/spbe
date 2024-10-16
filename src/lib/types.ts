@@ -18,13 +18,15 @@ export interface Allocation {
 }
 
 export interface Agents {
-  id: string;
-  name: string;
-  addresses: string;
+  id: number;
+  companyId?: number;
+  companyName: string;
+  agentId?: string | null;
+  agentName: string;
+  address: string;
   city: string;
   phone: string;
   fax?: string | null;
-  associatedCompanyId: number;
   createdBy: String;
   updatedBy: String;
   createdAt: Date;

@@ -4,19 +4,18 @@ import prisma from "@/lib/db";
 import { LpgDistributions } from "@/lib/types";
 import { getUser } from "./auth.actions";
 import { revalidatePath } from "next/cache";
+import { error } from "console";
+import { getErrorMessage } from "./error.action";
 
 export const searchDeliveryNumber = async (query: string) => {
   try {
     if (!query) return [];
-
-    console.log("Searching for query:", query);
-
-    const searchResult = await prisma.allocations.findMany({
+    const getAllocationData = await prisma.allocations.findMany({
       where: {
         AND: [
           {
             status: {
-              in: ["Pending"],
+              in: ["Pending", "Approved"],
             },
           },
           {
@@ -26,7 +25,6 @@ export const searchDeliveryNumber = async (query: string) => {
           },
         ],
       },
-
       select: {
         id: true,
         shipTo: true,
@@ -35,29 +33,11 @@ export const searchDeliveryNumber = async (query: string) => {
         allocatedQty: true,
       },
     });
-
-    console.log("Search result:", JSON.stringify(searchResult, null, 2));
-
-    return searchResult;
+    return getAllocationData.length > 0 ? getAllocationData : [];
   } catch (error) {
     console.error("Error saat mencari delivery number:", error);
     throw error;
   }
-};
-
-export const getErrorMessage = (error: unknown): string => {
-  let message: string;
-
-  if (error instanceof Error) {
-    message = error.message;
-  } else if (error && typeof error === "object" && "message" in error) {
-    message = String(error.message);
-  } else if (typeof error === "string") {
-    message = error;
-  } else {
-    message = "something went wrong";
-  }
-  return message;
 };
 
 export const postLpgData = async (formData: FormData) => {
@@ -151,5 +131,57 @@ export const getAllLpg = async () => {
     return data as LpgDistributions[];
   } catch (error) {
     throw error;
+  }
+};
+
+export const UpdateLpgData = async (formData: FormData) => {
+  const id = formData.get("id") as string; // ambil ID
+  const platKendaraan = formData.get("platKendaraan") as string;
+  const namaSopir = formData.get("namaSopir") as string;
+  const status = formData.get("status") as string;
+  const jumlahTabungBocor = parseInt(
+    formData.get("jumlahTabungBocor") as string
+  );
+  const isiKurang = parseInt(formData.get("isiKurang") as string);
+  if (!id) {
+    return {
+      error: "ID is missing.",
+    };
+  }
+
+  try {
+    // Update data ke database menggunakan Prisma
+    const updatedData = await prisma.lpgDistributions.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        licensePlate: platKendaraan,
+        driverName: namaSopir,
+        status: status,
+        bocor: jumlahTabungBocor,
+        isiKurang: isiKurang,
+      },
+    });
+    revalidatePath("/dashboard/penyaluran-elpiji");
+    return { success: true, data: updatedData };
+  } catch (error) {
+    return {
+      error: getErrorMessage(error),
+    };
+  }
+};
+
+export const deleteLpgData = async (id: number) => {
+  try {
+    await prisma.lpgDistributions.delete({
+      where: {
+        id: id,
+      },
+    });
+  } catch (error) {
+    return {
+      error: getErrorMessage(error),
+    };
   }
 };

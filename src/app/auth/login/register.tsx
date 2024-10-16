@@ -71,7 +71,7 @@ const SignUpForm = () => {
           Welcome back!
         </CardTitle>
         <CardDescription className="text-gray-500">
-          Sign in to your account to continue.
+          Register your account to continue.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-2">

@@ -24,15 +24,19 @@ import { postLpgData } from "@/app/actions/lpg-distribution.action";
 import { useFormStatus } from "react-dom";
 import { useForm } from "react-hook-form";
 import { revalidatePath } from "next/cache";
+import { format } from "date-fns";
+import { postAgentData } from "@/app/actions/agent.action";
+import { postCompaniesData } from "@/app/actions/companies.action";
 
 // TODO: kasih toast jika delivNumbernya gak ada
 
 interface Props {
   page: string;
-  data: LpgDistributionSearch[];
+  data?: LpgDistributionSearch[];
+  companyName?: { id: number; companyName: string }[];
 }
 
-const Form = ({ page, data }: Props) => {
+const Form = ({ page, data, companyName }: Props) => {
   // const [formData, setFormData] = useState({
   //   nomorTransaksi: "",
   //   nomorDo: "",
@@ -48,6 +52,7 @@ const Form = ({ page, data }: Props) => {
   // });
 
   const [counter, setCounter] = useState("0001");
+  const [selectedCompanyId, setSelectedCompanyId] = useState(0);
   // const [errorMessage, setErrorMessage] = useState("");
   // const [isFormValid, setIsFormValid] = useState(false);
 
@@ -144,6 +149,13 @@ const Form = ({ page, data }: Props) => {
   const [loading, setLoading] = useState(false);
   const { pending } = useFormStatus();
 
+  const handleCompanySelect = (value: any) => {
+    const selectedCompany = companyName?.find(
+      (company) => company.companyName === value
+    );
+    setSelectedCompanyId(selectedCompany?.id || 0);
+  };
+
   const handleSubmit = async (formData: FormData) => {
     setLoading(true);
     try {
@@ -167,6 +179,44 @@ const Form = ({ page, data }: Props) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmitAgent = async (formData: FormData) => {
+    const result = await postAgentData(formData);
+
+    if (result?.error) {
+      toast({
+        title: "Gagal",
+        description: result.error,
+        variant: "destructive",
+      });
+    } else {
+      ref.current?.reset();
+      toast({
+        title: "Berhasil",
+        description: "agent berhasil ditambahkan",
+      });
+
+      redirect("/master-data/agents");
+    }
+  };
+
+  const handleSubmitCompanies = async (formData: FormData) => {
+    const result = await postCompaniesData(formData);
+
+    if (result?.error) {
+      toast({
+        title: "Gagal",
+        description: result.error,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Berhasil",
+        description: "companies berhasil ditambahkan",
+      });
+    }
+    redirect("/master-data/companies");
   };
 
   return (
@@ -214,7 +264,7 @@ const Form = ({ page, data }: Props) => {
                   className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
                   placeholder="Nama agen"
                   name="namaAgen"
-                  value={data.length > 0 ? data[0].agentName : ""}
+                  value={data && data.length > 0 ? data[0].agentName : ""}
                   readOnly
                 />
               </div>
@@ -226,8 +276,9 @@ const Form = ({ page, data }: Props) => {
                 <Input
                   className="outline outline-2 outline-gray-200 bg-gray-200"
                   placeholder="Waktu pengambilan"
-                  type="date"
                   name="waktuPengambilan"
+                  value={format(new Date(), "dd MMMM yyyy")}
+                  readOnly
                 />
               </div>
 
@@ -261,7 +312,7 @@ const Form = ({ page, data }: Props) => {
                   className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
                   placeholder="Jumlah tabung"
                   name="jumlahTabung"
-                  value={data.length > 0 ? data[0].allocatedQty : ""}
+                  value={data && data.length > 0 ? data[0].allocatedQty : ""}
                   readOnly
                 />
               </div>
@@ -273,7 +324,7 @@ const Form = ({ page, data }: Props) => {
                   className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
                   placeholder="alokasi id"
                   name="allocationid"
-                  value={data.length > 0 ? data[0].id : ""}
+                  value={data && data.length > 0 ? data[0].id : ""}
                   readOnly
                 />
               </div>
@@ -285,7 +336,7 @@ const Form = ({ page, data }: Props) => {
                   className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
                   placeholder="shipTo"
                   name="shipTo"
-                  value={data.length > 0 ? data[0].shipTo.trim() : ""}
+                  value={data && data.length > 0 ? data[0].shipTo.trim() : ""}
                   readOnly
                 />
               </div>
@@ -297,7 +348,9 @@ const Form = ({ page, data }: Props) => {
                   className="cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200"
                   placeholder="Volume tabung"
                   name="volumeTabung"
-                  value={data.length > 0 ? data[0].allocatedQty * 3 : ""}
+                  value={
+                    data && data.length > 0 ? data[0].allocatedQty * 3 : ""
+                  }
                   readOnly
                 />
               </div>
@@ -327,43 +380,73 @@ const Form = ({ page, data }: Props) => {
         </div>
       )}
 
-      {/* {page === "agents" && (
+      {page === "agents" && (
         <div>
-          <form className="grid mx-6">
+          <form className="grid mx-6" action={handleSubmitAgent}>
             <div className="flex flex-col my-2 mt-6">
               <Label className="font-bold text-xs rounded-md my-2">Nama</Label>
-              <Input placeholder="Nama" />
+              <Input placeholder="Nama" name="agentName" />
+            </div>
+
+            <div className="flex flex-col my-2 mt-6">
+              <Label className="font-bold text-xs rounded-md my-2">
+                Ship To
+              </Label>
+              <Input placeholder="Ship To" name="shipTo" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
                 Alamat
               </Label>
-              <Input placeholder="Alamat" />
+              <Input placeholder="Alamat" name="address" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">Kota</Label>
-              <Input placeholder="Kota" />
+              <Input placeholder="Kota" name="city" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
                 Nomor Telepon
               </Label>
-              <Input placeholder="Nomor telepon" />
+              <Input placeholder="Nomor telepon" name="phone" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">Fax</Label>
-              <Input placeholder="Fax" />
+              <Input placeholder="Fax" name="fax" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
                 Perusahaan Asal
               </Label>
-              <Input placeholder="Perusahaan asal" />
+              <Select name="companyName" onValueChange={handleCompanySelect}>
+                <SelectTrigger className="outline-none">
+                  <SelectValue placeholder="Perusahaan Asal" />
+                </SelectTrigger>
+                <SelectContent>
+                  {companyName?.map((names) => (
+                    <SelectItem key={names.id} value={names.companyName}>
+                      {names.companyName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="hidden my-2">
+              <Label className="font-bold text-xs rounded-md my-2">
+                Id Company
+              </Label>
+              <Input
+                placeholder="companyId"
+                name="companyId"
+                value={selectedCompanyId}
+                readOnly
+              />
             </div>
 
             <div className="flex justify-end m-11">
@@ -377,30 +460,30 @@ const Form = ({ page, data }: Props) => {
 
       {page === "companies" && (
         <div>
-          <form className="grid mx-6 my-2">
+          <form className="grid mx-6 my-2" action={handleSubmitCompanies}>
             <div className="flex flex-col mt-6">
               <Label className="font-bold text-s my-2">Nama Perusahaan</Label>
-              <Input placeholder="Nama perusahaan" />
+              <Input placeholder="Nama perusahaan" name="companyName" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-s my-2">Alamat</Label>
-              <Input placeholder="Alamat" />
+              <Input placeholder="Alamat" name="address" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-s my-2">Nomor Telepon</Label>
-              <Input placeholder="Nomor telepon" />
+              <Input placeholder="Nomor telepon" name="telephone" />
+            </div>
+
+            <div className="flex justify-end m-11">
+              <Button type="submit" className="px-9">
+                Submit
+              </Button>
             </div>
           </form>
-
-          <div className="flex justify-end m-11">
-            <Button type="submit" className="px-9" disabled={!isFormValid}>
-              Submit
-            </Button>
-          </div>
         </div>
-      )} */}
+      )}
     </>
   );
 };

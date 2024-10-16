@@ -1,4 +1,3 @@
-import { getUser } from "@/app/actions/auth.actions";
 import { searchDeliveryNumber } from "@/app/actions/lpg-distribution.action";
 import { ContentLayout } from "@/components/ContentLayout";
 import Form from "@/components/FormComponent/Form";
@@ -17,12 +16,15 @@ const FormLpgPage = async ({
 }) => {
   const query = searchParams?.query || "";
   const data = await searchDeliveryNumber(query);
+
   return (
     <ContentLayout
       home={"dashboard"}
       mainpage={"penyaluran-elpiji"}
       childpage={"form"}
-      children={<Form page={"distribution"} data={data}/>}
+      children={
+        <Form page={"distribution"} data={data}  />
+      }
     />
   );
 };
