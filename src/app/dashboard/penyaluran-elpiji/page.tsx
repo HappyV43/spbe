@@ -9,15 +9,11 @@ export const metadata = {
 
 const PenyaluranElpijiPage = async () => {
   const data = await getAllLpg();
-  return (
-    <ContentLayout
-      home={"dashboard"}
-      mainpage={"penyaluran-elpiji"}
-      children={
-        <PenyaluranElpiji columns={lpgDistributionColumns} data={data} />
-      }
-    />
-  );
+  return (<ContentLayout  
+    home={"dashboard"}
+    mainpage={"penyaluran-elpiji"}
+    children={<PenyaluranElpiji columns={lpgDistributionColumns} data={data}/>}
+  />)
 };
 
 export default PenyaluranElpijiPage;

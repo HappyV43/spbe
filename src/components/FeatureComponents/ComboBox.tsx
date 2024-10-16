@@ -10,7 +10,7 @@ interface ComboBoxProps {
     value: string;
     setValue: (value: string) => void;
     placeholder?: string;
-    sortAsc?: boolean; // Optional prop to control sorting
+    sortAsc?: boolean; 
 }
 
 const ComboBox: React.FC<ComboBoxProps> = ({
@@ -18,7 +18,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({
     value,
     setValue,
     placeholder = "Select data...",
-    sortAsc = true, // Default to sorting ascending
+    sortAsc = true, 
     }) => {
     const [open, setOpen] = useState(false);
 

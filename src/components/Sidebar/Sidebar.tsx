@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSidebarToggle } from "@/hooks/useSidebarToggle";
 import { useStore } from "zustand";
 import { cn } from "@/lib/utils";
-import { Link, PanelsTopLeft } from "lucide-react";
+import { Link } from "lucide-react";
 import { SidebarToggle } from "./SidebarToggle";
 import { Button } from "../ui/button";
 import { Menu } from "./Menu";
@@ -18,7 +18,6 @@ export default function Sidebar ({}) {
   
   if(!sidebar) return null;
 
-  // Function to update the selected key in local storage
   const updateSelectedKey = (key: string) => {
     setSelectedKeys([key]);
     localStorage.setItem("selectedKey", key);
@@ -62,7 +61,6 @@ export default function Sidebar ({}) {
           asChild
         >
           <Link href="/dashboard" className="flex items-center gap-2">
-            {/* <PanelsTopLeft className="w-6 h-6 mr-1" /> */}
             <h1
               className={cn(
                 "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-500",

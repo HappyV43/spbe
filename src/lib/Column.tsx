@@ -2,39 +2,123 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
-import { Button } from "@/components/ui/button";
 import { Trash, Printer, Pencil} from 'lucide-react';
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import CetakPenyaluran from "@/components/CetakPenyaluran/CetakPenyaluran";
+import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@radix-ui/react-dialog";
+import { Button } from "react-day-picker";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import ActionButtons from "@/components/FeatureComponents/ActionButtons";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
-    accessorKey: "name",
+    header: "Tindakan",
+    cell: ({ row }) => {
+      // Define actions for edit, delete, and print
+      const handleEdit = () => {
+        console.log("Edit", row.original);
+      };
+      const handleDelete = async () => {
+        const id = row.original.id;
+
+        if (id === undefined) {
+          toast({
+            title: "Error",
+            description: "id gak ada",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        // const result = await deleteLpgData(id);
+        // if (result?.error) {
+        //   toast({
+        //     title: "Error",
+        //     description: result.error,
+        //     variant: "destructive",
+        //   });
+        // } else {
+        //   toast({
+        //     title: "Berhasil",
+        //     description: "Distribusi berhasil dihapus",
+        //   });
+        // }
+      };
+      const handlePrint = () => {
+        console.log("Print", row.original);
+      };
+
+      return (
+        <div className="flex justify-center space-x-4">
+          {/* Edit Icon */}
+          <Pencil
+            className="h-4 w-4 text-blue-500 cursor-pointer"
+            onClick={handleEdit}
+          />
+          {/* Delete Icon */}
+
+          {/* Print Icon */}
+          <PDFDownloadLink
+            document={<CetakPenyaluran data={row.original} />}
+            fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}
+          >
+            <Printer className="h-4 w-4 text-green-500 cursor-pointer" />
+          </PDFDownloadLink>
+          <Dialog>
+            <DialogTrigger>
+              <Trash className="h-4 w-4 text-red-500 cursor-pointer" />
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button onClick={handleDelete}>Confirm</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "bpeNumber",
+    header: "Nomor BPE",
+  },
+  {
+    accessorKey: "giDate",
+    header: "Tanggal",
+  },
+  {
+    accessorKey: "agentName",
     header: "Nama Agen",
   },
-  // {
-  //   accessorKey: "addresses",
-  //   header: "Alamat",
-  // },
-  // {
-  //   accessorKey: "city",
-  //   header: "Kota",
-  // },
-  // {
-  //   accessorKey: "phone",
-  //   header: "No HP",
-  // },
-  // {
-  //   accessorKey: "fax",
-  //   header: "Fax",
-  // },
-  // {
-  //   accessorKey: "associatedCompanyId",
-  //   header: "Nama Perusahaan",
-  // },
   {
-    accessorKey: "createdAt",
-    header: "Dibuat",
+    accessorKey: "licensePlate",
+    header: "Nomor Plat",
+  },
+  {
+    accessorKey: "deliveryNumber",
+    header: "Nomor DO",
+  },
+  {
+    accessorKey: "allocatedQty",
+    header: "Kuantitas",
+  },
+  {
+    accessorKey: "distributionQty",
+    header: "Jumlah Tabung",
+  },
+  {
+    accessorKey: "volume",
+    header: "Volume Tabung",
   },
   {
     accessorKey: "updatedAt",
@@ -44,57 +128,24 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
 
 export const allocationColumns: ColumnDef<Allocation>[] = [
   {
-    header: "Tindakan",
-    cell: ({ row }) => {
-      
-      // Define actions for edit, delete, and print
-      const handleEdit = () => {
-        console.log("Edit", row.original);
-      };
-      const handleDelete = () => {
-        console.log("Delete", row.original);
-      };
-      const handlePrint = () => {
-        console.log("Print", row.original);
-      };
-  
-      return (
-        <div className="flex justify-center space-x-4">
-          {/* Edit Icon */}
-          <Pencil 
-            className="h-4 w-4 text-blue-500 cursor-pointer"
-            onClick={handleEdit}
-          />
-          {/* Delete Icon */}
-          
-          {/* Print Icon */}
-          <PDFDownloadLink
-            document={<CetakPenyaluran data={row.original} />}
-            fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}>
-            <Printer 
-            className="h-4 w-4 text-green-500 cursor-pointer"
-            />
-          </PDFDownloadLink>
-          <Trash 
-              className="h-4 w-4 text-red-500 cursor-pointer"
-              onClick={handleDelete}
-            />
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-      let statusClass = "";
-      if (status === "Pending") {
-        statusClass = "text-orange-500";
-      } else if (status === "Approved") {
-        statusClass = "text-green-500";
-      }
-      return <span className={statusClass}>{status}</span>;
+       // Set different colors based on the status value
+    let statusClass = "";
+    switch (status) {
+      case "Pending":
+        statusClass = "text-orange-500"; 
+        break;
+      case "Approved":
+        statusClass = "text-lime-500";
+        break;
+      default:
+        statusClass = "text-gray-500"; 
+    }
+
+    return <span className={statusClass}>{status}</span>;
     },
   },
   {
@@ -131,6 +182,15 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Diperbarui",
     // cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
   },
+  {
+    header: "Tindakan",
+    enableHiding: false,
+    cell: ({ row }) => {
+      return (
+        <ActionButtons row={row}/>
+      )
+    },
+  },
   // {
   //   accessorKey: "createdAt",
   //   header: "Created At",
@@ -140,11 +200,11 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
 
 export const agentColumns: ColumnDef<Agents>[] = [
   {
-    accessorKey: "name",
-    header: "Nama",
+    accessorKey: "agentName",
+    header: "Nama Agen",
   },
   {
-    accessorKey: "addresses",
+    accessorKey: "address",
     header: "Alamat",
   },
   {
@@ -160,7 +220,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
     header: "Fax",
   },
   {
-    accessorKey: "associatedCompanyId",
+    accessorKey: "Companies",
     header: "Nama Perusahaan",
   },
   {
@@ -175,11 +235,11 @@ export const agentColumns: ColumnDef<Agents>[] = [
 
 export const companiesColumns: ColumnDef<Companies>[] = [
   {
-    accessorKey: "company",
+    accessorKey: "companyName",
     header: "Nama Perusahaan",
   },
   {
-    accessorKey: "addresses",
+    accessorKey: "address",
     header: "Alamat",
   },
   {
