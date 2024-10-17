@@ -1,9 +1,9 @@
 import React from "react";
-import { getUser } from "@/app/actions/auth.actions";
 import { redirect } from "next/navigation";
+import { assertAuthenticated } from "@/lib/lucia";
 
 const Auth = async () => {
-  const user = await getUser();
+  const user = await assertAuthenticated();
   if (user) {
     redirect("/dashboard/penyaluran-elpiji");
   }

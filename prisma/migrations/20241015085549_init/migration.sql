@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Agents" ALTER COLUMN "fax" DROP NOT NULL,
+ALTER COLUMN "shipTo" DROP NOT NULL;

@@ -2,8 +2,10 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoginForm } from "./login";
 import SignUpForm from "./register";
+import { getCompaniesNameData } from "@/app/actions/companies.action";
 
 const AuthLogin = async () => {
+  const data = await getCompaniesNameData();
   return (
     // TODO: HAPUS REGISTER KETIKA MAU KE PRODUCTION
     <div className="flex min-h-screen items-center justify-center p-4">
@@ -16,7 +18,7 @@ const AuthLogin = async () => {
           <LoginForm />
         </TabsContent>
         <TabsContent value="Register">
-          <SignUpForm />
+          <SignUpForm data={data} />
         </TabsContent>
       </Tabs>
     </div>

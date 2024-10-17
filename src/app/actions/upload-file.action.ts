@@ -21,7 +21,6 @@ export const uploadExcel = async (
           id: existingRecord.id,
         },
         data: {
-          giDate: data.giDate ? new Date(data.giDate) : null,
           shipTo: data.shipTo,
           materialName: data.materialName,
           agentName: data.agentName,
@@ -30,8 +29,8 @@ export const uploadExcel = async (
           updatedBy: data.updatedBy,
         },
       });
-      return updatedRecord;
       console.log("Data updated:");
+      return updatedRecord;
     } else {
       // Jika tidak ada, lakukan create
       const newRecord = await prisma.allocations.create({

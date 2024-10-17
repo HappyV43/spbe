@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique
-  password  String
-  role      String
-  updatedAt DateTime @updatedAt
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  username    String   @unique
+  password    String
+  role        String
+  companiesId Int?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
 
   session          Session[]
   alokasiCreatedBy Allocations[] @relation("createdByRelation")
@@ -58,20 +59,21 @@ model Companies {
 }
 
 model Agents {
-  id        String   @id
-  CompanyId Int
-  agentId   String
-  agentName String
-  address   String
-  city      String
-  phone     String
-  fax       String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  createdBy String
-  updatedBy String
+  id          Int      @id @default(autoincrement())
+  companyId   Int
+  companyName String
+  shipTo      String?
+  agentName   String
+  address     String
+  city        String
+  phone       String
+  fax         String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  updatedBy   String
 
-  Companies   Companies     @relation(fields: [CompanyId], references: [id])
+  Companies   Companies     @relation(fields: [companyId], references: [id])
   creator     User          @relation("agentCreatedByRelation", fields: [createdBy], references: [id])
   updater     User          @relation("agentUpdatedByRelation", fields: [updatedBy], references: [id])
   Allocations Allocations[]
@@ -82,7 +84,7 @@ model Allocations {
   giDate          DateTime?
   bpeNumber       String?
   deliveryNumber  String
-  agentId         String?
+  agentId         Int?
   shipTo          String
   materialName    String
   agentName       String

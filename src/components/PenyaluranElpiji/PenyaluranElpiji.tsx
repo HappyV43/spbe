@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Button } from "../ui/button"
 import { DataTable } from "../ui/data-table"
@@ -13,8 +13,8 @@ import { Plus, Search, SearchX } from "lucide-react"
 import { normalizeDateFrom, normalizeDateTo } from "@/utils/page"
 
 interface DistributionProps<TData, TValue> {
-    columns: ColumnDef<TData, TValue>[];
-    data: TData[];
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
 }
 
 const PenyaluranElpiji = <TData extends {

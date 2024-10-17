@@ -19,8 +19,10 @@ const Companies = <TData, TValue>({
       <div className=" items-center py-4 mx-4">
         <div className="justify-start mb-1">
           <Button variant="outline" className="ml-auto justify-start" asChild>
-              <Link href="agents/form">
-              <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Company</Link> 
+            <Link href="companies/form">
+              <Plus className="h-4 w-4 mr-2 cursor-pointer" />
+              New Company
+            </Link>
           </Button>
         </div>
         <DataTable columns={columns} data={data} />

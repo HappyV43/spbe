@@ -13,7 +13,7 @@ const AgentsPage = async () => {
     <ContentLayout
       home={"master-data"}
       mainpage={"agents"}
-      children={<Agents columns={agentColumns} data={data || []} />}
+      children={<Agents columns={agentColumns} data={data} />}
     />
   );
 };
