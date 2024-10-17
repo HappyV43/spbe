@@ -243,12 +243,12 @@ const Form = ({ page, data }: Props) => {
 
               <div className="flex flex-col my-2">
                 <Label className="font-bold text-xs my-2">Status</Label>
-                <Select name="status">
+                <Select name="status" defaultValue="Approved">
                   <SelectTrigger className="outline-none">
                     <SelectValue placeholder="Select Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pending">Pending</SelectItem>
+                    <SelectItem value="Pending" >Pending</SelectItem>
                     <SelectItem value="Approved">Approved</SelectItem>
                   </SelectContent>
                 </Select>
@@ -332,38 +332,38 @@ const Form = ({ page, data }: Props) => {
           <form className="grid mx-6">
             <div className="flex flex-col my-2 mt-6">
               <Label className="font-bold text-xs rounded-md my-2">Nama</Label>
-              <Input placeholder="Nama" />
+              <Input className={noReq} placeholder="Nama" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
                 Alamat
               </Label>
-              <Input placeholder="Alamat" />
+              <Input className={noReq} placeholder="Alamat" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">Kota</Label>
-              <Input placeholder="Kota" />
+              <Input className={noReq} placeholder="Kota" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
                 Nomor Telepon
               </Label>
-              <Input placeholder="Nomor telepon" />
+              <Input className={noReq} placeholder="Nomor telepon" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">Fax</Label>
-              <Input placeholder="Fax" />
+              <Input className={noReq} placeholder="Fax" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
                 Perusahaan Asal
               </Label>
-              <Input placeholder="Perusahaan asal" />
+              <Input className={noReq} placeholder="Perusahaan asal" />
             </div>
 
             <div className="flex justify-end m-11">
@@ -380,17 +380,17 @@ const Form = ({ page, data }: Props) => {
           <form className="grid mx-6 my-2">
             <div className="flex flex-col mt-6">
               <Label className="font-bold text-s my-2">Nama Perusahaan</Label>
-              <Input placeholder="Nama perusahaan" />
+              <Input className={noReq} placeholder="Nama perusahaan" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-s my-2">Alamat</Label>
-              <Input placeholder="Alamat" />
+              <Input className={noReq} placeholder="Alamat" />
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-s my-2">Nomor Telepon</Label>
-              <Input placeholder="Nomor telepon" />
+              <Input className={noReq} placeholder="Nomor telepon" />
             </div>
           </form>
 

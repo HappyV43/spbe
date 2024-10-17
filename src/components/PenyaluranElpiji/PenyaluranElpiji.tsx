@@ -6,10 +6,11 @@ import Link from "next/link"
 import ComboBox from "../FeatureComponents/ComboBox"
 import { Label } from "../ui/label"
 import { DatePickerWithRange } from "../FeatureComponents/DateRange"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "@/hooks/use-toast"
 import { Plus, Search, SearchX } from "lucide-react"
+import { normalizeDateFrom, normalizeDateTo } from "@/utils/page"
 
 interface DistributionProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -29,7 +30,6 @@ const PenyaluranElpiji = <TData extends {
 }: DistributionProps<TData, TValue>) => {
     const [notrans, setnotrans] = useState("");
     const [agentName, setAgentName] = useState("");
-    const [qty, setQty] = useState("");
     const [doNumber, setDoNumber] = useState("");
     const [dateRange, setDateRange] = useState<any>(""); 
     const [filteredData, setFilteredData] = useState<TData[]>(data);
@@ -71,6 +71,31 @@ const PenyaluranElpiji = <TData extends {
             const matchesAgentName = agentName ? item.agentName === agentName : true;
             const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
     
+            const matchesDate = dateRange?.from ? (
+                dateRange?.to ? (
+                    // For Range Dates
+                    item.giDate >= normalizeDateFrom(dateRange.from) &&
+                    item.giDate <= normalizeDateTo(dateRange.to)
+                ) : (
+                    // For Single Dates
+                    item.giDate >= normalizeDateFrom(dateRange.from) &&
+                    item.giDate <= normalizeDateTo(dateRange.from)
+                )
+            ) : true; 
+    
+            setFiltered(true);
+            return matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber;
+        });
+    
+        setFilteredData(filtered);
+    };
+
+    useEffect(() => {
+        const filtered = data.filter((item) => {
+            const matchesNoTrans = notrans ? item.bpeNumber === notrans : true;
+            const matchesAgentName = agentName ? item.agentName === agentName : true;
+            const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
+    
             const normalizeDateFrom = (date: Date) => {
                 const normalized = new Date(date);
                 normalized.setHours(0, 0, 0, 0);
@@ -100,7 +125,7 @@ const PenyaluranElpiji = <TData extends {
         });
     
         setFilteredData(filtered);
-    };
+    }, [notrans, agentName, doNumber, dateRange, data]);
 
     const handleClearSearch = () => {
         setAgentName("");
@@ -161,10 +186,10 @@ const PenyaluranElpiji = <TData extends {
                     </Button>
                     
                     <div className="flex space-x-2">
-                        <Button variant="default" onClick={handleSearch}>
+                        {/* <Button variant="default" onClick={handleSearch}>
                             <Search className="h-4 w-4 mr-2 cursor-pointer" /> Cari Penyaluran Elpiji
                         </Button>
-                        
+                         */}
                         {filtered && (
                             <Button variant="default" onClick={handleClearSearch}>
                                 <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian

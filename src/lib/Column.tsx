@@ -2,16 +2,17 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
-import { Trash, Printer, Pencil} from 'lucide-react';
+import { Trash, Printer, Pencil, SquarePlus} from 'lucide-react';
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import CetakPenyaluran from "@/components/CetakPenyaluran/CetakPenyaluran";
 import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
 import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@radix-ui/react-dialog";
-import { Button } from "react-day-picker";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import ActionButtons from "@/components/FeatureComponents/ActionButtons";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
@@ -187,7 +188,18 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <ActionButtons row={row}/>
+        <Button
+          variant="outline"
+          disabled={row.original.status === "Approved"}
+        >
+          <Link
+            href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+            className={row.original.status === "Approved" ? "cursor-not-allowed" : ""}
+          >
+            <SquarePlus className="h-4 w-4" />
+          </Link>
+        </Button>
+        // <ActionButtons row={row}/>
       )
     },
   },

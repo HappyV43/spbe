@@ -24,9 +24,9 @@ export default function Sidebar ({}) {
   };
 
   useEffect(() => {
-      if (pathname === "/dashboard/penyaluran-elpiji") {
+      if (pathname === "/dashboard/alokasi") {
         setSelectedKeys(['2']);
-      } else if (pathname === "/dashboard/alokasi") {
+      } else if (pathname === "/dashboard/penyaluran-elpiji") {
         setSelectedKeys(['3']);
       } else if (pathname === "/dashboard/cetak-penyaluran") {
         setSelectedKeys(['4']);

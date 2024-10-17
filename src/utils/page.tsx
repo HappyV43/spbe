@@ -33,3 +33,16 @@ export const generateColor = (index: number) => {
     ];
     return pastelColorPalette[index % pastelColorPalette.length];
 };
+
+
+export const normalizeDateFrom = (date: Date) => {
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
+};
+
+export const normalizeDateTo = (date: Date) => {
+    const normalized = new Date(date);
+    normalized.setHours(23, 59, 59, 999);
+    return normalized;
+};

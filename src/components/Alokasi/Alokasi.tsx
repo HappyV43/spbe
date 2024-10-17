@@ -5,15 +5,15 @@ import { DataTable } from "../ui/data-table";
 import Link from "next/link";
 import { Label } from "../ui/label";
 import ComboBox from "../FeatureComponents/ComboBox";
-import { Search, SearchX, TrendingUp, Upload } from "lucide-react";
-import { useState } from "react";
+import { Search, SearchX, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
 import { DatePickerWithRange } from "../FeatureComponents/DateRange";
 import { toast } from "@/hooks/use-toast";
 import { ChartComponent } from "../FeatureComponents/Chart";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { ChartConfig } from "../ui/chart";
-import { Legend } from "../FeatureComponents/Legend";
-import { endOfMonth, format, startOfMonth } from "date-fns";
+import { endOfMonth, format, getYear, startOfMonth } from "date-fns";
+import { normalizeDateFrom, normalizeDateTo } from "@/utils/page";
 
 interface AlokasiProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -21,6 +21,7 @@ interface AlokasiProps<TData, TValue> {
 }
 
 const Alokasi = <TData extends {
+    giDate: Date;
     deliveryNumber: any;
     allocatedQty: number;
     agentName: string;
@@ -32,11 +33,11 @@ const Alokasi = <TData extends {
   columns,
   data,
 }: AlokasiProps<TData, TValue>) => {
-    const [status, setStatus] = useState("");
+    const [status, setStatus] = useState("Pending");
     const [agentName, setAgentName] = useState("");
     const [doNumber, setDoNumber] = useState("");
     const [qty, setQty] = useState("");
-    const [dateRange, setDateRange] = useState<any>(""); 
+    const [dateFilter, setDateFilter] = useState<any>(""); 
     const [filteredData, setFilteredData] = useState<TData[]>(data);
     const [filtered, setFiltered] = useState<Boolean>(false);
 
@@ -61,21 +62,10 @@ const Alokasi = <TData extends {
         value: deliveryNumber,
     }));
 
-    const normalizeDateFrom = (date: Date) => {
-        const normalized = new Date(date);
-        normalized.setHours(0, 0, 0, 0);
-        return normalized;
-    };
-
-    const normalizeDateTo = (date: Date) => {
-        const normalized = new Date(date);
-        normalized.setHours(23, 59, 59, 999);
-        return normalized;
-    };
-    
     const today = new Date();
     const currentMonthStart = startOfMonth(today);
     const currentMonthEnd = endOfMonth(today);
+    const currentYear = getYear(today);
 
     const chartAllocatedMonth = data
         .filter((item) => item.updatedAt >= currentMonthStart && item.updatedAt <= currentMonthEnd)
@@ -91,6 +81,13 @@ const Alokasi = <TData extends {
             qty: item.allocatedQty, 
         }));
 
+    const chartAllocatedYear = data
+        .filter((item) => getYear(new Date(item.updatedAt)) === currentYear)
+        .map((item) => ({
+            agentName: item.agentName,
+            qty: item.allocatedQty,
+        }));
+
     const chartConfig = data.reduce((config, item) => {
         config[item.agentName] = {
             label: item.agentName,
@@ -100,7 +97,7 @@ const Alokasi = <TData extends {
     }, {} as ChartConfig);
 
     const handleSearch = () => {
-        if (!status && !agentName && !dateRange && !doNumber) {
+        if (!status && !agentName && !dateFilter && !doNumber) {
             toast({
                 duration: 1500,
                 variant:"destructive",
@@ -114,13 +111,13 @@ const Alokasi = <TData extends {
             const matchesAgentName = agentName ? item.agentName === agentName : true;
             const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
 
-            const matchesDate = dateRange?.from ? (
-                dateRange?.to ? (
-                    item.updatedAt >= normalizeDateFrom(dateRange.from) &&
-                    item.updatedAt <= normalizeDateTo(dateRange.to)
+            const matchesDate = dateFilter?.from ? (
+                dateFilter?.to ? (
+                    item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                    item.giDate <= normalizeDateTo(dateFilter.to)
                 ) : (
-                    item.updatedAt >= normalizeDateFrom(dateRange.from) &&
-                    item.updatedAt <= normalizeDateTo(dateRange.from)
+                    item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                    item.giDate <= normalizeDateTo(dateFilter.from)
                 )
             ) : true; 
     
@@ -131,23 +128,49 @@ const Alokasi = <TData extends {
         setFilteredData(filtered);
     };
 
+    // Filtering logic inside useEffect
+    useEffect(() => {
+        const filtered = data.filter((item) => {
+        const matchesStatus = status ? item.status === status : true;
+        const matchesAgentName = agentName ? item.agentName === agentName : true;
+        const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
+
+        const matchesDate = dateFilter?.from ? (
+            dateFilter?.to ? (
+            item.giDate >= normalizeDateFrom(dateFilter.from) &&
+            item.giDate <= normalizeDateTo(dateFilter.to)
+            ) : (
+            item.giDate >= normalizeDateFrom(dateFilter.from) &&
+            item.giDate <= normalizeDateTo(dateFilter.from)
+            )
+        ) : true;
+
+        return matchesStatus && matchesAgentName && matchesDoNumber && matchesDate;
+        });
+        setFilteredData(filtered);
+    }, [status, agentName, doNumber, dateFilter, data]);
+
     const handleClearSearch = () => {
         setStatus("");
         setAgentName("");
         setDoNumber("");
-        setDateRange(null);
+        setDateFilter(null);
     
         setFilteredData(data);
     
         setFiltered(false);
     };
+
     return (
         <div className="w-full">
             <div className="px-4 pt-4 text-center">
                 <h1 className="text-lg font-semibold">Chart Jumlah Tabung</h1>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 m-4">
-                <Card className="flex flex-col">
+            {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 m-4"> */}
+            <div className=" m-4">
+
+                {/* MANY CHARTS DISPLAYED */}
+                {/* <Card className="flex flex-col">
                     <CardHeader className="items-center pb-0">
                         <CardTitle>Hari ini</CardTitle>
                         <CardDescription>{format(new Date(), "dd MMMM yyyy")}</CardDescription>
@@ -155,8 +178,21 @@ const Alokasi = <TData extends {
                     <CardContent className="flex-1 pb-0">
                         <ChartComponent data={chartAllocatedToday} config={chartConfig} title={"Tabung Elpiji"} />
                     </CardContent>
+                </Card> */}
+
+                {/* ONLY 1 CHART DISPLAYED */}
+                <Card className="flex flex-col w-full md:h-[500px] px-2">   
+                    <CardHeader className="items-center pb-0">
+                        <CardTitle>Hari ini</CardTitle>
+                        <CardDescription>{format(new Date(), "dd MMMM yyyy")}</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 pb-0 pl-2">
+                        <ChartComponent data={chartAllocatedToday} config={chartConfig} title={"Tabung Elpiji"} />
+                    </CardContent>
                 </Card>
-                <Card className="flex flex-col">
+
+                {/* NOTE:REQ */}
+                {/* <Card className="flex flex-col">
                     <CardHeader className="items-center pb-0">
                         <CardTitle>Bulan ini</CardTitle>
                         <CardDescription>{format(new Date(), "MMMM yyyy")}</CardDescription>
@@ -173,7 +209,7 @@ const Alokasi = <TData extends {
                     <CardContent className="flex-1 pb-0">
                         <ChartComponent data={chartAllocatedMonth} config={chartConfig} title={"Tabung Elpiji"} />
                     </CardContent>
-                </Card>
+                </Card> */}
             </div>
             <div className="items-center py-4 mx-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
@@ -210,8 +246,8 @@ const Alokasi = <TData extends {
                     <div>
                         <Label htmlFor="date-search" className="text-lg">Tanggal</Label>
                         <DatePickerWithRange
-                            value={dateRange}
-                            onDateChange={setDateRange}
+                            value={dateFilter}
+                            onDateChange={setDateFilter}
                             placeholder="Pilih tanggal..."
                         />
                     </div>
@@ -226,11 +262,10 @@ const Alokasi = <TData extends {
                     </Button>
                     
                     <div className="flex space-x-2">
-                        <Button variant="default" onClick={handleSearch}>
+                        {/* <Button variant="default" onClick={handleSearch}>
                             <Search className="h-4 w-4 mr-2 cursor-pointer" /> Cari Alokasi
-                        </Button>
-                        
-                        {filtered && (
+                        </Button> */}
+                        {(status || doNumber || agentName || dateFilter != null) &&(
                             <Button variant="default" onClick={handleClearSearch}>
                                 <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
                             </Button>

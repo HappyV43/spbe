@@ -31,14 +31,14 @@ export function getMenuList(pathname: string): Group[] {
           icon: House,
           submenus: [
             {
-              href: "/dashboard/penyaluran-elpiji",
-              label: "Penyaluran Elpiji",
-              active: pathname === "/dashboard/penyaluran-elpiji"
-            },
-            {
               href: "/dashboard/alokasi",
               label: "Alokasi",
               active: pathname === "/dashboard/alokasi"
+            },
+            {
+              href: "/dashboard/penyaluran-elpiji",
+              label: "Penyaluran Elpiji",
+              active: pathname === "/dashboard/penyaluran-elpiji"
             },
             // {
             //   href: "/dashboard/cetak-penyaluran",
