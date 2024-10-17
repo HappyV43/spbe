@@ -78,6 +78,7 @@ export type SignInValues = {
   username: string;
   password: string;
   role: string;
+  company: any;
 };
 
 export interface RawData {

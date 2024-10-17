@@ -1,14 +1,13 @@
-// import Alokasi from "@/components/Alokasi/Alokasi";
-import { getUser } from "@/app/actions/auth.actions";
 import { ContentLayout } from "@/components/ContentLayout";
 import UploadAlokasi from "@/components/UploadAlokasi/UploadAlokasi";
+import { assertAuthenticated } from "@/lib/lucia";
 
 export const metadata = {
   title: "Upload Alokasi PKMU",
 };
 
 const AlokasiPage = async () => {
-  const user = await getUser();
+  const user = await assertAuthenticated();
 
   return (
     <ContentLayout

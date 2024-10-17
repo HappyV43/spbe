@@ -47,11 +47,11 @@ export function LoginForm() {
         title: "Login has been successfully",
       });
     } else {
-      router.push("/auth/login");
       toast({
         variant: "destructive",
-        title: "Oops something went wrong",
+        title: "Username Password salah",
       });
+      router.push("/auth/login");
     }
   }
 

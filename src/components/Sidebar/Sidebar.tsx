@@ -10,13 +10,13 @@ import { SidebarToggle } from "./SidebarToggle";
 import { Button } from "../ui/button";
 import { Menu } from "./Menu";
 
-export default function Sidebar ({}) {
+export default function Sidebar({}) {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const pathname = usePathname();
 
   const sidebar = useStore(useSidebarToggle, (state) => state);
-  
-  if(!sidebar) return null;
+
+  if (!sidebar) return null;
 
   const updateSelectedKey = (key: string) => {
     setSelectedKeys([key]);
@@ -24,23 +24,23 @@ export default function Sidebar ({}) {
   };
 
   useEffect(() => {
-      if (pathname === "/dashboard/penyaluran-elpiji") {
-        setSelectedKeys(['2']);
-      } else if (pathname === "/dashboard/alokasi") {
-        setSelectedKeys(['3']);
-      } else if (pathname === "/dashboard/cetak-penyaluran") {
-        setSelectedKeys(['4']);
-      } else if (pathname === "/master-data/agents") {
-        setSelectedKeys(['6']);
-      } else if (pathname === "/master-data/companies") {
-        setSelectedKeys(['7']);
-      } else if (pathname === "/register") {
-        updateSelectedKey("8");
-      } 
-      // TODO
-      // if (userRole === "admin" && pathname === "/register") {
-      //   updateSelectedKey("8");
-      // }
+    if (pathname === "/dashboard/penyaluran-elpiji") {
+      setSelectedKeys(["2"]);
+    } else if (pathname === "/dashboard/alokasi") {
+      setSelectedKeys(["3"]);
+    } else if (pathname === "/dashboard/cetak-penyaluran") {
+      setSelectedKeys(["4"]);
+    } else if (pathname === "/master-data/agents") {
+      setSelectedKeys(["6"]);
+    } else if (pathname === "/master-data/companies") {
+      setSelectedKeys(["7"]);
+    } else if (pathname === "/register") {
+      updateSelectedKey("8");
+    }
+    // TODO
+    // if (userRole === "admin" && pathname === "/register") {
+    //   updateSelectedKey("8");
+    // }
   }, [pathname]);
 
   return (
@@ -77,4 +77,4 @@ export default function Sidebar ({}) {
       </div>
     </aside>
   );
-};
+}

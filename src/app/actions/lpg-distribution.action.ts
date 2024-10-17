@@ -2,10 +2,10 @@
 
 import prisma from "@/lib/db";
 import { LpgDistributions } from "@/lib/types";
-import { getUser } from "./auth.actions";
 import { revalidatePath } from "next/cache";
-import { error } from "console";
 import { getErrorMessage } from "./error.action";
+import { assertAuthenticated } from "@/lib/lucia";
+import { Prisma } from "@prisma/client";
 
 export const searchDeliveryNumber = async (query: string) => {
   try {
@@ -76,7 +76,7 @@ export const postLpgData = async (formData: FormData) => {
     };
 
   try {
-    const user = await getUser();
+    const user = await assertAuthenticated();
     if (!user)
       return {
         error: "User tidak ada atau user belum login",
@@ -179,9 +179,45 @@ export const deleteLpgData = async (id: number) => {
         id: id,
       },
     });
+    revalidatePath("/dashboard/penyaluran-elpiji");
   } catch (error) {
     return {
       error: getErrorMessage(error),
     };
+  }
+};
+
+export const getNextNumber = async () => {
+  try {
+    const date = new Date();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const yy = String(date.getFullYear()).slice(2);
+    const prefix = `BPE-${mm}${yy}-`;
+
+    const result = await prisma.lpgDistributions.findMany({
+      where: {
+        status: { in: ["Pending", "Approved"] },
+        bpeNumber: { startsWith: prefix },
+      },
+      select: { bpeNumber: true },
+      orderBy: { bpeNumber: "desc" },
+      take: 1,
+    });
+
+    if (result.length === 0) {
+      return `${prefix}0001`;
+    }
+
+    const lastBpeNumber = result[0].bpeNumber;
+    const numericPart = parseInt(lastBpeNumber.slice(-4), 10);
+    const nextNumericPart = numericPart + 1;
+    const nextBpeNumber = `${prefix}${nextNumericPart
+      .toString()
+      .padStart(4, "0")}`;
+
+    return nextBpeNumber;
+  } catch (error) {
+    console.error("Error getting next number:", error);
+    throw error;
   }
 };

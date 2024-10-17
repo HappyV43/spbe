@@ -38,31 +38,40 @@ import { Role } from "@/lib/Column";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const SignUpForm = () => {
+const SignUpForm = ({ data }: { id: number; companyName: string }[]) => {
   const router = useRouter();
   const form = useForm<SignInValues>({
     defaultValues: {
       username: "",
       password: "",
+      role: "",
     },
   });
 
   // 2. Define a submit handler.
   async function onSubmit(values: SignInValues) {
-    const res = await registerAction(values);
-    if (res.success) {
-      router.push("/dashboard/alokasi");
-      toast({
-        title: "Register has been succesfully",
-      });
-    } else {
-      router.push("/auth/login");
-      toast({
-        variant: "destructive",
-        title: "Oops something went wrong",
-      });
-    }
+    // const res =
+    await registerAction(values);
+    // if (res.success) {
+    //   router.push("/dashboard/alokasi");
+    //   toast({
+    //     title: "Register has been succesfully",
+    //   });
+    // } else {
+    //   router.push("/auth/login");
+    //   toast({
+    //     variant: "destructive",
+    //     title: "Oops something went wrong",
+    //   });
+    // }
   }
   return (
     <Card className="w-screen max-w-lg rounded-lg shadow-lg">
@@ -70,6 +79,7 @@ const SignUpForm = () => {
         <CardTitle className="text-2xl font-semibold flex justify-between">
           Welcome back!
         </CardTitle>
+
         <CardDescription className="text-gray-500">
           Register your account to continue.
         </CardDescription>
@@ -170,6 +180,45 @@ const SignUpForm = () => {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="company"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Company</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      const selectedCompany = data.find(
+                        (company: any) => company.id.toString() === value
+                      );
+                      field.onChange({
+                        id: value,
+                        companyName: selectedCompany
+                          ? selectedCompany.companyName
+                          : "",
+                      });
+                    }}
+                    value={field.value ? field.value.id : undefined}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Pilih Company">
+                        {field.value
+                          ? field.value.companyName
+                          : "Pilih Company"}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {data.map((company: any) => (
+                        <SelectItem key={company.id} value={company.id}>
+                          {company.companyName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+              )}
+            />
+
             <Button type="submit" className="self-start">
               Sign Up
             </Button>

@@ -2,16 +2,31 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
-import { Trash, Printer, Pencil} from 'lucide-react';
+import { Trash, Printer, Pencil } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import CetakPenyaluran from "@/components/CetakPenyaluran/CetakPenyaluran";
 import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "@/hooks/use-toast";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@radix-ui/react-dialog";
-import { Button } from "react-day-picker";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@radix-ui/react-dialog";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import ActionButtons from "@/components/FeatureComponents/ActionButtons";
+import { deleteLpgData } from "@/app/actions/lpg-distribution.action";
+import { revalidatePath } from "next/cache";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
@@ -33,19 +48,20 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
           return;
         }
 
-        // const result = await deleteLpgData(id);
-        // if (result?.error) {
-        //   toast({
-        //     title: "Error",
-        //     description: result.error,
-        //     variant: "destructive",
-        //   });
-        // } else {
-        //   toast({
-        //     title: "Berhasil",
-        //     description: "Distribusi berhasil dihapus",
-        //   });
-        // }
+        const result = await deleteLpgData(id);
+        if (result?.error) {
+          toast({
+            title: "Error",
+            description: result.error,
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Berhasil",
+            description: "Distribusi berhasil dihapus",
+          });
+
+        }
       };
       const handlePrint = () => {
         console.log("Print", row.original);
@@ -132,20 +148,20 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-       // Set different colors based on the status value
-    let statusClass = "";
-    switch (status) {
-      case "Pending":
-        statusClass = "text-orange-500"; 
-        break;
-      case "Approved":
-        statusClass = "text-lime-500";
-        break;
-      default:
-        statusClass = "text-gray-500"; 
-    }
+      // Set different colors based on the status value
+      let statusClass = "";
+      switch (status) {
+        case "Pending":
+          statusClass = "text-orange-500";
+          break;
+        case "Approved":
+          statusClass = "text-lime-500";
+          break;
+        default:
+          statusClass = "text-gray-500";
+      }
 
-    return <span className={statusClass}>{status}</span>;
+      return <span className={statusClass}>{status}</span>;
     },
   },
   {
@@ -186,9 +202,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Tindakan",
     enableHiding: false,
     cell: ({ row }) => {
-      return (
-        <ActionButtons row={row}/>
-      )
+      return <ActionButtons row={row} />;
     },
   },
   // {
@@ -220,7 +234,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
     header: "Fax",
   },
   {
-    accessorKey: "Companies",
+    accessorKey: "companyName",
     header: "Nama Perusahaan",
   },
   {

@@ -20,7 +20,6 @@ import { logOut } from "@/app/actions/auth.actions";
 interface MenuProps {
   isOpen: boolean | undefined;
 }
-
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);

@@ -2,8 +2,8 @@
 import prisma from "@/lib/db";
 import { Companies } from "@/lib/types";
 import { getErrorMessage } from "./error.action";
-import { getUser } from "./auth.actions";
 import { revalidatePath } from "next/cache";
+import { assertAuthenticated } from "@/lib/lucia";
 
 export const getCompaniesAll = async () => {
   try {
@@ -15,13 +15,12 @@ export const getCompaniesAll = async () => {
 
 export const getCompaniesNameData = async () => {
   try {
-    const data = await prisma.companies.findMany({
+    return await prisma.companies.findMany({
       select: {
         id: true,
         companyName: true,
       },
     });
-    return data;
   } catch (error) {
     throw error;
   }
@@ -32,7 +31,7 @@ export const postCompaniesData = async (formData: FormData) => {
   const address = formData.get("address")?.toString();
   const telephone = formData.get("telephone")?.toString();
 
-  const user = await getUser();
+  const user = await assertAuthenticated();
   if (!user) {
     return {
       error: "User tidak ada atau user belum login",

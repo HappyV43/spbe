@@ -1,4 +1,5 @@
 import { Database, House, LucideIcon, Settings, User } from "lucide-react";
+import { cookies } from "next/headers";
 
 type Submenu = {
   href: string;
@@ -33,21 +34,21 @@ export function getMenuList(pathname: string): Group[] {
             {
               href: "/dashboard/penyaluran-elpiji",
               label: "Penyaluran Elpiji",
-              active: pathname === "/dashboard/penyaluran-elpiji"
+              active: pathname === "/dashboard/penyaluran-elpiji",
             },
             {
               href: "/dashboard/alokasi",
               label: "Alokasi",
-              active: pathname === "/dashboard/alokasi"
+              active: pathname === "/dashboard/alokasi",
             },
             // {
             //   href: "/dashboard/cetak-penyaluran",
             //   label: "Cetak Penyaluran",
             //   active: pathname === "/dashboard/cetak-penyaluran"
             // }
-          ]
-        }
-      ]
+          ],
+        },
+      ],
     },
     {
       groupLabel: "Master Data",
@@ -61,16 +62,16 @@ export function getMenuList(pathname: string): Group[] {
             {
               href: "/master-data/agents",
               label: "Agents",
-              active: pathname === "/master-data/agents"
+              active: pathname === "/master-data/agents",
             },
             {
               href: "/master-data/companies",
               label: "Companies",
-              active: pathname === "/master-data/companies"
-            }
-          ]
-        }
-      ]
+              active: pathname === "/master-data/companies",
+            },
+          ],
+        },
+      ],
     },
     {
       groupLabel: "Setting",
@@ -81,14 +82,14 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname === "/setting",
           icon: Settings,
           submenus: [
-            { 
+            {
               href: "/setting/register",
               label: "Register",
               active: pathname === "/setting/register",
-            }
-          ]
-        }
-      ]
-    }
+            },
+          ],
+        },
+      ],
+    },
   ];
 }

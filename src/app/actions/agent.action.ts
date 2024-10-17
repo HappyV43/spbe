@@ -2,14 +2,15 @@
 import prisma from "@/lib/db";
 import { Agents } from "@/lib/types";
 import { getErrorMessage } from "./error.action";
-import { getUser } from "./auth.actions";
 import { revalidatePath } from "next/cache";
 import { getCompaniesAll } from "./companies.action";
+import { assertAuthenticated } from "@/lib/lucia";
+import { redirect } from "next/navigation";
 
 export const getAgentsAll = async () => {
   const companiesData = await getCompaniesAll();
   if (!companiesData) {
-    console.log("Belom ada data company");
+    redirect("/master-data/companies/form");
   }
   try {
     return await prisma.agents.findMany();
@@ -32,7 +33,7 @@ export const postAgentData = async (formData: FormData) => {
       error: "Semua field harus di isi",
     };
   }
-  const user = await getUser();
+  const user = await assertAuthenticated();
   if (!user) {
     return {
       error: "User tidak ditemukan. Silakan login kembali.",
