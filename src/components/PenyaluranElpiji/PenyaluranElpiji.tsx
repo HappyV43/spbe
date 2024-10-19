@@ -10,7 +10,11 @@ import { useEffect, useState } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "@/hooks/use-toast"
 import { Plus, Search, SearchX } from "lucide-react"
-import { normalizeDateFrom, normalizeDateTo } from "@/utils/page"
+import { getMonthlyTotalQty, getTodayTotalQty, getWeekTotalQty, normalizeDateFrom, normalizeDateTo } from "@/utils/page"
+import { ChartComponent } from "../FeatureComponents/Chart";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/card";
+import { format } from "date-fns";
+import { ChartConfig } from "../ui/chart";
 
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -35,6 +39,13 @@ const PenyaluranElpiji = <TData extends {
     const [filteredData, setFilteredData] = useState<TData[]>(data);
     const [filtered, setFiltered] = useState<Boolean>(false);
 
+    const monthlyData = getMonthlyTotalQty(data);
+    const weeklyData = getWeekTotalQty(data);
+    const todayData = [getTodayTotalQty(data)];
+    console.log(todayData)
+    console.log(weeklyData)
+    // console.log(data)
+
     const notransOptions = Array.from(
         new Set(data.map((item) => item.bpeNumber)) 
     ).map((bpeNumber) => ({
@@ -55,40 +66,6 @@ const PenyaluranElpiji = <TData extends {
         label: deliveryNumber,
         value: deliveryNumber,
     }));
-
-    const handleSearch = () => {
-        if (!notrans && !agentName && !dateRange && !doNumber) {
-            toast({
-                duration: 1500,
-                variant:"destructive",
-                title:"Silakan isi minimal satu filter pencarian!"
-            });
-            return;
-        }
-        
-        const filtered = data.filter((item) => {
-            const matchesNoTrans = notrans ? item.bpeNumber === notrans : true;
-            const matchesAgentName = agentName ? item.agentName === agentName : true;
-            const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
-    
-            const matchesDate = dateRange?.from ? (
-                dateRange?.to ? (
-                    // For Range Dates
-                    item.giDate >= normalizeDateFrom(dateRange.from) &&
-                    item.giDate <= normalizeDateTo(dateRange.to)
-                ) : (
-                    // For Single Dates
-                    item.giDate >= normalizeDateFrom(dateRange.from) &&
-                    item.giDate <= normalizeDateTo(dateRange.from)
-                )
-            ) : true; 
-    
-            setFiltered(true);
-            return matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber;
-        });
-    
-        setFilteredData(filtered);
-    };
 
     useEffect(() => {
         const filtered = data.filter((item) => {
@@ -127,6 +104,13 @@ const PenyaluranElpiji = <TData extends {
         setFilteredData(filtered);
     }, [notrans, agentName, doNumber, dateRange, data]);
 
+    const chartConfig  = {
+        qty: {
+            label: "Kuantitas",
+            color: "hsl(var(--chart-1))",
+        },
+    } satisfies ChartConfig;
+
     const handleClearSearch = () => {
         setAgentName("");
         setDoNumber("");
@@ -137,9 +121,34 @@ const PenyaluranElpiji = <TData extends {
     
         setFiltered(false);
     };
+    
 
     return (
         <div className="w-full">
+            <div className="px-4 pt-4 text-center">
+                <h1 className="text-lg font-semibold">Chart Jumlah Tabung</h1>
+            </div>
+            <div className=" m-4">
+                <Card className="flex flex-col w-full md:h-[500px] px-2 my-5">   
+                    <CardHeader className="items-center pb-0">
+                        <CardTitle>Minggu ini</CardTitle>
+                        <CardDescription>Mingguan ({format(new Date(), "dd MMMM yyyy")})</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 pb-0 pl-2">
+                        <ChartComponent data={weeklyData} config={chartConfig} title={"Tabung Elpiji"} timeFrame={"weekdays"}/>
+                    </CardContent>
+                </Card>
+
+                <Card className="flex flex-col w-full md:h-[500px] px-2 my-5">   
+                    <CardHeader className="items-center pb-0">
+                        <CardTitle>Tahun ini</CardTitle>
+                        <CardDescription>Tahunan ({format(new Date(), "MMMM yyyy")})</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 pb-0 pl-2">
+                        <ChartComponent data={monthlyData} config={chartConfig} title={"Tabung Elpiji"} timeFrame={"monthly"} />
+                    </CardContent>
+                </Card>
+            </div>
             <div className=" items-center py-4 mx-4">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
                     <div>
@@ -180,7 +189,7 @@ const PenyaluranElpiji = <TData extends {
                 </div>
 
                 <div className="flex justify-between items-center mb-3">
-                    <Button variant="outline" asChild>
+                    <Button variant="default" asChild>
                         <Link href="penyaluran-elpiji/form">
                         <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Penyaluran Elpiji</Link>
                     </Button>

@@ -1,58 +1,69 @@
-import React from "react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import React, { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import { Pencil, Printer, Trash } from "lucide-react";
+import { Pencil, Printer } from "lucide-react";
 import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { EditForm } from "./EditForm";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import CetakPenyaluran from "../CetakPenyaluran/CetakPenyaluran";
 
 interface ActionButtonProps {
-    row: any;
+  data?: any;
+  page?: string;
 }
 
-export function ActionButtons({
-    row,
-}: ActionButtonProps) {
-    const handleEdit = () => {
-        console.log("Edit", row.original);
-    };
-    const handleDelete = () => {
-        console.log("Delete", row.original);
-    };
-    return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <DotsHorizontalIcon className="h-4 w-4" />
-                </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+export function ActionButtons({ data, page }: ActionButtonProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-                <DropdownMenuItem onClick={handleEdit}>
-                    <Pencil className="h-4 w-4 mr-2 text-blue-500" />
-                    <span>Edit</span>
-                </DropdownMenuItem>
+  const handleEditClick = () => {
+    setIsDialogOpen(true);
+  };
 
-                <DropdownMenuItem asChild>
-                    <PDFDownloadLink
-                        document={<CetakPenyaluran data={row.original} />}
-                        fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}
-                    >
-                        <Printer className="h-4 w-4 mr-2 text-green-500" />
-                        <span>Print</span>
-                    </PDFDownloadLink>
-                </DropdownMenuItem>
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+  };
 
-                <DropdownMenuItem onClick={handleDelete}>
-                    <Trash className="h-4 w-4 mr-2 text-red-500" />
-                    <span>Delete</span>
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    );
+  return (
+    <>
+
+      <PDFDownloadLink
+        document={<CetakPenyaluran data={data} />}
+        fileName={`Penyaluran Elpiji ${data.deliveryNumber}.pdf`}
+        >
+        <Printer className="h-4 w-4 text-green-500 cursor-pointer" />
+        </PDFDownloadLink>
+      {/* Dialog for Edit Form */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Data</DialogTitle>
+            <DialogDescription>
+              Make changes to your data here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <EditForm data={data} page={page} />
+          <DialogFooter>
+            <Button onClick={handleCloseDialog}>Close</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
 }
 
 export default ActionButtons;
