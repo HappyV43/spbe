@@ -14,43 +14,41 @@ export const uploadExcel = async (
       },
     });
 
+
+    const allocationData = {
+      shipTo: data.shipTo,
+      materialName: data.materialName,
+      agentName: data.agentName,
+      plannedGiDate: data.plannedGiDate,
+      allocatedQty: data.allocatedQty,
+      updatedBy: data.updatedBy,
+    };
+
+    let result;
     if (existingRecord) {
-      // Jika ada record dengan deliveryNumber yang sama, lakukan update (override)
-      const updatedRecord = await prisma.allocations.update({
-        where: {
-          id: existingRecord.id,
-        },
-        data: {
-          shipTo: data.shipTo,
-          materialName: data.materialName,
-          agentName: data.agentName,
-          plannedGiDate: data.plannedGiDate,
-          allocatedQty: data.allocatedQty,
-          updatedBy: data.updatedBy,
-        },
+      // Update existing record
+      result = await prisma.allocations.update({
+        where: { id: existingRecord.id },
+        data: allocationData,
       });
-      console.log("Data updated:");
-      return updatedRecord;
+      console.log("Data updated:", result);
     } else {
-      // Jika tidak ada, lakukan create
-      const newRecord = await prisma.allocations.create({
+      // Create new record
+      result = await prisma.allocations.create({
         data: {
+          ...allocationData,
           giDate: data.giDate ? new Date(data.giDate) : null,
           deliveryNumber: data.deliveryNumber,
-          shipTo: data.shipTo,
-          materialName: data.materialName,
-          agentName: data.agentName,
-          plannedGiDate: data.plannedGiDate,
-          allocatedQty: data.allocatedQty,
           createdBy: data.createdBy,
-          updatedBy: data.updatedBy,
         },
       });
-      console.log("New data created:");
-      revalidatePath("/dashboard/alokasi");
-      return newRecord;
+      console.log("New data created:", result);
     }
+
+    revalidatePath("/dashboard/alokasi");
+    return result;
   } catch (error) {
+    console.error("Failed to upload Excel data:", error);
     throw new Error("Failed to upload Excel data");
   }
 };

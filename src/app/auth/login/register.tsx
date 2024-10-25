@@ -46,7 +46,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const SignUpForm = ({ data }: { id: number; companyName: string }[]) => {
+interface CompanyData {
+  id: number;
+  companyName: string;
+}
+
+interface SignUpFormProps {
+  data: CompanyData[];
+}
+
+const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
   const router = useRouter();
   const form = useForm<SignInValues>({
     defaultValues: {
@@ -58,20 +67,19 @@ const SignUpForm = ({ data }: { id: number; companyName: string }[]) => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: SignInValues) {
-    // const res =
-    await registerAction(values);
-    // if (res.success) {
-    //   router.push("/dashboard/alokasi");
-    //   toast({
-    //     title: "Register has been succesfully",
-    //   });
-    // } else {
-    //   router.push("/auth/login");
-    //   toast({
-    //     variant: "destructive",
-    //     title: "Oops something went wrong",
-    //   });
-    // }
+    const res = await registerAction(values);
+    if (res.success) {
+      router.push("/dashboard/alokasi");
+      toast({
+        title: "Register has been succesfully",
+      });
+    } else {
+      router.push("/auth/login");
+      toast({
+        variant: "destructive",
+        title: "Oops something went wrong",
+      });
+    }
   }
   return (
     <Card className="w-screen max-w-lg rounded-lg shadow-lg">

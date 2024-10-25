@@ -1,5 +1,5 @@
 import "server-only";
-import { createSession, generateSessionToken, validateRequest } from "@/auth";
+import { createSession, generateSessionToken } from "@/auth";
 import { cache } from "react";
 import { cookies } from "next/headers";
 
@@ -29,18 +29,6 @@ export function getSessionToken(): string | undefined {
   return cookies().get(SESSION_COOKIE_NAME)?.value;
 }
 
-export const getCurrentUser = cache(async () => {
-  const { user } = await validateRequest();
-  return user ?? undefined;
-});
-
-export const assertAuthenticated = async () => {
-  const user = await getCurrentUser();
-  if (!user) {
-    throw Error;
-  }
-  return user;
-};
 
 export async function setSession(userId: string) {
   const token = generateSessionToken();

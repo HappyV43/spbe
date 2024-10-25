@@ -1,11 +1,8 @@
 import SignUpForm from "@/app/auth/login/register";
 
 const Register = () => {
-  return (
-    <div className="flex justify-center">
-      <SignUpForm />
-    </div>
-  );
+  // TODO: REGISTER
+  return <div className="flex justify-center"></div>;
 };
 
 export default Register;

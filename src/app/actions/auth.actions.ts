@@ -11,9 +11,16 @@ import {
 } from "@/lib/lucia";
 import { encodeHexLowerCase } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
-import { invalidateSession } from "@/auth";
+import {
+  SessionValidationResult,
+  createSession,
+  generateSessionToken,
+  invalidateSession,
+  validateSessionToken,
+} from "@/auth";
 import { getErrorMessage } from "./error.action";
 import { cookies } from "next/headers";
+import { cache } from "react";
 
 export const signIn = async (values: SignInValues) => {
   try {
@@ -35,19 +42,7 @@ export const signIn = async (values: SignInValues) => {
       console.log(`Failed login attempt for username: ${values.username}`);
       return { success: false, error: "Invalid credentials" };
     }
-
     await setSession(user.id);
-
-    cookies().set({
-      name: "userRole",
-      value: user.role,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Secure untuk production
-      maxAge: 86400, // 1 hari
-      path: "/",
-      sameSite: "strict",
-    });
-
     return { success: true };
   } catch (error) {
     console.error("Error during sign in:", error);
@@ -62,15 +57,10 @@ export const logOut = async () => {
       sha256(new TextEncoder().encode(sessionToken))
     );
 
-    // Invalidate session in the database
     await invalidateSession(sessionId);
   }
 
-  // Delete cookie on the client side
   deleteSessionTokenCookie();
-
-  // Redirect to login page
-  return redirect("/auth/login");
 };
 
 export const registerAction = async (values: SignInValues) => {
@@ -101,3 +91,18 @@ export const registerAction = async (values: SignInValues) => {
     return { error: getErrorMessage(error), success: false };
   }
 };
+
+export const getCurrentSession = cache(
+  async (): Promise<SessionValidationResult> => {
+    const token = cookies().get("spbe-auth-cookies")?.value ?? null;
+    if (token === null) {
+      return { session: null, user: null };
+    }
+    const result = await validateSessionToken(token);
+    if (!result.session) {
+      // Jika sesi tidak valid, hapus cookie
+      cookies().delete("spbe-auth-cookies");
+    }
+    return result;
+  }
+);

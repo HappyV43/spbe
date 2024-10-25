@@ -4,22 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
 import { Allocation, RawDataMap } from "@/lib/types";
-import * as XLSX from "xlsx";
+import { read, utils } from "xlsx";
 import { uploadBulkExcel } from "@/app/actions/upload-file.action";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // import shadcn table components
 import { toast } from "@/hooks/use-toast";
+import { Router, useRouter } from "next/router";
 
-interface User {
-  id: string;
-}
-
-interface user {
-  user: User;
-}
-
-export default function UploadAlokasi({ user }: user) {
+export default function UploadAlokasi({
+  user,
+}: {
+  user: {
+    id: string;
+    username: string;
+  };
+}) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
   const [tableData, setTableData] = useState<Allocation[]>([]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -34,10 +32,10 @@ export default function UploadAlokasi({ user }: user) {
       reader.onload = async (e) => {
         const data = e.target?.result;
         if (data) {
-          const workbook = XLSX.read(data, { type: "binary" });
+          const workbook = read(data, { type: "binary" });
           const sheetName = workbook.SheetNames[0];
           const workSheet = workbook.Sheets[sheetName];
-          const json = XLSX.utils.sheet_to_json(workSheet);
+          const json = utils.sheet_to_json(workSheet);
           const test = json as RawDataMap[];
           const prev = json as Allocation[];
 
@@ -63,9 +61,8 @@ export default function UploadAlokasi({ user }: user) {
           try {
             await uploadBulkExcel(transformedData);
             toast({
-              variant:"default",
-              title: "Upload Excel Berhasil"
-            })
+              title: "Upload Excel Berhasil",
+            });
             redirect("/dashboard/alokasi");
           } catch (error) {
             console.error(error);
@@ -134,7 +131,7 @@ export default function UploadAlokasi({ user }: user) {
         </div>
       </div>
 
-      {tableData.length > 0 && (
+      {/* {tableData.length > 0 && (
         <div className="mt-8 w-full max-w-4xl">
           <h2 className="text-2xl font-semibold">Pratinjau Excel</h2>
           <Table>
@@ -166,7 +163,7 @@ export default function UploadAlokasi({ user }: user) {
             </TableBody>
           </Table>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

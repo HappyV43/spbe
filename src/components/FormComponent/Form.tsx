@@ -18,12 +18,10 @@ import {
   useSearchParams,
 } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-import { LpgDistributionSearch, LpgDistributions } from "@/lib/types";
+import { LpgDistributionSearch } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { postLpgData } from "@/app/actions/lpg-distribution.action";
 import { useFormStatus } from "react-dom";
-import { useForm } from "react-hook-form";
-import { revalidatePath } from "next/cache";
 import { postCompaniesData } from "@/app/actions/companies.action";
 
 // TODO: kasih toast jika delivNumbernya gak ada

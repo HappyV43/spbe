@@ -64,11 +64,6 @@ export function getMenuList(pathname: string): Group[] {
               label: "Agents",
               active: pathname === "/master-data/agents",
             },
-            {
-              href: "/master-data/companies",
-              label: "Companies",
-              active: pathname === "/master-data/companies",
-            },
           ],
         },
       ],
@@ -82,6 +77,11 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname === "/setting",
           icon: Settings,
           submenus: [
+            {
+              href: "/master-data/companies",
+              label: "Companies",
+              active: pathname === "/master-data/companies",
+            },
             {
               href: "/setting/register",
               label: "Register",

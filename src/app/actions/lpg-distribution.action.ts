@@ -4,8 +4,8 @@ import prisma from "@/lib/db";
 import { LpgDistributions } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { getErrorMessage } from "./error.action";
-import { assertAuthenticated } from "@/lib/lucia";
-import { Prisma } from "@prisma/client";
+import { getCurrentSession } from "./auth.actions";
+import { redirect } from "next/dist/server/api-utils";
 
 export const searchDeliveryNumber = async (query: string) => {
   try {
@@ -76,7 +76,7 @@ export const postLpgData = async (formData: FormData) => {
     };
 
   try {
-    const user = await assertAuthenticated();
+    const { user } = await getCurrentSession();
     if (!user)
       return {
         error: "User tidak ada atau user belum login",
@@ -111,7 +111,7 @@ export const postLpgData = async (formData: FormData) => {
         updatedBy: user.id,
       },
     });
-    revalidatePath("/dashboard/penyaluran-elpiji");
+    revalidatePath("/dashboard/alokasi");
   } catch (error) {
     return {
       error: getErrorMessage(error),

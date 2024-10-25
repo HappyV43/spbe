@@ -10,7 +10,7 @@ import { SidebarToggle } from "./SidebarToggle";
 import { Button } from "../ui/button";
 import { Menu } from "./Menu";
 
-export default function Sidebar({}) {
+export default function Sidebar() {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const pathname = usePathname();
 

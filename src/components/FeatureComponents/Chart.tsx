@@ -15,17 +15,11 @@ interface ChartProps<TData> {
   title?: string;
 }
 
-export function ChartComponent<TData extends { qty: number; agentName: string }>({
-  data,
-  config,
-  title,
-}: ChartProps<TData>) {
+export function ChartComponent<
+  TData extends { qty: number; agentName: string }
+>({ data, config, title }: ChartProps<TData>) {
   if (!data || data.length === 0) {
-    return (
-      <div className="text-center text-gray-500 py-4">
-        No data
-      </div>
-    );
+    return <div className="text-center text-gray-500 py-4">No data</div>;
   }
 
   const aggregatedData = React.useMemo(() => {
@@ -33,7 +27,10 @@ export function ChartComponent<TData extends { qty: number; agentName: string }>
     data.forEach(({ qty, agentName }) => {
       result[agentName] = (result[agentName] || 0) + qty;
     });
-    return Object.entries(result).map(([agentName, qty]) => ({ agentName, qty }));
+    return Object.entries(result).map(([agentName, qty]) => ({
+      agentName,
+      qty,
+    }));
   }, [data]);
 
   const totalAllocated = React.useMemo(() => {
@@ -60,10 +57,19 @@ export function ChartComponent<TData extends { qty: number; agentName: string }>
 
   return (
     <div className="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 md:space-x-4 py-4">
-      <div className="flex-grow h-72 md:h-auto">
-        <ChartContainer config={config} className="mx-auto w-full max-w-[400px] md:max-w-full aspect-square">
+      {/* <div className="flex-grow h-72 md:h-auto">
+        <ChartContainer config={config} className="mx-auto w-full max-w-[400px] md:max-w-full aspect-square"> */}
+      <div className="flex-grow">
+        <ChartContainer
+          config={config}
+          className="mx-auto w-full max-w-[400px] md:max-w-full aspect-square"
+          style={{ height: "auto", maxHeight: "400px" }}
+        >
           <PieChart>
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
             <Pie
               data={pieData}
               dataKey="qty"
@@ -109,7 +115,7 @@ export function ChartComponent<TData extends { qty: number; agentName: string }>
           </PieChart>
         </ChartContainer>
       </div>
-      <div className="flex-shrink-0 w-full md:w-40 max-h-80 md:overflow-y-auto">
+      <div className="flex-shrink-0 w-full md:w-40 max-h-80 md:overflow-y-auto p-0">
         <Legend data={pieData} />
       </div>
     </div>

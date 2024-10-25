@@ -3,7 +3,7 @@ import prisma from "@/lib/db";
 import { Companies } from "@/lib/types";
 import { getErrorMessage } from "./error.action";
 import { revalidatePath } from "next/cache";
-import { assertAuthenticated } from "@/lib/lucia";
+import { getCurrentSession } from "./auth.actions";
 
 export const getCompaniesAll = async () => {
   try {
@@ -31,7 +31,7 @@ export const postCompaniesData = async (formData: FormData) => {
   const address = formData.get("address")?.toString();
   const telephone = formData.get("telephone")?.toString();
 
-  const user = await assertAuthenticated();
+  const { user } = await getCurrentSession();
   if (!user) {
     return {
       error: "User tidak ada atau user belum login",

@@ -1,5 +1,5 @@
-// import Alokasi from "@/components/Alokasi/Alokasi";
 import { getAllokasiAll } from "@/app/actions/alokasi.action";
+import { getCurrentSession } from "@/app/actions/auth.actions";
 import Alokasi from "@/components/Alokasi/Alokasi";
 import { ContentLayout } from "@/components/ContentLayout";
 import { allocationColumns } from "@/lib/Column";
@@ -10,6 +10,7 @@ export const metadata = {
 
 const AlokasiPage = async () => {
   const data = await getAllokasiAll();
+
   return (
     <ContentLayout
       home={"dashboard"}

@@ -34,13 +34,6 @@ export async function createSession(
   return session;
 }
 
-export async function validateRequest(): Promise<SessionValidationResult> {
-  const sessionToken = getSessionToken();
-  if (!sessionToken) {
-    return { session: null, user: null };
-  }
-  return validateSessionToken(sessionToken);
-}
 
 export async function validateSessionToken(
   token: string

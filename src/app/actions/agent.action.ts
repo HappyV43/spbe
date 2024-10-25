@@ -4,8 +4,8 @@ import { Agents } from "@/lib/types";
 import { getErrorMessage } from "./error.action";
 import { revalidatePath } from "next/cache";
 import { getCompaniesAll } from "./companies.action";
-import { assertAuthenticated } from "@/lib/lucia";
 import { redirect } from "next/navigation";
+import { getCurrentSession } from "./auth.actions";
 
 export const getAgentsAll = async () => {
   const companiesData = await getCompaniesAll();
@@ -33,7 +33,7 @@ export const postAgentData = async (formData: FormData) => {
       error: "Semua field harus di isi",
     };
   }
-  const user = await assertAuthenticated();
+  const { user } = await getCurrentSession();
   if (!user) {
     return {
       error: "User tidak ditemukan. Silakan login kembali.",
