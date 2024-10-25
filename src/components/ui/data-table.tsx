@@ -30,22 +30,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  children? : React.ReactNode;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  children,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+  const [sorting, setSorting] = React.useState([{ id: 'updatedAt', desc: true }]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
- 
 
   const table = useReactTable({
       data,
@@ -59,10 +54,10 @@ export function DataTable<TData, TValue>({
       onColumnVisibilityChange: setColumnVisibility,
       onRowSelectionChange: setRowSelection,
       state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
+        sorting,
+        columnFilters,
+        columnVisibility,
+        rowSelection,
       },
   })
 
@@ -95,13 +90,14 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
+                
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className="hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="p-4 text-center ">
+                    <TableCell key={cell.id} className="p-4 text-center">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -136,7 +132,7 @@ export function DataTable<TData, TValue>({
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 30, 40, 50].map((pageSize) => (
+              {[10, 25, 50, 100].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>

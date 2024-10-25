@@ -24,23 +24,23 @@ export default function Sidebar() {
   };
 
   useEffect(() => {
-    if (pathname === "/dashboard/penyaluran-elpiji") {
-      setSelectedKeys(["2"]);
-    } else if (pathname === "/dashboard/alokasi") {
-      setSelectedKeys(["3"]);
-    } else if (pathname === "/dashboard/cetak-penyaluran") {
-      setSelectedKeys(["4"]);
-    } else if (pathname === "/master-data/agents") {
-      setSelectedKeys(["6"]);
-    } else if (pathname === "/master-data/companies") {
-      setSelectedKeys(["7"]);
-    } else if (pathname === "/register") {
-      updateSelectedKey("8");
-    }
-    // TODO
-    // if (userRole === "admin" && pathname === "/register") {
-    //   updateSelectedKey("8");
-    // }
+      if (pathname === "/dashboard/alokasi") {
+        setSelectedKeys(['2']);
+      } else if (pathname === "/dashboard/penyaluran-elpiji") {
+        setSelectedKeys(['3']);
+      } else if (pathname === "/dashboard/cetak-penyaluran") {
+        setSelectedKeys(['4']);
+      } else if (pathname === "/master-data/agents") {
+        setSelectedKeys(['6']);
+      } else if (pathname === "/master-data/companies") {
+        setSelectedKeys(['7']);
+      } else if (pathname === "/register") {
+        updateSelectedKey("8");
+      } 
+      // TODO
+      // if (userRole === "admin" && pathname === "/register") {
+      //   updateSelectedKey("8");
+      // }
   }, [pathname]);
 
   return (

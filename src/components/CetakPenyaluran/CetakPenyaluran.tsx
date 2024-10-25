@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { addDays, format } from "date-fns";
+import { toNormalCase } from '@/utils/page';
 
 interface CetakPenyaluranProps {
     data: any;
@@ -129,7 +130,7 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
             <View style={styles.detailsRow}>
                 <View style={styles.detailsColumn}>
                     <Text style={styles.detailsLabel}>No. Pol Kend</Text>
-                    <Text style={styles.detailsValue}>: {data.noPol}</Text>
+                    <Text style={styles.detailsValue}>: {data.licensePlate}</Text>
                 </View>
                 <View style={styles.detailsColumn}>
                     <Text style={styles.detailsLabel}>Tanggal</Text>
@@ -208,8 +209,10 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Penerima</Text>
                     <Text style={styles.signatureLine} />
+                    <Text style={{ textAlign: 'center' }}>{toNormalCase(data.driverName)}</Text>
                 </View>
             </View>
+            
 
             {/* Footer */}
             <Text style={styles.footerText}>

@@ -7,7 +7,7 @@ import { Allocation, RawDataMap } from "@/lib/types";
 import { read, utils } from "xlsx";
 import { uploadBulkExcel } from "@/app/actions/upload-file.action";
 import { toast } from "@/hooks/use-toast";
-import { Router, useRouter } from "next/router";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
 export default function UploadAlokasi({
   user,
@@ -104,8 +104,7 @@ export default function UploadAlokasi({
                 />
               </svg>
               <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                <span className="font-semibold">Click to upload</span> or drag
-                and drop
+                <span className="font-semibold">Click to upload</span>
               </p>
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 .xlsx, .xls

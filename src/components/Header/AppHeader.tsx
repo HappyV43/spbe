@@ -3,6 +3,7 @@ import { SheetMenu } from "../Sidebar/SheetMenu";
 import { BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage, Breadcrumb } from "../ui/breadcrumb";
 import { ToggleMode } from "../ToggleMode";
 import React from "react";
+import { toNormalCase } from "@/utils/page";
 
 interface HeaderProps {
   home: string;
@@ -13,13 +14,7 @@ interface HeaderProps {
 
 export default function AppHeader({ home, mainpage, childpage, childrenpage }: HeaderProps) {
 
-  function toNormalCase(str: string): string {
-    return str
-      .replace(/([a-z])([A-Z])/g, '$1 $2') // Handle camelCase and PascalCase (splits words where lowercase is followed by uppercase)
-      .replace(/-/g, ' ') // Replace kebab-case hyphens with spaces
-      .replace(/\b\w/g, char => char.toUpperCase()) // Capitalize the first letter of each word
-      .trim(); // Remove any leading or trailing spaces (if applicable)
-  }
+
 
   return (
     <header className="sticky top-0 z-10 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-secondary">

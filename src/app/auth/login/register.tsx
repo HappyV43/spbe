@@ -6,19 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -34,17 +22,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { SignInValues } from "@/lib/types";
 import { registerAction } from "@/app/actions/auth.actions";
-import { Role } from "@/lib/Column";
-import { cn } from "@/lib/utils";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { EyeOff, Eye } from "lucide-react";
 
 interface CompanyData {
   id: number;
@@ -57,6 +35,7 @@ interface SignUpFormProps {
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
     defaultValues: {
       username: "",
@@ -65,7 +44,6 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
     },
   });
 
-  // 2. Define a submit handler.
   async function onSubmit(values: SignInValues) {
     const res = await registerAction(values);
     if (res.success) {
@@ -81,159 +59,76 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
       });
     }
   }
+
   return (
-    <Card className="w-screen max-w-lg rounded-lg shadow-lg">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-semibold flex justify-between">
-          Welcome back!
-        </CardTitle>
+    <div className="flex w-full h-auto">
+      <Card className="p-6 m-6 justify-center items-center w-full">
+        <CardHeader>
+          <CardTitle>Register</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input
+                        // className="max-w-lg"
+                        placeholder="Enter your username..."
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-        <CardDescription className="text-gray-500">
-          Register your account to continue.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        <Form {...form}>
-          <form
-            className="flex flex-col gap-2"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your name..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password..."
-                      {...field}
-                      onChange={(e) => {
-                        e.target.value = e.target.value.trim();
-                        field.onChange(e);
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant="outline"
-                          role="combobox"
-                          className={cn(
-                            "w-[200px] justify-between",
-                            !field.value && "text-muted-foreground"
-                          )}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative max-w-lg">
+                        <Input
+                          type={showPassword ? "text" : "password"} 
+                          placeholder="Enter your password..."
+                          {...field}
+                        />
+                        {/* Eye Icon Button */}
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-3 flex items-center"
+                          onClick={() => setShowPassword(!showPassword)}
                         >
-                          {/* Corrected comparison: field.value is compared to role.value */}
-                          {field.value
-                            ? Role.find((role) => role.value === field.value)
-                                ?.label
-                            : "Select Role"}
-                          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[200px] p-0">
-                      <Command>
-                        <CommandList>
-                          <CommandEmpty>No Role found.</CommandEmpty>
-                          <CommandGroup>
-                            {Role.map((role) => (
-                              <CommandItem
-                                value={role.label}
-                                key={role.value}
-                                onSelect={() => field.onChange(role.value)}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    role.value === field.value
-                                      ? "opacity-100"
-                                      : "opacity-0"
-                                  )}
-                                />
-                                {role.label}
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                        </CommandList>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="company"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Company</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      const selectedCompany = data.find(
-                        (company: any) => company.id.toString() === value
-                      );
-                      field.onChange({
-                        id: value,
-                        companyName: selectedCompany
-                          ? selectedCompany.companyName
-                          : "",
-                      });
-                    }}
-                    value={field.value ? field.value.id : undefined}
-                  >
-                    <SelectTrigger className="w-[180px]">
-                      <SelectValue placeholder="Pilih Company">
-                        {field.value
-                          ? field.value.companyName
-                          : "Pilih Company"}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {data.map((company: any) => (
-                        <SelectItem key={company.id} value={company.id}>
-                          {company.companyName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            />
-
-            <Button type="submit" className="self-start">
-              Sign Up
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5" />
+                          ) : (
+                            <Eye className="h-5 w-5" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="self-start">
+                Sign Up
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

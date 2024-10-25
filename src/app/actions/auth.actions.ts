@@ -1,6 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
 import { SignInValues } from "@/lib/types";
 import { Argon2id } from "oslo/password";
@@ -20,6 +19,7 @@ import {
 } from "@/auth";
 import { getErrorMessage } from "./error.action";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { cache } from "react";
 
 export const signIn = async (values: SignInValues) => {
@@ -91,6 +91,21 @@ export const registerAction = async (values: SignInValues) => {
     return { error: getErrorMessage(error), success: false };
   }
 };
+
+export const getCurrentSession = cache(
+  async (): Promise<SessionValidationResult> => {
+    const token = cookies().get("spbe-auth-cookies")?.value ?? null;
+    if (token === null) {
+      return { session: null, user: null };
+    }
+    const result = await validateSessionToken(token);
+    if (!result.session) {
+      // Jika sesi tidak valid, hapus cookie
+      cookies().delete("spbe-auth-cookies");
+    }
+    return result;
+  }
+);
 
 export const getCurrentSession = cache(
   async (): Promise<SessionValidationResult> => {

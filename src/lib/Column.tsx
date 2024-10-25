@@ -2,106 +2,27 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
-import { Trash, Printer, Pencil } from "lucide-react";
+import { Printer, SquarePlus } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import CetakPenyaluran from "@/components/CetakPenyaluran/CetakPenyaluran";
-import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
-import { toast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
-import ActionButtons from "@/components/FeatureComponents/ActionButtons";
-import { deleteLpgData } from "@/app/actions/lpg-distribution.action";
-import { revalidatePath } from "next/cache";
+import Link from "next/link";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     header: "Tindakan",
     cell: ({ row }) => {
-      // Define actions for edit, delete, and print
-      const handleEdit = () => {
-        console.log("Edit", row.original);
-      };
-      const handleDelete = async () => {
-        const id = row.original.id;
-
-        if (id === undefined) {
-          toast({
-            title: "Error",
-            description: "id gak ada",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        const result = await deleteLpgData(id);
-        if (result?.error) {
-          toast({
-            title: "Error",
-            description: result.error,
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Berhasil",
-            description: "Distribusi berhasil dihapus",
-          });
-
-        }
-      };
-      const handlePrint = () => {
-        console.log("Print", row.original);
-      };
-
       return (
-        <div className="flex justify-center space-x-4">
-          {/* Edit Icon */}
-          <Pencil
-            className="h-4 w-4 text-blue-500 cursor-pointer"
-            onClick={handleEdit}
-          />
-          {/* Delete Icon */}
-
-          {/* Print Icon */}
+        <Button variant="outline" asChild className="text-center align-center justify-center">
           <PDFDownloadLink
+            className="text-center"
             document={<CetakPenyaluran data={row.original} />}
             fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}
           >
-            <Printer className="h-4 w-4 text-green-500 cursor-pointer" />
-          </PDFDownloadLink>
-          <Dialog>
-            <DialogTrigger>
-              <Trash className="h-4 w-4 text-red-500 cursor-pointer" />
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Are you absolutely sure?</DialogTitle>
-                <DialogDescription>
-                  This action cannot be undone. This will permanently delete
-                  your account and remove your data from our servers.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button onClick={handleDelete}>Confirm</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </div>
-      );
+            <Printer className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+          </PDFDownloadLink> 
+        </Button>
+      )
     },
   },
   {
@@ -139,6 +60,8 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    sortingFn: 'datetime',
+    sortDescFirst: true,
   },
 ];
 
@@ -148,20 +71,12 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-      // Set different colors based on the status value
-      let statusClass = "";
-      switch (status) {
-        case "Pending":
-          statusClass = "text-orange-500";
-          break;
-        case "Approved":
-          statusClass = "text-lime-500";
-          break;
-        default:
-          statusClass = "text-gray-500";
-      }
-
-      return <span className={statusClass}>{status}</span>;
+  
+      return (
+        <span className={status === "Pending" ? "text-orange-500" : "text-lime-500"}>
+          {status}
+        </span>
+      );
     },
   },
   {
@@ -183,7 +98,22 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "allocatedQty",
     header: "Jumlah",
-    // cell: ({ row }) => row.original.alocatedQty.toLocaleString(), // Optional: format angka
+  },
+  {
+    accessorKey: "plannedGiDate",
+    header: "Planned GI Date",
+    cell: ({ row }) => {
+      const rawDate = row.getValue("plannedGiDate") as string; // Get the string date (e.g., "01102024")
+      
+      // Extract the day, month, and year from the string
+      const day = rawDate.slice(0, 2);  // "01"
+      const month = rawDate.slice(2, 4); // "10"
+      const year = rawDate.slice(4); // "2024"
+  
+      const formattedDate = `${day}-${month}-${year}`; // Format to "dd-MM-yyyy"
+  
+      return <span>{formattedDate}</span>; // Return the formatted date
+    }
   },
   {
     accessorKey: "giDate",
@@ -196,20 +126,26 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    // cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
   },
   {
     header: "Tindakan",
     enableHiding: false,
     cell: ({ row }) => {
-      return <ActionButtons row={row} />;
+      return (
+        <Button
+        variant="outline"
+        disabled={row.original.status === "Approved"}
+      >
+        <Link
+          href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+          className={row.original.status === "Approved" ? "cursor-not-allowed" : ""}
+        >
+          <SquarePlus className="h-4 w-4" />
+        </Link>
+      </Button>
+      )
     },
   },
-  // {
-  //   accessorKey: "createdAt",
-  //   header: "Created At",
-  //   cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(), // Format tanggal
-  // },
 ];
 
 export const agentColumns: ColumnDef<Agents>[] = [

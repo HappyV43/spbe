@@ -1,122 +1,117 @@
 import * as React from "react";
-import { Pie, PieChart, Tooltip, Label, Cell } from "recharts";
+import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, LabelList } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { generateColor } from "@/utils/color";
-import { Legend } from "./Legend";
+import { generateColor } from "@/utils/page";
+import { format, eachDayOfInterval, eachMonthOfInterval, startOfMonth, endOfMonth, getDay, startOfWeek, endOfWeek, startOfYear, endOfYear } from "date-fns";
 
-interface ChartProps<TData> {
-  config: ChartConfig;
-  data: TData[];
-  title?: string;
+// Interface for the data item
+interface DataItem {
+  qty: number;
+  agentName?: string;
+  giDate: Date;
 }
 
-export function ChartComponent<
-  TData extends { qty: number; agentName: string }
->({ data, config, title }: ChartProps<TData>) {
+// Adjusted ChartProps to handle both daily and monthly data
+interface ChartProps<TData> {
+  config: ChartConfig;
+  data: Array<{ giDate: string; qty: number }>; // allow day or month
+  title?: string;
+  timeFrame: "weekdays" | "monthly"; // time frame to handle different data types
+}
+
+export function ChartComponent<TData extends DataItem>({
+  data,
+  config,
+  title,
+  timeFrame,
+}: ChartProps<TData>) {
   if (!data || data.length === 0) {
     return <div className="text-center text-gray-500 py-4">No data</div>;
   }
 
+  // Aggregate data based on weekdays or monthly selection
   const aggregatedData = React.useMemo(() => {
     const result: Record<string, number> = {};
-    data.forEach(({ qty, agentName }) => {
-      result[agentName] = (result[agentName] || 0) + qty;
-    });
-    return Object.entries(result).map(([agentName, qty]) => ({
-      agentName,
-      qty,
-    }));
-  }, [data]);
+
+    if (timeFrame === "monthly") {
+      // Get all months in the current year
+      const months = eachMonthOfInterval({
+        start: startOfYear(new Date()),
+        end: endOfYear(new Date()),
+      }).map((monthDate) => format(monthDate, "MMMM"));
+
+      // Aggregate data by month
+      data.forEach(({ qty, giDate }) => {
+        const month = giDate; // Convert giDate to month name
+        result[month] = (result[month] || 0) + qty;
+      });
+
+      // Return aggregated data but filter out months with 0 qty
+      return months
+        .map((month) => ({
+          month,
+          qty: result[month] || 0,
+        }))
+        // .filter(({ qty }) => qty > 0); // Exclude months with 0 qty
+    } else if (timeFrame === "weekdays") {
+      const startDate = startOfWeek(new Date());
+      const endDate = endOfWeek(new Date());
+
+      const weekdays = eachDayOfInterval({ start: startDate, end: endDate })
+        .filter((day) => {
+          const dayOfWeek = getDay(day);
+          // Filter only Monday (1) to Friday (5)
+          return dayOfWeek >= 1 && dayOfWeek <= 6;
+        });
+
+      data.forEach(({ qty, giDate }) => {
+        const day = giDate;
+        result[day] = (result[day] || 0) + qty;
+      });
+
+      return weekdays.map((day) => ({
+        day: format(day, "dd-MM-yyyy"),
+        qty: result[format(day, "dd-MM-yyyy")] || 0,
+      }));
+    }
+
+    return [];
+  }, [data, timeFrame]);
 
   const totalAllocated = React.useMemo(() => {
     return aggregatedData.reduce((acc, curr) => acc + curr.qty, 0);
   }, [aggregatedData]);
 
-  const pieData = aggregatedData.map((entry, index) => ({
-    ...entry,
-    fill: generateColor(index),
-  }));
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const { name, value } = payload[0];
-      return (
-        <div className="bg-white p-2 rounded border shadow">
-          <p className="font-bold">{name}</p>
-          <p>{`Allocated: ${value}`}</p>
-        </div>
-      );
-    }
-    return null;
-  };
-
   return (
     <div className="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 md:space-x-4 py-4">
-      {/* <div className="flex-grow h-72 md:h-auto">
-        <ChartContainer config={config} className="mx-auto w-full max-w-[400px] md:max-w-full aspect-square"> */}
       <div className="flex-grow">
-        <ChartContainer
-          config={config}
-          className="mx-auto w-full max-w-[400px] md:max-w-full aspect-square"
-          style={{ height: "auto", maxHeight: "400px" }}
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Pie
-              data={pieData}
+        <ChartContainer config={config} className="mx-auto w-full max-w-[600px] md:max-w-full aspect-square" style={{ height: 'auto', maxHeight: '400px' }}>
+          <AreaChart data={aggregatedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorQty" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={generateColor(0)} stopOpacity={0.8} />
+                <stop offset="95%" stopColor={generateColor(0)} stopOpacity={0.1} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey={timeFrame === "monthly" ? "month" : "day"} tickLine={false} axisLine={false} />
+            <YAxis />
+            <Tooltip content={<ChartTooltipContent hideLabel />} />
+            <Area
+              type="monotone"
               dataKey="qty"
-              nameKey="agentName"
-              innerRadius={60}
-              strokeWidth={5}
-              labelLine={false}
+              stroke={generateColor(0)}
+              fillOpacity={1}
+              fill="url(#colorQty)"
             >
-              {pieData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
-              ))}
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
-                          x={viewBox.cx}
-                          y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
-                        >
-                          {totalAllocated.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy || 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          {title}
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
-              />
-            </Pie>
-            <Tooltip content={<CustomTooltip />} />
-          </PieChart>
+              <LabelList dataKey="qty" position="top" />
+            </Area>
+          </AreaChart>
         </ChartContainer>
-      </div>
-      <div className="flex-shrink-0 w-full md:w-40 max-h-80 md:overflow-y-auto p-0">
-        <Legend data={pieData} />
       </div>
     </div>
   );
