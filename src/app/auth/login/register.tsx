@@ -24,7 +24,7 @@ import { SignInValues } from "@/lib/types";
 import { registerAction } from "@/app/actions/auth.actions";
 import { EyeOff, Eye } from "lucide-react";
 
-const SignUpForm = ({ data }: { id: number; companyName: string }[]) => {
+const SignUpForm = ({ }: { id: number; companyName: string }[]) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
@@ -58,11 +58,13 @@ const SignUpForm = ({ data }: { id: number; companyName: string }[]) => {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        // className="max-w-lg"
-                        placeholder="Enter your username..."
-                        {...field}
-                      />
+                      <div className="relative max-w-lg">
+                        <Input
+                          // className="max-w-lg"
+                          placeholder="Enter your username..."
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

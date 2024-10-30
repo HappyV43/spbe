@@ -20,58 +20,91 @@ export default function UploadAlokasi({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tableData, setTableData] = useState<Allocation[]>([]);
 
+  console.log(tableData)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+  
+      // Validasi jenis file
+      const validTypes = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"];
+      if (!validTypes.includes(file.type)) {
+        toast({ title: "Jenis file tidak valid. Harap unggah file dengan format .xlsx atau .xls.", variant: "destructive" });
+        return;
+      }
+  
+      const maxSizeInBytes = 2 * 1024 * 1024; // 2 MB
+      if (file.size > maxSizeInBytes) {
+        toast({ title: "Ukuran file melebihi 2 MB. Harap unggah file yang lebih kecil.", variant: "destructive" });
+        return;
+      }
+  
+      setSelectedFile(file);
+      previewExcel(file);
     }
   };
+  
 
-  async function uploadExcel() {
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        const data = e.target?.result;
-        if (data) {
-          const workbook = read(data, { type: "binary" });
-          const sheetName = workbook.SheetNames[0];
-          const workSheet = workbook.Sheets[sheetName];
-          const json = utils.sheet_to_json(workSheet);
-          const test = json as RawDataMap[];
-          const prev = json as Allocation[];
-
-          const transformedData = test.map((row) => {
-            return {
-              shipTo: String(row.SHIP_TO),
-              agentName: String(row.SHIP_TO_NAME),
-              deliveryNumber: String(row.DO_NUMBER),
-              allocatedQty:
-                typeof row.QUANTITY === "string"
-                  ? parseInt(row.QUANTITY)
-                  : row.QUANTITY,
-              materialName: String(row.MATERIAL_NAME),
-              plannedGiDate: String(row.PLANNED_GI_DATE),
-              giDate: row.giDate ? new Date(row.giDate) : null,
-              createdBy: user.id,
-              updatedBy: user.id,
-            };
-          });
-
-          setTableData(transformedData);
-
-          try {
-            await uploadBulkExcel(transformedData);
-            toast({
-              title: "Upload Excel Berhasil",
-            });
-            redirect("/dashboard/alokasi");
-          } catch (error) {
-            console.error(error);
-          }
+  const previewExcel = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = e.target?.result;
+      if (data) {
+        const workbook = read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const workSheet = workbook.Sheets[sheetName];
+  
+        const requiredColumns = ["SHIP_TO", "SHIP_TO_NAME", "DO_NUMBER", "QUANTITY", "MATERIAL_NAME", "PLANNED_GI_DATE"];
+        const sheetHeaders:any = utils.sheet_to_json(workSheet, { header: 1 })[0]; 
+        const missingColumns = requiredColumns.filter(col => !sheetHeaders.includes(col));
+  
+        if (missingColumns.length > 0) {
+          toast({ title: `Kolom yang hilang: ${missingColumns.join(", ")}. Harap periksa format file Anda.`, variant:"destructive" });
+          return;
         }
-      };
-      reader.readAsArrayBuffer(selectedFile);
+  
+        const json = utils.sheet_to_json(workSheet);
+        const uploadedData = json as RawDataMap[];
+        
+        const transformedData = uploadedData.map((row) => ({
+          shipTo: String(row.SHIP_TO),
+          agentName: String(row.SHIP_TO_NAME),
+          deliveryNumber: String(row.DO_NUMBER),
+          allocatedQty:
+            typeof row.QUANTITY === "string"
+              ? parseInt(row.QUANTITY)
+              : row.QUANTITY,
+          materialName: String(row.MATERIAL_NAME),
+          plannedGiDate: String(row.PLANNED_GI_DATE),
+          giDate: row.giDate ? new Date(row.giDate) : null,
+          createdBy: user.id,
+          updatedBy: user.id,
+        }));
+  
+        setTableData(transformedData);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+  
+  const uploadExcel = async () => {
+    if(selectedFile != null && tableData.length >0){
+      try {
+        await uploadBulkExcel(tableData);
+        toast({ title: "Upload Excel Berhasil" });
+        redirect("/dashboard/alokasi");
+      } catch (error) {
+        toast({ title: "Upload Excel Gagal", variant:"destructive" });
+        console.error(error);
+      }
+    } else{
+      toast({ 
+        title: selectedFile == null 
+          ? "Harap pilih file untuk diunggah." 
+          : "Data tidak ditemukan. Harap periksa format file.",
+        variant: "destructive" 
+      });
     }
-  }
+  };
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 px-4 py-12 md:px-6 lg:px-8">
@@ -85,7 +118,7 @@ export default function UploadAlokasi({
         <div>
           <label
             htmlFor="dropzone-file"
-            className="flex flex-col items-center justify-center gap-4  w-full h-96 border-2 border-primary border-dashed rounded-lg cursor-pointer bg-gray-50  dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
+            className="flex flex-col items-center justify-center gap-4 w-full h-96 border-2 border-primary border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
           >
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               <svg
@@ -126,37 +159,39 @@ export default function UploadAlokasi({
             value={selectedFile ? selectedFile.name : "Upload File"}
             className="text-primary"
           />
-          <Button onClick={uploadExcel}>Impor File</Button>
+          <Button onClick={uploadExcel}>
+            {tableData.length > 0 ? "Upload" : "Impor"} Data
+          </Button>
         </div>
       </div>
 
       {tableData.length > 0 && (
-        <div className="mt-8 w-full max-w-4xl">
-          <h2 className="text-2xl font-semibold">Pratinjau Excel</h2>
+        <div className="mt-8 w-full">
+          <h2 className="text-2xl font-semibold my-3">Pratinjau Excel</h2>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Ship To</TableHead>
-                <TableHead>Nama Agen</TableHead>
-                <TableHead>Nomer DO</TableHead>
-                <TableHead>Jumlah Tabung</TableHead>
-                <TableHead>Nama Material</TableHead>
-                <TableHead>Planned GI Date</TableHead>
-                <TableHead>GI Date</TableHead>
+                <TableHead className="text-lg">No</TableHead>
+                <TableHead className="text-lg">Ship To</TableHead>
+                <TableHead className="text-lg">Nama Agen</TableHead>
+                <TableHead className="text-lg">Nomer DO</TableHead>
+                <TableHead className="text-lg">Jumlah Tabung</TableHead>
+                <TableHead className="text-lg">Nama Material</TableHead>
+                <TableHead className="text-lg">Planned GI Date</TableHead>
+                <TableHead className="text-lg">GI Date</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tableData.map((row, index) => (
-                <TableRow key={index} className="my-6">
-                  <TableCell>{row.shipTo}</TableCell>
-                  <TableCell>{row.agentName}</TableCell>
-                  <TableCell>{row.deliveryNumber}</TableCell>
-                  <TableCell>{row.allocatedQty}</TableCell>
-                  <TableCell>{row.materialName}</TableCell>
-                  <TableCell>{row.plannedGiDate}</TableCell>
-                  <TableCell>
-                    {row.giDate ? row.giDate.toLocaleDateString() : ""}
-                  </TableCell>
+                <TableRow key={index}>
+                  <TableCell className="py-3">{index +1}</TableCell>
+                  <TableCell className="py-3">{row.shipTo}</TableCell>
+                  <TableCell className="py-3">{row.agentName}</TableCell>
+                  <TableCell className="py-3">{row.deliveryNumber}</TableCell>
+                  <TableCell className="py-3">{row.allocatedQty}</TableCell>
+                  <TableCell className="py-3">{row.materialName}</TableCell>
+                  <TableCell className="py-3">{row.plannedGiDate}</TableCell>
+                  <TableCell className="py-3">{row.giDate ? row.giDate.toLocaleDateString() : ""}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

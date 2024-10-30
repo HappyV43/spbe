@@ -9,12 +9,27 @@ import { DatePickerWithRange } from "../FeatureComponents/DateRange"
 import { useEffect, useState } from "react"
 import { ColumnDef } from "@tanstack/react-table"
 import { toast } from "@/hooks/use-toast"
-import { Plus, Search, SearchX } from "lucide-react"
+import { Plus, Printer, Search, SearchX } from "lucide-react"
 import { getMonthlyTotalQty, getTodayTotalQty, getWeekTotalQty, normalizeDateFrom, normalizeDateTo } from "@/utils/page"
 import { ChartComponent } from "../FeatureComponents/Chart";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/card";
 import { format } from "date-fns";
 import { ChartConfig } from "../ui/chart";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import RekapPenyaluran from "../CetakDistribusi/RekapPenyaluran";
+
+interface Records {
+    bpeNumber :String
+    giDate :Date
+    agentName: String
+    licensePlate:String
+    allocatedQty: number
+    driverName: String
+    distributionQty:number
+    volume:number
+    deliveryNumbr: string
+    status: string;
+}
 
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -42,9 +57,6 @@ const PenyaluranElpiji = <TData extends {
     const monthlyData = getMonthlyTotalQty(data);
     const weeklyData = getWeekTotalQty(data);
     const todayData = [getTodayTotalQty(data)];
-    console.log(todayData)
-    console.log(weeklyData)
-    // console.log(data)
 
     const notransOptions = Array.from(
         new Set(data.map((item) => item.bpeNumber)) 
@@ -60,6 +72,7 @@ const PenyaluranElpiji = <TData extends {
         value: agentName,
     }));
 
+    console.log(agentNameOptions)
     const doNumberOptions = Array.from(
         new Set(data.map((item) => item.deliveryNumber)) 
     ).map((deliveryNumber) => ({
@@ -68,6 +81,7 @@ const PenyaluranElpiji = <TData extends {
     }));
 
     useEffect(() => {
+        // console.log(data)
         const filtered = data.filter((item) => {
             const matchesNoTrans = notrans ? item.bpeNumber === notrans : true;
             const matchesAgentName = agentName ? item.agentName === agentName : true;
@@ -192,6 +206,16 @@ const PenyaluranElpiji = <TData extends {
                     <Button variant="default" asChild>
                         <Link href="penyaluran-elpiji/form">
                         <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Penyaluran Elpiji</Link>
+                    </Button>
+
+                    <Button variant="default" asChild>
+                        <PDFDownloadLink
+                            className="text-center"
+                            document={<RekapPenyaluran data={agentName != null ? filteredData : data} />}
+                            fileName={`Penyaluran Elpiji.pdf`}
+                        >
+                            <Printer className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+                        </PDFDownloadLink> 
                     </Button>
                     
                     <div className="flex space-x-2">

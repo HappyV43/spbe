@@ -25,7 +25,7 @@ import { useFormStatus } from "react-dom";
 import { useForm } from "react-hook-form";
 import { revalidatePath } from "next/cache";
 import { postCompaniesData } from "@/app/actions/companies.action";
-import CetakPenyaluran from "../CetakPenyaluran/CetakPenyaluran";
+import CetakPenyaluran from "../CetakDistribusi/CetakPenyaluran";
 import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
 import { Printer } from "lucide-react";
 
