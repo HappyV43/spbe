@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import EditFormAgents from "../components/CRUD/EditFormAgents";
 import EditFormLpg from "@/components/CRUD/EditFormLpg";
+import CetakPenyaluran from "@/components/CetakDistribusi/CetakPenyaluran";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
