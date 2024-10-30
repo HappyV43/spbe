@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
         padding: 30,
         fontSize: 10,
         lineHeight: 1.5,
+        fontFamily: 'Times-Roman',
     },
     header: {
         marginBottom: 20,
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 14,
+        fontFamily: "Times-Bold",
         fontWeight: 'extrabold',
         marginBottom: 10,
     },
@@ -44,7 +46,7 @@ const styles = StyleSheet.create({
     },
     detailsLabel: {
         fontWeight: 'bold',
-        width: '25%', // Adjust width as needed
+        width: '25%', 
     },
     detailsValue: {
         width: '60%', 
@@ -66,6 +68,7 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: '#000',
         textAlign: 'center',
+        fontFamily: "Times-Bold",
     },
     tableCell: {
         padding: 5,

@@ -4,7 +4,6 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
 import { Printer, SquarePlus } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import CetakPenyaluran from "@/components/CetakPenyaluran/CetakPenyaluran";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import EditFormAgents from "../components/CRUD/EditFormAgents";

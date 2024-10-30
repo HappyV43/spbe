@@ -20,7 +20,7 @@ interface ChartProps<TData> {
   config: ChartConfig;
   data: Array<{ giDate: string; qty: number }>; // allow day or month
   title?: string;
-  timeFrame: "weekdays" | "monthly"; // time frame to handle different data types
+  timeFrame: "weekdays" | "monthly"; 
 }
 
 export function ChartComponent<TData extends DataItem>({
@@ -54,7 +54,7 @@ export function ChartComponent<TData extends DataItem>({
       return months
         .map((month) => ({
           month,
-          qty: result[month] || 0,
+          qty: result[month],
         }))
         // .filter(({ qty }) => qty > 0); // Exclude months with 0 qty
     } else if (timeFrame === "weekdays") {
@@ -88,9 +88,9 @@ export function ChartComponent<TData extends DataItem>({
 
   return (
     <div className="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 md:space-x-4 py-4">
-      <div className="flex-grow">
-        <ChartContainer config={config} className="mx-auto w-full max-w-[600px] md:max-w-full aspect-square" style={{ height: 'auto', maxHeight: '400px' }}>
-          <AreaChart data={aggregatedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+      <div className="flex-grow my-5">
+      <ChartContainer config={config} className="mx-auto w-full max-w-[600px] md:max-w-full aspect-square" style={{ height: '400px', maxHeight: '400px' }}>
+      <AreaChart data={aggregatedData} margin={{ top: 20, right: 30, left: 0, bottom: 30 }}>
             <defs>
               <linearGradient id="colorQty" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={generateColor(0)} stopOpacity={0.8} />

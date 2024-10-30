@@ -23,12 +23,13 @@ import { useRouter } from "next/navigation";
 import { SignInValues } from "@/lib/types";
 import { signIn } from "@/app/actions/auth.actions";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { ToggleMode } from "@/components/ToggleMode";
 import { toast } from "@/hooks/use-toast";
 
 export function LoginForm() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   // 1. Define your form.
   const form = useForm<SignInValues>({
@@ -40,7 +41,9 @@ export function LoginForm() {
 
   // 2. Define a submit handler.
   async function onSubmit(values: SignInValues) {
+    setIsLoading(true); // Set loading state to true when submitting
     const result = await signIn(values);
+    setIsLoading(false); // Set loading state to false after submission
     if (result.success) {
       router.push("/dashboard/alokasi");
       toast({
@@ -132,8 +135,9 @@ export function LoginForm() {
             <Button
               type="submit"
               className="w-full bg-primary hover:bg-primary-dark"
+              disabled={isLoading}
             >
-              Login
+                Login {isLoading && <Loader2 className="mr-2 h-4 w-4 px-3 animate-spin" />}
             </Button>
           </form>
         </Form>

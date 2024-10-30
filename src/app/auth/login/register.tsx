@@ -80,11 +80,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        // className="max-w-lg"
-                        placeholder="Enter your username..."
-                        {...field}
-                      />
+                      <div className="relative max-w-lg">
+                        <Input
+                          // className="max-w-lg"
+                          placeholder="Enter your username..."
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
