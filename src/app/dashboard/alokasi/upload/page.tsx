@@ -10,7 +10,7 @@ export const metadata = {
 const AlokasiPage = async () => {
   const { user } = await getCurrentSession();
   if (!user) {
-    redirect("/auth/ogin");
+    redirect("/auth/login");
   }
 
   return (

@@ -1,5 +1,5 @@
 // import Alokasi from "@/components/Alokasi/Alokasi";
-import { getUser } from "@/app/actions/auth.actions";
+import { getCurrentSession } from "@/app/actions/auth.actions";
 import { ContentLayout } from "@/components/ContentLayout";
 import UploadAlokasi from "@/components/UploadAlokasi/UploadAlokasi";
 import UploadAlokasiBulanan from "@/components/UploadAlokasiBulanan/UploadAlokasiBulanan";
@@ -9,7 +9,7 @@ export const metadata = {
 };
 
 const AlokasiPage = () => {
-  const user = getUser();
+  const user = getCurrentSession();
 
   return (
     <ContentLayout

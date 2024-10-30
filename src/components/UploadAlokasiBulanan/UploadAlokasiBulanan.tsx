@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import * as XLSX from "xlsx";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"; // import shadcn table components
 import { toast } from "@/hooks/use-toast";
+import { utils } from "xlsx";
+import { RawDataMap } from "@/lib/types";
 
 export default function UploadAlokasiBulanan() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -12,39 +14,93 @@ export default function UploadAlokasiBulanan() {
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      setSelectedFile(event.target.files[0]);
+      const file = event.target.files[0];
+  
+      // Validasi jenis file
+      const validTypes = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"];
+      if (!validTypes.includes(file.type)) {
+        toast({ title: "Jenis file tidak valid. Harap unggah file dengan format .xlsx atau .xls.", variant: "destructive" });
+        return;
+      }
+  
+      const maxSizeInBytes = 2 * 1024 * 1024; // 2 MB
+      if (file.size > maxSizeInBytes) {
+        toast({ title: "Ukuran file melebihi 2 MB. Harap unggah file yang lebih kecil.", variant: "destructive" });
+        return;
+      }
+  
+      setSelectedFile(file);
+      previewExcel(file);
     }
   };
 
-  function uploadExcelBulanan() {
-    if (selectedFile) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const data = e.target?.result;
-        if (data) {
-          const workbook = XLSX.read(data, { type: "binary" });
-          const sheetName = workbook.SheetNames[0];
-          const workSheet = workbook.Sheets[sheetName];
-          const json = XLSX.utils.sheet_to_json(workSheet);
-          
-          const transformedData = json.map((row: any, index: number) => ({
-            nomor: index + 1,
-            date: String(row.Date),
-            total: Number(row.Total),
-            volume: Number(row.Total) * 3,
-          }));
+  const previewExcel = (file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const data = e.target?.result;
+      if (data) {
 
-          setTableData(transformedData);
+        const workbook = XLSX.read(data, { type: "binary" });
+        const sheetName = workbook.SheetNames[0];
+        const workSheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(workSheet);
+        
+        const transformedData = json.map((row: any, index: number) => ({
+          nomor: index + 1,
+          date: String(row.Date),
+          total: Number(row.Total),
+          volume: Number(row.Total) * 3,
+        }));
 
-          toast({
-            variant: "default",
-            title: "Upload Excel Berhasil dengan Dummy Data",
-          });
-        }
-      };
-      reader.readAsArrayBuffer(selectedFile);
+        setTableData(transformedData);
+
+        const uploadedData = json as RawDataMap[];
+        
+        // const transformedData = uploadedData.map((row) => ({
+        //   shipTo: String(row.SHIP_TO),
+        //   agentName: String(row.SHIP_TO_NAME),
+        //   deliveryNumber: String(row.DO_NUMBER),
+        //   allocatedQty:
+        //     typeof row.QUANTITY === "string"
+        //       ? parseInt(row.QUANTITY)
+        //       : row.QUANTITY,
+        //   materialName: String(row.MATERIAL_NAME),
+        //   plannedGiDate: String(row.PLANNED_GI_DATE),
+        //   giDate: row.giDate ? new Date(row.giDate) : null,
+        //   createdBy: user.id,
+        //   updatedBy: user.id,
+        // }));
+  
+        // setTableData(transformedData);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const uploadExcel = async () => {
+    if(selectedFile == null || tableData.length <= 0){
+      toast({ 
+        title: selectedFile == null 
+          ? "Harap pilih file untuk diunggah." 
+          : "Data tidak ditemukan. Harap periksa format file.",
+        variant: "destructive" 
+      });
+      return
     }
-  }
+
+      console.log(selectedFile)
+      console.log(tableData.length)
+      // const te = await uploadBulkExcel(tableData);
+      // console.log(te)
+      toast({ title: "Upload Excel Berhasil" });
+      // redirect("/dashboard/alokasi");
+    // } catch (error) {
+    //   toast({ title: "Upload Excel Gagal", variant:"destructive" });
+    //   console.error(error);
+    // }
+  };
+
+  
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 px-4 py-12 md:px-6 lg:px-8">
@@ -99,7 +155,9 @@ export default function UploadAlokasiBulanan() {
             value={selectedFile ? selectedFile.name : "Upload File"}
             className="text-primary"
           />
-          <Button onClick={uploadExcelBulanan}>Impor File</Button>
+          <Button onClick={uploadExcel}>
+                      {tableData.length > 0 ? "Upload" : "Impor"} Data
+            </Button>
         </div>
       </div>
 
