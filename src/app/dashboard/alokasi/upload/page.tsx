@@ -1,5 +1,4 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
-import { getCurrentSession } from "@/app/actions/auth.actions";
 import { ContentLayout } from "@/components/ContentLayout";
 import UploadAlokasi from "@/components/UploadAlokasi/UploadAlokasi";
 import { redirect } from "next/navigation";

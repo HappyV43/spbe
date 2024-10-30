@@ -37,21 +37,6 @@ interface Props {
 }
 
 const Form = ({ page, data, companyName, bpe }: Props) => {
-  // const [formData, setFormData] = useState({
-  //   nomorTransaksi: "",
-  //   nomorDo: "",
-  //   platKendaraan: "",
-  //   namaSopir: "",
-  //   jumlahTabung: 0,
-  //   volumeTabung: 0,
-  //   jumlahTabungBocor: Number(""),
-  //   isiKurang: Number(""),
-  //   namaAgen: "",
-  //   waktuPengambilan: new Date(),
-  //   status: "",
-  // });
-
-  const [counter, setCounter] = useState("0001");
   const [selectedCompanyId, setSelectedCompanyId] = useState(0);
 
   const handleCompanySelect = (value: any) => {
@@ -59,15 +44,6 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
       (company) => company.companyName === value
     );
     setSelectedCompanyId(Number(selectedCompany?.id) || 0);
-  };
-  // const [errorMessage, setErrorMessage] = useState("");
-  // const [isFormValid, setIsFormValid] = useState(false);
-
-  const generateNomorTransaksi = () => {
-    const date = new Date();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const yy = String(date.getFullYear()).slice(2);
-    return `BPE-${mm}${yy}-${"0001".padStart(4, "0")}`;
   };
 
   // useEffect(() => {
@@ -187,7 +163,6 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
         // handleDownload();
         redirect("/dashboard/penyaluran-elpiji");
   
-        setLoading(false);
       }
     };
   
@@ -277,7 +252,7 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
                   className={nonReq}
                   placeholder="Waktu pengambilan"
                   name="waktuPengambilan"
-                  value={format(new Date(), "dd MMMM yyyy")}
+                  value={format(new Date(), 'yyyy-MM-dd')}
                   readOnly
                 />
               </div>

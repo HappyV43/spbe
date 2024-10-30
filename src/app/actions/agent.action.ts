@@ -13,7 +13,9 @@ export const getAgentsAll = async () => {
     redirect("/master-data/companies/form");
   }
   try {
-    return await prisma.agents.findMany();
+    return await prisma.agents.findMany({
+      distinct: ["agentName"],
+    });
   } catch (error) {
     throw error;
   }
@@ -65,55 +67,68 @@ export const postAgentData = async (formData: FormData) => {
   }
 };
 export const updateAgentData = async (formData: FormData) => {
-  const agentName = formData.get("agentName")?.toString();
+  const agentNameLabel = formData.get("agentName")?.toString();
   const shipTo = formData.get("shipTo")?.toString()
     ? formData.get("shipTo")?.toString()
     : null;
-  const companyId = Number(formData.get("companyId"));
   const address = formData.get("address")?.toString();
   const city = formData.get("city")?.toString();
   const phone = formData.get("phone")?.toString();
   const fax = formData.get("fax")?.toString()
     ? formData.get("shipTo")?.toString()
     : null;
-  const companyName = formData.get("companyName")?.toString();
-  if (!companyId) {
+  const agentId = Number(formData.get("agentId"));
+
+  if (!agentId) {
     return {
-      error: "ID is missing.",
+      error: "Id is missing",
     };
   }
 
   try {
+    // Update data di tabel 'agents'
     const updatedData = await prisma.agents.update({
       where: {
-        id: companyId,
+        id: agentId,
       },
       data: {
-        companyId: companyId,
-        agentName: agentName,
-        shipTo: shipTo,
-        address: address,
-        city: city,
-        fax: fax,
-        phone: phone,
-        companyName: companyName,
+        agentName: agentNameLabel,
+        shipTo,
+        address,
+        city,
+        fax,
+        phone,
       },
     });
+
+    if (updatedData) {
+      await prisma.allocations.updateMany({
+        where: {
+          agentId: agentId,
+        },
+        data: {
+          agentName: agentNameLabel,
+        },
+      });
+    }
+
+    if (updatedData) {
+      // Dapatkan semua allocationId yang terkait dengan agentId
+      const allocations = await prisma.allocations.findMany({
+        where: { agentId: agentId },
+        select: { id: true },
+      });
+
+      const allocationIds = allocations.map((allocation) => allocation.id);
+
+      // Update agentName di LpgDistributions berdasarkan allocationId
+      await prisma.lpgDistributions.updateMany({
+        where: { allocationId: { in: allocationIds } },
+        data: { agentName: agentNameLabel },
+      });
+    }
     revalidatePath("/data-master/agents");
     return { success: true, data: updatedData };
-  } catch (error) {
-    return {
-      error: getErrorMessage(error),
-    };
-  }
-};
-export const deleteAgentData = async (id: number) => {
-  try {
-    await prisma.agents.delete({
-      where: {
-        id: id,
-      },
-    });
   } catch (error) {
     return {
       error: getErrorMessage(error),

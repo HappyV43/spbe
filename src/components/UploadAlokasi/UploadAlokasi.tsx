@@ -2,12 +2,19 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Allocation, RawDataMap } from "@/lib/types";
 import { read, utils } from "xlsx";
 import { uploadBulkExcel } from "@/app/actions/upload-file.action";
 import { toast } from "@/hooks/use-toast";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
 
 export default function UploadAlokasi({
   user,
@@ -19,6 +26,7 @@ export default function UploadAlokasi({
 }) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tableData, setTableData] = useState<Allocation[]>([]);
+  const router = useRouter();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -63,9 +71,12 @@ export default function UploadAlokasi({
             toast({
               title: "Upload Excel Berhasil",
             });
-            redirect("/dashboard/alokasi");
+            // router.push("/dashboard/alokasi");
           } catch (error) {
-            console.error(error);
+            toast({
+              title: "Harus upload excel SPBE",
+            });
+            console.log(error);
           }
         }
       };
@@ -130,7 +141,7 @@ export default function UploadAlokasi({
         </div>
       </div>
 
-      {/* {tableData.length > 0 && (
+      {tableData.length > 0 && (
         <div className="mt-8 w-full max-w-4xl">
           <h2 className="text-2xl font-semibold">Pratinjau Excel</h2>
           <Table>
@@ -162,7 +173,7 @@ export default function UploadAlokasi({
             </TableBody>
           </Table>
         </div>
-      )} */}
+      )}
     </div>
   );
 }
