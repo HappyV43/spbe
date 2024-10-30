@@ -23,6 +23,7 @@ import { useRouter } from "next/navigation";
 import { SignInValues } from "@/lib/types";
 import { registerAction } from "@/app/actions/auth.actions";
 import { EyeOff, Eye } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface CompanyData {
   id: number;

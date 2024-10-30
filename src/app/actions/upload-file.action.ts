@@ -14,10 +14,20 @@ export const uploadExcel = async (
       },
     });
 
+    const findAgentName = await prisma.agents.findMany({
+      where: {
+        agentName: data.agentName,
+      },
+      select: {
+        id: true,
+      },
+    });
+    const agentId = findAgentName.length > 0 ? findAgentName[0].id : null;
 
     const allocationData = {
       shipTo: data.shipTo,
       materialName: data.materialName,
+      agentId: agentId,
       agentName: data.agentName,
       plannedGiDate: data.plannedGiDate,
       allocatedQty: data.allocatedQty,
@@ -31,7 +41,6 @@ export const uploadExcel = async (
         where: { id: existingRecord.id },
         data: allocationData,
       });
-      console.log("Data updated:", result);
     } else {
       // Create new record
       result = await prisma.allocations.create({
@@ -42,7 +51,6 @@ export const uploadExcel = async (
           createdBy: data.createdBy,
         },
       });
-      console.log("New data created:", result);
     }
 
     revalidatePath("/dashboard/alokasi");

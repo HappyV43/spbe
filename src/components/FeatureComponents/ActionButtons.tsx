@@ -20,7 +20,7 @@ import {
 } from "../ui/dialog";
 import { EditForm } from "./EditForm";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import CetakPenyaluran from "../CetakPenyaluran/CetakPenyaluran";
+import CetakPenyaluran from "../CetakDistribusi/CetakPenyaluran";
 
 interface ActionButtonProps {
   data?: any;
@@ -40,7 +40,6 @@ export function ActionButtons({ data, page }: ActionButtonProps) {
 
   return (
     <>
-
       <PDFDownloadLink
         document={<CetakPenyaluran data={data} />}
         fileName={`Penyaluran Elpiji ${data.deliveryNumber}.pdf`}

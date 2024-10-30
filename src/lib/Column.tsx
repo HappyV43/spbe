@@ -4,136 +4,35 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Allocation, Agents, Companies, LpgDistributions, MonthlyAllocation } from "@/lib/types";
 import { Trash, Printer, Pencil, SquarePlus } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import CetakPenyaluran from "@/components/CetakPenyaluran/CetakPenyaluran";
-import { DialogHeader, DialogFooter } from "@/components/ui/dialog";
-import { toast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import ActionButtons from "@/components/FeatureComponents/ActionButtons";
 import Link from "next/link";
-
-export const lpgDistributionMonthlyColumns: ColumnDef<LpgDistributions>[] = [
-  {
-    accessorKey: "bpeNumber",
-    header: "Nomor BPE",
-  },
-  {
-    accessorKey: "giDate",
-    header: "Tanggal",
-  },
-  {
-    accessorKey: "agentName",
-    header: "Nama Agen",
-  },
-  {
-    accessorKey: "licensePlate",
-    header: "Nomor Plat",
-  },
-  {
-    accessorKey: "deliveryNumber",
-    header: "Nomor DO",
-  },
-  {
-    accessorKey: "allocatedQty",
-    header: "Kuantitas",
-  },
-  {
-    accessorKey: "distributionQty",
-    header: "Jumlah Tabung",
-  },
-  {
-    accessorKey: "volume",
-    header: "Volume Tabung",
-  },
-  {
-    accessorKey: "updatedAt",
-    header: "Diperbarui",
-  },
-];
+import EditFormAgents from "../components/CRUD/EditFormAgents";
+import EditFormLpg from "@/components/CRUD/EditFormLpg";
+import CetakPenyaluran from "@/components/CetakDistribusi/CetakPenyaluran";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     header: "Tindakan",
     cell: ({ row }) => {
-      return(
-        <ActionButtons data={row.original} page="distribution"/>
-      )
-
-      // const {openEditFormDialog, EditFormComponent} = useEditFormDialog();
-      // // Define actions for edit, delete, and print
-      // const handleEdit = () => {
-      //   openEditFormDialog();
-      //   console.log("Edit", openEditFormDialog);
-      // };
-      // const handleDelete = async () => {
-      //   const id = row.original.id;
-
-      //   if (id === undefined) {
-      //     toast({
-      //       title: "Error",
-      //       description: "id gak ada",
-      //       variant: "destructive",
-      //     });
-      //     return;
-      //   }
-
-        // const result = await deleteLpgData(id);
-        // if (result?.error) {
-        //   toast({
-        //     title: "Error",
-        //     description: result.error,
-        //     variant: "destructive",
-        //   });
-        // } else {
-        //   toast({
-        //     title: "Berhasil",
-        //     description: "Distribusi berhasil dihapus",
-        //   });
-
-        // }
-
-      // return (
-      //   <div className="flex justify-center space-x-4">
-      //     {/* Edit Icon */}
-      //     {/* <Pencil
-      //       className="h-4 w-4 text-blue-500 cursor-pointer"
-      //       onClick={handleEdit}
-      //     /> */}
-      //     <EditFormComponent/>
-      //     {/* Delete Icon */}
-
-      //     {/* Print Icon */}
-      //     <PDFDownloadLink
-      //       document={<CetakPenyaluran data={row.original} />}
-      //       fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}
-      //     >
-      //       <Printer className="h-4 w-4 text-green-500 cursor-pointer" />
-      //     </PDFDownloadLink>
-      //     <Dialog>
-      //       <DialogTrigger>
-      //         <Trash className="h-4 w-4 text-red-500 cursor-pointer" />
-      //       </DialogTrigger>
-      //       <DialogContent>
-      //         <DialogHeader>
-      //           <DialogTitle>Are you absolutely sure?</DialogTitle>
-      //           <DialogDescription>
-      //             This action cannot be undone. This will permanently delete
-      //             your account and remove your data from our servers.
-      //           </DialogDescription>
-      //         </DialogHeader>
-      //         <DialogFooter>
-      //           <Button onClick={handleDelete}>Confirm</Button>
-      //         </DialogFooter>
-      //       </DialogContent>
-      //     </Dialog>
-      //   </div>
-      // );
+      return (
+        <div className="flex">
+          <Button
+            variant="outline"
+            asChild
+            className="text-center align-center justify-center"
+          >
+            <PDFDownloadLink
+              className="text-center"
+              document={<CetakPenyaluran data={row.original} />}
+              fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}
+            >
+              <Printer className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+            </PDFDownloadLink>
+          </Button>
+          <EditFormLpg row={row.original} />
+        </div>
+      );
     },
   },
   {
@@ -171,6 +70,8 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    sortingFn: "datetime",
+    sortDescFirst: true,
   },
 ];
 
@@ -180,20 +81,14 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-      // Set different colors based on the status value
-      let statusClass = "";
-      switch (status) {
-        case "Pending":
-          statusClass = "text-orange-500";
-          break;
-        case "Approved":
-          statusClass = "text-lime-500";
-          break;
-        default:
-          statusClass = "text-gray-500";
-      }
 
-      return <span className={statusClass}>{status}</span>;
+      return (
+        <span
+          className={status === "Pending" ? "text-orange-500" : "text-lime-500"}
+        >
+          {status}
+        </span>
+      );
     },
   },
   {
@@ -215,7 +110,22 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "allocatedQty",
     header: "Jumlah",
-    // cell: ({ row }) => row.original.alocatedQty.toLocaleString(), // Optional: format angka
+  },
+  {
+    accessorKey: "plannedGiDate",
+    header: "Planned GI Date",
+    cell: ({ row }) => {
+      const rawDate = row.getValue("plannedGiDate") as string; // Get the string date (e.g., "01102024")
+
+      // Extract the day, month, and year from the string
+      const day = rawDate.slice(0, 2); // "01"
+      const month = rawDate.slice(2, 4); // "10"
+      const year = rawDate.slice(4); // "2024"
+
+      const formattedDate = `${day}-${month}-${year}`; // Format to "dd-MM-yyyy"
+
+      return <span>{formattedDate}</span>; // Return the formatted date
+    },
   },
   {
     accessorKey: "giDate",
@@ -235,18 +145,17 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     enableHiding: false,
     cell: ({ row }) => {
       return (
-        <Button
-        variant="outline"
-        disabled={row.original.status === "Approved"}
-      >
-        <Link
-          href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
-          className={row.original.status === "Approved" ? "cursor-not-allowed" : ""}
-        >
-          <SquarePlus className="h-4 w-4" />
-        </Link>
-      </Button>
-      )
+        <Button variant="outline" disabled={row.original.status === "Approved"}>
+          <Link
+            href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+            className={
+              row.original.status === "Approved" ? "cursor-not-allowed" : ""
+            }
+          >
+            <SquarePlus className="h-4 w-4" />
+          </Link>
+        </Button>
+      );
     },
   },
   // {
@@ -268,6 +177,34 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
 ];
 
 export const agentColumns: ColumnDef<Agents>[] = [
+  {
+    accessorKey: "Tindakan",
+    cell: ({ row }) => {
+      return (
+        // <div className="flex">
+        //   <Button
+        //     variant="outline"
+        //     asChild
+        //     className="text-center align-center justify-center"
+        //   >
+        //     <span className="text-red-500">
+        //       <Trash2 className="h-4 w-4 text-center align-center  cursor-pointer" />
+        //     </span>
+        //   </Button>
+        //   <Button
+        //     variant="outline"
+        //     asChild
+        //     className="text-center align-center justify-center"
+        //   >
+        //     <span className="text-orange-500">
+        //       <Pencil className="h-4 w-4 text-center align-center cursor-pointer" />
+        //     </span>
+        //   </Button>
+        // </div>
+        <EditFormAgents row={row.original} />
+      );
+    },
+  },
   {
     accessorKey: "agentName",
     header: "Nama Agen",

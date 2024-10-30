@@ -5,7 +5,7 @@ import { LpgDistributions } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { getErrorMessage } from "./error.action";
 import { getCurrentSession } from "./auth.actions";
-import { redirect } from "next/dist/server/api-utils";
+import { format } from "date-fns";
 
 export const searchDeliveryNumber = async (query: string) => {
   try {
@@ -138,7 +138,6 @@ export const UpdateLpgData = async (formData: FormData) => {
   const id = formData.get("id") as string; // ambil ID
   const platKendaraan = formData.get("platKendaraan") as string;
   const namaSopir = formData.get("namaSopir") as string;
-  const status = formData.get("status") as string;
   const jumlahTabungBocor = parseInt(
     formData.get("jumlahTabungBocor") as string
   );
@@ -158,7 +157,6 @@ export const UpdateLpgData = async (formData: FormData) => {
       data: {
         licensePlate: platKendaraan,
         driverName: namaSopir,
-        status: status,
         bocor: jumlahTabungBocor,
         isiKurang: isiKurang,
       },

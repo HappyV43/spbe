@@ -1,4 +1,4 @@
-import { getCurrentSession, getUser } from "@/app/actions/auth.actions";
+import { getCurrentSession } from "@/app/actions/auth.actions";
 import { getCompaniesAll } from "@/app/actions/companies.action";
 import Companies from "@/components/Companies/Companies";
 import { ContentLayout } from "@/components/ContentLayout";
