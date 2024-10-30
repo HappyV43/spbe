@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Ellipsis, LogOut } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,14 +21,11 @@ interface MenuProps {
   isOpen: boolean | undefined;
 }
 export function Menu({ isOpen }: MenuProps) {
-  const router = useRouter();
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
   const handleClick = async () => {
     try {
       await logOut();
-      router.push("/auth/login");
-      router.refresh();
     } catch (error) {
       console.error("Failed to call action:", error);
     }
@@ -93,7 +90,6 @@ export function Menu({ isOpen }: MenuProps) {
               )}
             </li>
           ))}
-
           <li className="w-full grow flex items-end">
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>

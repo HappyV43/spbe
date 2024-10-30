@@ -41,6 +41,11 @@ export function getMenuList(pathname: string): Group[] {
               label: "Penyaluran Elpiji",
               active: pathname === "/dashboard/penyaluran-elpiji",
             },
+            {
+              href: "/dashboard/alokasi-bulanan",
+              label: "Alokasi Bulanan",
+              active: pathname === "/dashboard/alokasi-bulanan",
+            },
             // {
             //   href: "/dashboard/cetak-penyaluran",
             //   label: "Cetak Penyaluran",
@@ -64,6 +69,11 @@ export function getMenuList(pathname: string): Group[] {
               label: "Agents",
               active: pathname === "/master-data/agents",
             },
+            {
+              href: "/master-data/companies",
+              label: "Companies",
+              active: pathname === "/master-data/companies",
+            },
           ],
         },
       ],
@@ -77,11 +87,6 @@ export function getMenuList(pathname: string): Group[] {
           active: pathname === "/setting",
           icon: Settings,
           submenus: [
-            {
-              href: "/master-data/companies",
-              label: "Companies",
-              active: pathname === "/master-data/companies",
-            },
             {
               href: "/setting/register",
               label: "Register",

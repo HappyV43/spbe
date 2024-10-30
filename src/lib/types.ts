@@ -17,6 +17,17 @@ export interface Allocation {
   createdAt?: Date;
 }
 
+export interface MonthlyAllocation {
+  id: number;
+  date?: Date;
+  totalQty?: number | 0;
+  totalVolume?: number | 0;
+  createdBy: string;
+  updatedBy: string;
+  updatedAt?: Date;
+  createdAt?: Date;
+}
+
 export interface Agents {
   id: number;
   companyId?: number;
@@ -97,6 +108,20 @@ export interface RawData {
 }
 
 export interface RawDataMap {
+  agentId?: string | null;
+  SHIP_TO: string;
+  SHIP_TO_NAME: string;
+  DO_NUMBER: string;
+  QUANTITY: number;
+  MATERIAL_NAME: string;
+  PLANNED_GI_DATE: string;
+  giDate?: Date | null;
+  bpe?: string | null;
+  createdBy: string;
+  updatedBy: string;
+}
+
+export interface RawDataMapMonthly {
   agentId?: string | null;
   SHIP_TO: string;
   SHIP_TO_NAME: string;

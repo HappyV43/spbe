@@ -10,7 +10,7 @@ import { SidebarToggle } from "./SidebarToggle";
 import { Button } from "../ui/button";
 import { Menu } from "./Menu";
 
-export default function Sidebar() {
+export default function Sidebar({}) {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const pathname = usePathname();
 
@@ -28,8 +28,10 @@ export default function Sidebar() {
         setSelectedKeys(['2']);
       } else if (pathname === "/dashboard/penyaluran-elpiji") {
         setSelectedKeys(['3']);
-      } else if (pathname === "/dashboard/cetak-penyaluran") {
+      } else if (pathname === "/dashboard/alokasi-bulanan") {
         setSelectedKeys(['4']);
+      } else if (pathname === "/dashboard/cetak-penyaluran") {
+        setSelectedKeys(['5']);
       } else if (pathname === "/master-data/agents") {
         setSelectedKeys(['6']);
       } else if (pathname === "/master-data/companies") {
