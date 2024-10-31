@@ -32,20 +32,21 @@ const AlokasiBulanan = <TData extends {
 }: AlokasiBulananProps<TData, TValue>) => {
     return (
         <div className="w-full">
-            <div className="px-4 pt-4 text-center">
-                <h1 className="text-lg font-semibold">Chart Jumlah Tabung</h1>
-            </div>
- 
-
+            <div className="items-center py-4 mx-4">
                 <div className="flex justify-between items-center mb-3 space-x-2">
-                    <Button variant="outline" asChild>
+                    <Button className="mx-4" variant="default" asChild>
                         <Link href="alokasi-bulanan/upload"> 
                             <Upload className="h-4 w-4 mr-2 cursor-pointer"/>
                             Upload Alokasi
                         </Link>
                     </Button>
                 </div>
+
+                <DataTable columns={columns} data={data} />
+            </div>
         </div>
+
+        
     );
 };
 

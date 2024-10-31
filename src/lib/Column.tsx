@@ -171,8 +171,16 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     header: "Jumlah",
   },
   {
-    accessorKey: "giDate",
-    header: "GI Date",
+    accessorKey: "totalVolume",
+    header: "Total Volume ",
+  },
+  {
+    accessorKey: "date",
+    header: "Tanggal",
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
   },
 ];
 
