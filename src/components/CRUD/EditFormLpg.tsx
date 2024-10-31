@@ -18,7 +18,7 @@ import { Pencil } from "lucide-react";
 import { redirect } from "next/navigation";
 import React, { useRef, useState } from "react";
 
-const EditFormLpg = ({ row }) => {
+const EditFormLpg = ({ row } :any) => {
   const ref = useRef<HTMLFormElement>(null);
   const [id, setId] = useState(row.id);
   const [platKendaraan, setPlatKendaraan] = useState(row.licensePlate);
@@ -50,12 +50,9 @@ const EditFormLpg = ({ row }) => {
       <DialogTrigger>
         <Button
           variant="outline"
-          asChild
-          className="text-center align-center justify-center"
+          className="text-center align-center justify-center w-1"
         >
-          <span className="className=h-4 w-4 text-center align-center text-green-500 cursor-pointer">
-            <Pencil />
-          </span>
+            <Pencil className="h-4 w-4 text-center align-center text-green-500 cursor-pointer"/>
         </Button>
       </DialogTrigger>
       <DialogContent>

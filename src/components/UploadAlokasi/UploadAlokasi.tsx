@@ -28,7 +28,6 @@ export default function UploadAlokasi({
   const [tableData, setTableData] = useState<Allocation[]>([]);
   const router = useRouter();
 
-  console.log(tableData)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
@@ -95,23 +94,26 @@ export default function UploadAlokasi({
   };
   
   const uploadExcel = async () => {
-    if(selectedFile != null && tableData.length >0){
-      try {
-        await uploadBulkExcel(tableData);
-        toast({ title: "Upload Excel Berhasil" });
-        redirect("/dashboard/alokasi");
-      } catch (error) {
-        toast({ title: "Upload Excel Gagal", variant:"destructive" });
-        console.error(error);
-      }
-    } else{
+    if(selectedFile == null || tableData.length <= 0){
       toast({ 
         title: selectedFile == null 
           ? "Harap pilih file untuk diunggah." 
           : "Data tidak ditemukan. Harap periksa format file.",
         variant: "destructive" 
       });
+      return
     }
+
+      console.log(selectedFile)
+      console.log(tableData.length)
+      const te = await uploadBulkExcel(tableData);
+      console.log(te)
+      toast({ title: "Upload Excel Berhasil" });
+      // redirect("/dashboard/alokasi");
+    // } catch (error) {
+    //   toast({ title: "Upload Excel Gagal", variant:"destructive" });
+    //   console.error(error);
+    // }
   };
 
   return (
