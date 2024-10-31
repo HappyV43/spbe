@@ -1,196 +1,164 @@
 "use client";
-import React, { useRef, useState } from "react";
-import { Breadcrumb, Typography, Input, Space, Table, Button } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
-import Highlighter from "react-highlight-words";
-import type { InputRef, TableColumnsType, TableColumnType } from "antd";
-import type { FilterDropdownProps } from "antd/es/table/interface";
-import { Content } from "antd/es/layout/layout";
-import { createStyles } from 'antd-style'; // Make sure to import this
-import CustomTable from "../Table/CustomTable";
-import { AlokasiDataType, data } from "../data/DataAlokasi";
+import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "../ui/button";
+import { DataTable } from "../ui/data-table";
+import Link from "next/link";
+import { Label } from "../ui/label";
+import ComboBox from "../FeatureComponents/ComboBox";
+import { SearchX, Upload } from "lucide-react";
+import { useEffect, useState } from "react";
+import { DatePickerWithRange } from "../FeatureComponents/DateRange";
+import { normalizeDateFrom, normalizeDateTo } from "@/utils/page";
 
-const { Title } = Typography;
+interface AlokasiProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
 
-const Alokasi = () => {
-  const [totalData, setTotalData] = useState("600");
-  const [searchText, setSearchText] = useState("");
-  const [searchedColumn, setSearchedColumn] = useState("");
-  const [qtyFilter, setQtyFilter] = useState("");
-  const [GIDateFilter, setGIDateFilter] = useState("");
-  const [status, setStatus] = useState("");
-  const searchInput = useRef<InputRef>(null);
+const Alokasi = <TData extends {
+    giDate: Date;
+    deliveryNumber: string;
+    allocatedQty: number;
+    agentName: string;
+    status: string;
+    updatedAt: Date;
+  },
+  TValue
+>({
+  columns,
+  data,
+}: AlokasiProps<TData, TValue>) => {
+    const [status, setStatus] = useState("Pending");
+    const [agentName, setAgentName] = useState("");
+    const [doNumber, setDoNumber] = useState("");
+    const [dateFilter, setDateFilter] = useState<any>(""); 
+    const [filteredData, setFilteredData] = useState<TData[]>(data);
+    const [filtered, setFiltered] = useState<Boolean>(false);
 
-  const filteredData = data.filter(item => 
-    (qtyFilter ? item.qty.toString().includes(qtyFilter) : true) &&
-    (GIDateFilter ? item.GIDate.includes(GIDateFilter) : true) &&
-    (status ? item.status.includes(status) : true)
-  );
+    const statusOptions = Array.from(
+      new Set(data.map((item) => item.status))
+    ).map((status) => ({
+      label: status,
+      value: status,
+    }));
 
-  const handleSearch = (
-    selectedKeys: string[],
-    confirm: FilterDropdownProps["confirm"],
-    dataIndex: keyof AlokasiDataType
-  ) => {
-    confirm();
-    setSearchText(selectedKeys[0]);
-    setSearchedColumn(dataIndex);
-  };
+    const agentNameOptions = Array.from(
+      new Set(data.map((item) => item.agentName))
+    ).map((agentName) => ({
+      label: agentName,
+      value: agentName,
+    }));
 
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters();
-    setSearchText("");
-  };
+    const doNumberOptions = Array.from(
+        new Set(data.map((item) => item.deliveryNumber)) 
+    ).map((deliveryNumber) => ({
+        label: deliveryNumber,
+        value: deliveryNumber,
+    }));
 
-  const getColumnSearchProps = (dataIndex: keyof AlokasiDataType): TableColumnType<AlokasiDataType> => ({
-    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
-      <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
-        <Input
-          ref={searchInput}
-          placeholder={`Search ${dataIndex}`}
-          value={selectedKeys[0]}
-          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
-          onPressEnter={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-          style={{ marginBottom: 8, display: "block" }}
-        />
-        <Space>
-          <Button
-            type="primary"
-            onClick={() => handleSearch(selectedKeys as string[], confirm, dataIndex)}
-            icon={<SearchOutlined />}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Search
-          </Button>
-          <Button
-            onClick={() => clearFilters && handleReset(clearFilters)}
-            size="small"
-            style={{ width: 90 }}
-          >
-            Reset
-          </Button>
-        </Space>
-      </div>
-    ),
-    filterIcon: (filtered: boolean) => (
-      <SearchOutlined style={{ color: filtered ? "#1677ff" : undefined }} />
-    ),
-    onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes((value as string).toLowerCase()),
-    render: (text) =>
-      searchedColumn === dataIndex ? (
-        <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
-          searchWords={[searchText]}
-          autoEscape
-          textToHighlight={text ? text.toString() : ""}
-        />
-      ) : (
-        text
-      ),
-  });
+    useEffect(() => {
+        const filtered = data.filter((item) => {
+          const matchesStatus = status ? item.status === status : true;
+          const matchesAgentName = agentName ? item.agentName === agentName : true;
+          const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
 
-  const columns: TableColumnsType<AlokasiDataType> = [
-    {
-      title: "Delivery Number",
-      dataIndex: "deliveryNumber",
-      key: "deliveryNumber",
-      width: "20%",
-    },
-    {
-      title: "Ship To",
-      dataIndex: "shipTo",
-      key: "shipTo",
-      width: "15%",
-    },
-    {
-      title: "Nama Agen",
-      dataIndex: "namaAgen",
-      key: "namaAgen",
-      width: "20%",
-    },
-    {
-      title: "Quantity",
-      dataIndex: "qty",
-      key: "qty",
-      width: "15%",
-    },
-    {
-      title: "Material Name",
-      dataIndex: "materialName",
-      key: "materialName",
-      width: "30%",
-    },
-    {
-      title: "GI Date",
-      dataIndex: "GIDate",
-      key: "GIDate",
-      width: "15%",
-    },
-    {
-      title: "BPE",
-      dataIndex: "BPE",
-      key: "BPE",
-      width: "20%",
-    },
-    {
-      title: "Tanggal",
-      dataIndex: "tanggal",
-      key: "tanggal",
-      width: "20%",
-    },
-    {
-      title: "Periode",
-      dataIndex: "periode",
-      key: "periode",
-      width: "20%",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      width: "20%",
-    },
-  ];
+          const matchesDate = dateFilter?.from ? (
+              dateFilter?.to ? (
+                item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                item.giDate <= normalizeDateTo(dateFilter.to)
+              ) : (
+                item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                item.giDate <= normalizeDateTo(dateFilter.from)
+              )
+          ) : true;
+          console.log(matchesAgentName, matchesDoNumber, matchesStatus,"DATe: ",  matchesDate);
 
-  return (
-    <>
-      <Content>
-        <div className={`bg-white h-auto p-6 pb-2 rounded-lg`}>
-          <Title>Alokasi {totalData}</Title>
+          return matchesStatus && matchesAgentName && matchesDoNumber && matchesDate;
+        });
+        console.log(filtered)
 
-          {/* Filter Inputs */}
-          <Space style={{ marginBottom: 16 }}>
-            <Title></Title>
-            <Input
-              placeholder="All Qty"
-              value={qtyFilter}
-              onChange={(e) => setQtyFilter(e.target.value)}
-              style={{ width: 200 }}
+        setFilteredData(filtered);
+    }, [status, agentName, doNumber, dateFilter, data]);
+
+    const handleClearSearch = () => {
+        setStatus("");
+        setAgentName("");
+        setDoNumber("");
+        setDateFilter(null);
+    
+        setFilteredData(data);
+    
+        setFiltered(false);
+    };
+
+    return (
+        <div className="w-full">
+            <div className="items-center py-4 mx-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
+                    <div>
+                        <Label htmlFor="status-search" className="text-lg">Status</Label>
+                        <ComboBox
+                            data={statusOptions} 
+                            value={status}
+                            setValue={setStatus}
+                            placeholder="Pilih status..."
+                        />
+                    </div>
+
+          <div>
+            <Label htmlFor="agent-search" className="text-lg">
+              Name Agen
+            </Label>
+            <ComboBox
+              data={agentNameOptions}
+              value={agentName}
+              setValue={setAgentName}
+              placeholder="Pilih agen..."
             />
-            <Input
-              placeholder="All GI Date"
-              value={GIDateFilter}
-              onChange={(e) => setGIDateFilter(e.target.value)}
-              style={{ width: 200 }}
-            />
-            <Input
-              placeholder="All Status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              style={{ width: 200 }}
-            />
-          </Space>
-
-          {/* TABLE */}
-          <div className="pt-6">
-            <CustomTable data={filteredData} columns={columns} bordered expandable />
           </div>
+
+          <div>
+            <Label htmlFor="do-search" className="text-lg">
+              Nomer DO
+            </Label>
+            <ComboBox
+              data={doNumberOptions}
+              value={doNumber}
+              setValue={setDoNumber}
+              placeholder="Pilih delivery number..."
+            />
+          </div>
+
+                    <div>
+                        <Label htmlFor="date-search" className="text-lg">Tanggal</Label>
+                        <DatePickerWithRange
+                            value={dateFilter}
+                            onDateChange={setDateFilter}
+                            placeholder="Pilih tanggal..."
+                        />
+                    </div>
+                </div>
+
+                <div className="flex justify-between items-center mb-3 space-x-2">
+                    <Button variant="default" asChild>
+                        <Link href="alokasi/upload"> 
+                            <Upload className="h-4 w-4 mr-2 cursor-pointer"/>
+                            Upload Alokasi
+                        </Link>
+                    </Button>
+                    
+                    <div className="flex space-x-2">
+                        {(status || doNumber || agentName || dateFilter != null) &&(
+                            <Button variant="default" onClick={handleClearSearch}>
+                                <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
+                            </Button>
+                        )}
+                    </div>
+                </div>
+                <DataTable columns={columns} data={filteredData} />
+            </div>
         </div>
-      </Content>
-    </>
-  );
+    );
 };
 
 export default Alokasi;

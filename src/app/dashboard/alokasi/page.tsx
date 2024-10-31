@@ -1,15 +1,22 @@
+import { getAllokasiAll } from "@/app/actions/alokasi.action";
+import { getCurrentSession } from "@/app/actions/auth.actions";
 import Alokasi from "@/components/Alokasi/Alokasi";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
+import { ContentLayout } from "@/components/ContentLayout";
+import { allocationColumns } from "@/lib/Column";
 
 export const metadata = {
   title: "Alokasi PKMU",
 };
 
-const AlokasiPage = () => {
+const AlokasiPage = async () => {
+  const data = await getAllokasiAll();
+
   return (
-    <DefaultLayout>
-      <Alokasi/>
-    </DefaultLayout>
+    <ContentLayout
+      home={"dashboard"}
+      mainpage={"alokasi"}
+      children={<Alokasi columns={allocationColumns} data={data} />}
+    />
   );
 };
 
