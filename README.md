@@ -39,6 +39,7 @@ git push origin <branchYgInginDipush>
 ```bash
 #env untuk db
 DATABASE_URL=""
+testing
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
