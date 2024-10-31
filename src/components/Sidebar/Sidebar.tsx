@@ -5,41 +5,44 @@ import { usePathname } from "next/navigation";
 import { useSidebarToggle } from "@/hooks/useSidebarToggle";
 import { useStore } from "zustand";
 import { cn } from "@/lib/utils";
-import { Link, PanelsTopLeft } from "lucide-react";
+import { Link } from "lucide-react";
 import { SidebarToggle } from "./SidebarToggle";
 import { Button } from "../ui/button";
 import { Menu } from "./Menu";
 
-export default function Sidebar ({}) {
+export default function Sidebar({}) {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const pathname = usePathname();
 
   const sidebar = useStore(useSidebarToggle, (state) => state);
-  
-  if(!sidebar) return null;
 
-  // Function to update the selected key in local storage
+  if (!sidebar) return null;
+
   const updateSelectedKey = (key: string) => {
     setSelectedKeys([key]);
     localStorage.setItem("selectedKey", key);
   };
 
   useEffect(() => {
-      if (pathname === "/dashboard/penyaluran-elpiji") {
+      if (pathname === "/dashboard/alokasi") {
         setSelectedKeys(['2']);
-      } else if (pathname === "/dashboard/alokasi") {
+      } else if (pathname === "/dashboard/penyaluran-elpiji") {
         setSelectedKeys(['3']);
-      } else if (pathname === "/dashboard/cetak-penyaluran") {
+      } else if (pathname === "/dashboard/alokasi-bulanan") {
         setSelectedKeys(['4']);
+      } else if (pathname === "/dashboard/cetak-penyaluran") {
+        setSelectedKeys(['5']);
       } else if (pathname === "/master-data/agents") {
         setSelectedKeys(['6']);
       } else if (pathname === "/master-data/companies") {
         setSelectedKeys(['7']);
-      } else if (pathname === "/profile") {
+      } else if (pathname === "/register") {
         updateSelectedKey("8");
-      } else if (pathname === "/") {
-        updateSelectedKey("2");
-      }
+      } 
+      // TODO
+      // if (userRole === "admin" && pathname === "/register") {
+      //   updateSelectedKey("8");
+      // }
   }, [pathname]);
 
   return (
@@ -60,7 +63,6 @@ export default function Sidebar ({}) {
           asChild
         >
           <Link href="/dashboard" className="flex items-center gap-2">
-            {/* <PanelsTopLeft className="w-6 h-6 mr-1" /> */}
             <h1
               className={cn(
                 "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-500",
@@ -77,4 +79,4 @@ export default function Sidebar ({}) {
       </div>
     </aside>
   );
-};
+}

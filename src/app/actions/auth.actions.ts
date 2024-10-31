@@ -1,92 +1,65 @@
 "use server";
 
-import { lucia } from "@/lib/lucia";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import prisma from "@/lib/db";
 import { SignInValues } from "@/lib/types";
 import { Argon2id } from "oslo/password";
+import {
+  deleteSessionTokenCookie,
+  getSessionToken,
+  setSession,
+} from "@/lib/lucia";
+import { encodeHexLowerCase } from "@oslojs/encoding";
+import { sha256 } from "@oslojs/crypto/sha2";
+import {
+  SessionValidationResult,
+  createSession,
+  generateSessionToken,
+  invalidateSession,
+  validateSessionToken,
+} from "@/auth";
+import { getErrorMessage } from "./error.action";
+import { cookies } from "next/headers";
+import { cache } from "react";
 
 export const signIn = async (values: SignInValues) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      username: values.username,
-    },
-  });
+  try {
+    const user = await prisma.user.findUnique({
+      where: { username: values.username },
+    });
 
-  if (!user || !user.password) {
-    return { success: false, error: "Invalid Credentials!" };
+    if (!user || !user.password) {
+      console.log(`Failed login attempt for username: ${values.username}`);
+      return { success: false, error: "Invalid credentials" };
+    }
+
+    const passwordMatch = await new Argon2id().verify(
+      user.password,
+      values.password
+    );
+
+    if (!passwordMatch) {
+      console.log(`Failed login attempt for username: ${values.username}`);
+      return { success: false, error: "Invalid credentials" };
+    }
+    await setSession(user.id);
+    return { success: true };
+  } catch (error) {
+    console.error("Error during sign in:", error);
+    return { success: false, error: "An unexpected error occurred" };
   }
-
-  const passwordMatch = await new Argon2id().verify(
-    user.password,
-    values.password
-  );
-
-  if (!passwordMatch) {
-    return { success: false, error: "Invalid Credentials!" };
-  }
-
-  // successfully login
-  const session = await lucia.createSession(user.id, {});
-  const sessionCookie = await lucia.createSessionCookie(session.id);
-
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes
-  );
-
-  return { success: true };
 };
 
 export const logOut = async () => {
-  const sessionCookie = await lucia.createBlankSessionCookie();
-  cookies().set(
-    sessionCookie.name,
-    sessionCookie.value,
-    sessionCookie.attributes
-  );
-  return redirect("/auth/login");
-};
+  const sessionToken = getSessionToken();
+  if (sessionToken) {
+    const sessionId = encodeHexLowerCase(
+      sha256(new TextEncoder().encode(sessionToken))
+    );
 
-export const getUser = async () => {
-  const sessionId = cookies().get(lucia.sessionCookieName)?.value || null;
-  if (!sessionId) {
-    return null;
+    await invalidateSession(sessionId);
   }
 
-  const { session, user } = await lucia.validateSession(sessionId);
-  try {
-    if (session && session.fresh) {
-      // refreshing their session cookie
-      const sessionCookie = await lucia.createSessionCookie(session.id);
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
-    }
-    if (!session) {
-      const sessionCookie = await lucia.createBlankSessionCookie();
-      cookies().set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes
-      );
-    }
-  } catch (error) {
-    console.error("error disini", error);
-  }
-  const dbUser = await prisma.user.findUnique({
-    where: {
-      id: user?.id,
-    },
-    select: {
-      username: true,
-    },
-  });
-  return dbUser;
+  deleteSessionTokenCookie();
 };
 
 export const registerAction = async (values: SignInValues) => {
@@ -106,17 +79,26 @@ export const registerAction = async (values: SignInValues) => {
       data: {
         username: values.username,
         password: hashedPassword,
+        role: values.role,
+        companiesId: parseInt(values.company.id),
       },
     });
-    const session = await lucia.createSession(user.id, {});
-    const sessionCookie = await lucia.createSessionCookie(session.id);
-    cookies().set(
-      sessionCookie.name,
-      sessionCookie.value,
-      sessionCookie.attributes
-    );
+
+    await setSession(user.id);
     return { success: true };
   } catch (error) {
-    return { error: "Something went wrong", success: false };
+    return { error: getErrorMessage(error), success: false };
   }
 };
+
+export const getCurrentSession = cache(
+  async (): Promise<SessionValidationResult> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("spbe-auth-cookies")?.value ?? null;
+    if (token === null) {
+      return { session: null, user: null };
+    }
+    const result = await validateSessionToken(token);
+    return result;
+  }
+);

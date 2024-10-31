@@ -1,46 +1,137 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Allocation } from "@/lib/types";
-import { AgentsDataType } from "./DataAgents";
-import { CompaniesDataType } from "./DataCompanies";
+import {
+  Allocation,
+  Agents,
+  Companies,
+  LpgDistributions,
+  MonthlyAllocation,
+} from "@/lib/types";
+import { Trash, Printer, Pencil, SquarePlus } from "lucide-react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Button } from "@/components/ui/button";
+import ActionButtons from "@/components/FeatureComponents/ActionButtons";
+import Link from "next/link";
+import EditFormAgents from "../components/CRUD/EditFormAgents";
+import EditFormLpg from "@/components/CRUD/EditFormLpg";
+import CetakPenyaluran from "@/components/CetakDistribusi/CetakPenyaluran";
 
-// Definisikan kolom untuk tabel menggunakan TanStack Table
+export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
+  {
+    header: "Tindakan",
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-1">
+          <Button
+            variant="outline"
+            asChild
+            className="text-center align-center justify-center w-1"
+          >
+            <PDFDownloadLink
+              className="text-center"
+              document={<CetakPenyaluran data={row.original} />}
+              fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}
+            >
+              <Printer className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+            </PDFDownloadLink>
+          </Button>
+          <EditFormLpg row={row.original} />
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "bpeNumber",
+    header: "Nomor BPE",
+  },
+  {
+    accessorKey: "giDate",
+    header: "Tanggal",
+  },
+  {
+    accessorKey: "agentName",
+    header: "Nama Agen",
+  },
+  {
+    accessorKey: "licensePlate",
+    header: "Nomor Plat",
+  },
+  {
+    accessorKey: "deliveryNumber",
+    header: "Nomor DO",
+  },
+  {
+    accessorKey: "allocatedQty",
+    header: "Kuantitas",
+  },
+  {
+    accessorKey: "distributionQty",
+    header: "Jumlah Tabung",
+  },
+  {
+    accessorKey: "volume",
+    header: "Volume Tabung",
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+    sortingFn: "datetime",
+    sortDescFirst: true,
+  },
+];
+
 export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-      let statusClass = "";
-      if (status === "Pending") {
-        statusClass = "text-orange-500";
-      } else if (status === "delivered") {
-        statusClass = "text-green-500";
-      }
-      return <span className={statusClass}>{status}</span>;
+      // console.log(status)
+      return (
+        <span
+          className={status == "Pending" ? ("text-orange-500") : ("text-lime-500")}
+        >
+          {status}
+        </span>
+      );
     },
   },
   {
     accessorKey: "deliveryNumber",
-    header: "Delivery Number",
+    header: "Nomer DO",
   },
   {
     accessorKey: "shipTo",
     header: "Ship To",
   },
   {
-    accessorKey: "namaAgen",
-    header: "Agent Name",
+    accessorKey: "agentName",
+    header: "Nama Agen",
   },
   {
     accessorKey: "materialName",
-    header: "Material Name",
+    header: "Nama Material",
   },
   {
-    accessorKey: "alocatedQty",
-    header: "Quantity",
-    cell: ({ row }) => row.original.alocatedQty.toLocaleString(), // Optional: format angka
+    accessorKey: "allocatedQty",
+    header: "Jumlah",
+  },
+  {
+    accessorKey: "plannedGiDate",
+    header: "Planned GI Date",
+    cell: ({ row }) => {
+      const rawDate = row.getValue("plannedGiDate") as string; // Get the string date (e.g., "01102024")
+
+      // Extract the day, month, and year from the string
+      const day = rawDate.slice(0, 2); // "01"
+      const month = rawDate.slice(2, 4); // "10"
+      const year = rawDate.slice(4); // "2024"
+
+      const formattedDate = `${day}-${month}-${year}`; // Format to "dd-MM-yyyy"
+
+      return <span>{formattedDate}</span>; // Return the formatted date
+    },
   },
   {
     accessorKey: "giDate",
@@ -48,12 +139,30 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   },
   {
     accessorKey: "bpeNumber",
-    header: "BPE Number",
+    header: "Nomer BPE",
   },
   {
     accessorKey: "updatedAt",
-    header: "Updated At",
-    cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
+    header: "Diperbarui",
+    // cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
+  },
+  {
+    header: "Tindakan",
+    enableHiding: false,
+    cell: ({ row }) => {
+      return (
+        <Button variant="outline" disabled={row.original.status === "Approved"}>
+          <Link
+            href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+            className={
+              row.original.status === "Approved" ? "cursor-not-allowed" : ""
+            }
+          >
+            <SquarePlus className="h-4 w-4" />
+          </Link>
+        </Button>
+      );
+    },
   },
   // {
   //   accessorKey: "createdAt",
@@ -62,69 +171,92 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   // },
 ];
 
-export const agentColumns: ColumnDef<AgentsDataType>[] = [
-
+export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
-      accessorKey: "id",
-      header: "ID",
+    accessorKey: "totalElpiji",
+    header: "Jumlah",
   },
   {
-      accessorKey: "name",
-      header: "Name",
+    accessorKey: "volume",
+    header: "Total Volume ",
   },
   {
-      accessorKey: "address",
-      header: "Address",
+    accessorKey: "date",
+    header: "Tanggal",
   },
   {
-      accessorKey: "city",
-      header: "City",
+    accessorKey: "createdAt",
+    header: "Diperbarui",
   },
-  {
-      accessorKey: "phone",
-      header: "Phone",
-  },
-  {
-      accessorKey: "fax",
-      header: "Fax",
-  },
-  {
-      accessorKey: "associatedCompanyId",
-      header: "Associated Company Id",
-  },
-  {
-      accessorKey: "createdAt",
-      header: "Created At",
-  },
-  {
-      accessorKey: "updatedAt",
-      header: "Updated At",
-  }
 ];
 
-export const companiesColumns: ColumnDef<CompaniesDataType>[] = [
+export const agentColumns: ColumnDef<Agents>[] = [
   {
-      accessorKey: 'id',
-      header: 'ID',
+    accessorKey: "Tindakan",
+    cell: ({ row }) => {
+      return (
+        <EditFormAgents row={row.original} />
+      );
+    },
   },
   {
-      accessorKey: 'company',
-      header: 'Company Name',
+    accessorKey: "agentName",
+    header: "Nama Agen",
   },
   {
-      accessorKey: 'address',
-      header: 'Address',
+    accessorKey: "address",
+    header: "Alamat",
   },
   {
-      accessorKey: 'telephone',
-      header: 'Telephone',
+    accessorKey: "city",
+    header: "Kota",
   },
   {
-      accessorKey: 'createdAt',
-      header: 'Created At',
+    accessorKey: "phone",
+    header: "No HP",
   },
   {
-      accessorKey: 'updatedAt',
-      header: 'Updated At',
+    accessorKey: "fax",
+    header: "Fax",
   },
+  {
+    accessorKey: "companyName",
+    header: "Nama Perusahaan",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Dibuat",
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+  },
+];
+
+export const companiesColumns: ColumnDef<Companies>[] = [
+  {
+    accessorKey: "companyName",
+    header: "Nama Perusahaan",
+  },
+  {
+    accessorKey: "address",
+    header: "Alamat",
+  },
+  {
+    accessorKey: "telephone",
+    header: "No HP",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Dibuat",
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+  },
+];
+
+export const Role = [
+  { label: "User", value: "USER" },
+  { label: "Admin", value: "ADMIN" },
 ];
