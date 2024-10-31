@@ -73,9 +73,7 @@ export const uploadBulkExcel = async (datas: Allocation[]) => {
   }
 };
 
-export const uploadExcelMonthly = async (
-  data: Omit<MonthlyAllocation, "createdAt" | "updatedAt">
-) => {
+export const uploadExcelMonthly = async (data: MonthlyAllocation) => {
   try {
     const excelMonthly = await prisma.monthlyAllocations.create({
       data: {

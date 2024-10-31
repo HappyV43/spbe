@@ -1,7 +1,13 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Allocation, Agents, Companies, LpgDistributions, MonthlyAllocation } from "@/lib/types";
+import {
+  Allocation,
+  Agents,
+  Companies,
+  LpgDistributions,
+  MonthlyAllocation,
+} from "@/lib/types";
 import { Trash, Printer, Pencil, SquarePlus } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
@@ -167,11 +173,11 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
 
 export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
-    accessorKey: "allocatedQty",
+    accessorKey: "totalElpiji",
     header: "Jumlah",
   },
   {
-    accessorKey: "totalVolume",
+    accessorKey: "volume",
     header: "Total Volume ",
   },
   {
@@ -179,7 +185,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     header: "Tanggal",
   },
   {
-    accessorKey: "updatedAt",
+    accessorKey: "createdAt",
     header: "Diperbarui",
   },
 ];
@@ -274,4 +280,3 @@ export const Role = [
   { label: "User", value: "USER" },
   { label: "Admin", value: "ADMIN" },
 ];
-

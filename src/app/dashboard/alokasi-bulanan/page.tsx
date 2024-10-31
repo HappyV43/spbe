@@ -1,14 +1,14 @@
+import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
 import AlokasiBulanan from "@/components/AlokasiBulanan/AlokasiBulanan";
 import { ContentLayout } from "@/components/ContentLayout";
-import { allocationColumns, monthlyAllocationColumns } from "@/lib/Column";
-import { data } from "@/lib/dummyData/DataAlokasiBulanan";
+import { monthlyAllocationColumns } from "@/lib/Column";
 
 export const metadata = {
     title: "Alokasi Bulanan PKMU",
 }
 
-const AlokasiBulananPage = () => {
-    // const data = await getAlokasiBulananAll();
+const AlokasiBulananPage = async () => {
+    const data = await getMonthlyAllocation();
     return(
         <ContentLayout 
         home={"dashboard"} 
