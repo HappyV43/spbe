@@ -1,10 +1,17 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Allocation, Agents, Companies, LpgDistributions } from "@/lib/types";
-import { Printer, SquarePlus } from "lucide-react";
+import {
+  Allocation,
+  Agents,
+  Companies,
+  LpgDistributions,
+  MonthlyAllocation,
+} from "@/lib/types";
+import { Trash, Printer, Pencil, SquarePlus } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
+import ActionButtons from "@/components/FeatureComponents/ActionButtons";
 import Link from "next/link";
 import EditFormAgents from "../components/CRUD/EditFormAgents";
 import EditFormLpg from "@/components/CRUD/EditFormLpg";
@@ -137,6 +144,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    // cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
   },
   {
     header: "Tindakan",
@@ -155,6 +163,30 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
         </Button>
       );
     },
+  },
+  // {
+  //   accessorKey: "createdAt",
+  //   header: "Created At",
+  //   cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(), // Format tanggal
+  // },
+];
+
+export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
+  {
+    accessorKey: "totalElpiji",
+    header: "Jumlah",
+  },
+  {
+    accessorKey: "volume",
+    header: "Total Volume ",
+  },
+  {
+    accessorKey: "date",
+    header: "Tanggal",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Diperbarui",
   },
 ];
 

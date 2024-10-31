@@ -17,6 +17,16 @@ export interface Allocation {
   createdAt?: Date;
 }
 
+export interface MonthlyAllocation {
+  Tanggal: Date;
+  Total_Elpiji: number;
+  Volume_Total_Elpiji: number;
+  createdBy: string;
+  updatedBy: string;
+  updatedAt?: Date;
+  createdAt?: Date;
+}
+
 export interface Agents {
   id: number;
   companyId?: number;

@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { Agents, Allocation, RawData } from "@/lib/types";
+import { Agents, Allocation, MonthlyAllocation, RawData } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 
 export const uploadExcel = async (
@@ -70,5 +70,36 @@ export const uploadBulkExcel = async (datas: Allocation[]) => {
   } catch (error) {
     console.error(error);
     throw new Error("Bulk upload failed");
+  }
+};
+
+export const uploadExcelMonthly = async (data: MonthlyAllocation) => {
+  try {
+    const excelMonthly = await prisma.monthlyAllocations.create({
+      data: {
+        date: data.Tanggal,
+        totalElpiji: data.Total_Elpiji,
+        volume: data.Volume_Total_Elpiji,
+        updatedBy: data.updatedBy,
+        createdBy: data.createdBy,
+      },
+    });
+    return { success: true, data: excelMonthly };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Bulk upload failed");
+  }
+};
+
+export const uploadBulkExcelMonthly = async (datas: MonthlyAllocation[]) => {
+  try {
+    for (const excel of datas) {
+      await uploadExcelMonthly(excel);
+    }
+    revalidatePath("/dashboard/alokasi-bulanan");
+  } catch (error) {
+    return {
+      error: "Terjadi masalah saat import excel",
+    };
   }
 };

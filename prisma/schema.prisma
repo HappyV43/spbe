@@ -34,6 +34,9 @@ model User {
 
   companiesCreatedBy Companies[] @relation("companiesCreatedByRelation")
   companiesUpdatedBy Companies[] @relation("companiesUpdatedByRelation")
+
+  MonthlyAllocationsCreatedby MonthlyAllocations[] @relation("createdByRelationMonthly")
+  MonthlyAllocationsUpdatedBy MonthlyAllocations[] @relation("updatedByRelationMonthly")
 }
 
 model Session {
@@ -100,6 +103,19 @@ model Allocations {
   Agent           Agents?           @relation(fields: [agentId], references: [id])
   creator         User              @relation("createdByRelation", fields: [createdBy], references: [id])
   updater         User              @relation("updatedByRelation", fields: [updatedBy], references: [id])
+}
+
+model MonthlyAllocations {
+  id          Int      @id @default(autoincrement())
+  date        DateTime
+  totalElpiji Int
+  volume      Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String
+  updatedBy   String
+  creator     User     @relation("createdByRelationMonthly", fields: [createdBy], references: [id])
+  updater     User     @relation("updatedByRelationMonthly", fields: [updatedBy], references: [id])
 }
 
 model LpgDistributions {
