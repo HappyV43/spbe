@@ -1,15 +1,18 @@
 // import Alokasi from "@/components/Alokasi/Alokasi";
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import { ContentLayout } from "@/components/ContentLayout";
-import UploadAlokasi from "@/components/UploadAlokasi/UploadAlokasi";
 import UploadAlokasiBulanan from "@/components/UploadAlokasiBulanan/UploadAlokasiBulanan";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Upload Alokasi Bulanan PKMU",
 };
 
-const AlokasiPage = () => {
-  const user = getCurrentSession();
+const AlokasiPage = async () => {
+  const { user } = await getCurrentSession();
+  if (!user) {
+    redirect("/auth/login");
+  }
 
   return (
     <ContentLayout
