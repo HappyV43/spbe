@@ -50,10 +50,11 @@ const PenyaluranElpiji = <TData extends {
     const [notrans, setnotrans] = useState("");
     const [agentName, setAgentName] = useState("");
     const [doNumber, setDoNumber] = useState("");
-    const [dateRange, setDateRange] = useState<any>(""); 
+    const [dateFilter, setDateFilter] = useState<any>(null); 
     const [filteredData, setFilteredData] = useState<TData[]>(data);
     const [filtered, setFiltered] = useState<Boolean>(false);
 
+    console.log(dateFilter)
     const monthlyData = getMonthlyTotalQty(data);
     const weeklyData = getWeekTotalQty(data);
     const todayData = [getTodayTotalQty(data)];
@@ -72,7 +73,7 @@ const PenyaluranElpiji = <TData extends {
         value: agentName,
     }));
 
-    console.log(agentNameOptions)
+    // console.log(agentNameOptions)
     const doNumberOptions = Array.from(
         new Set(data.map((item) => item.deliveryNumber)) 
     ).map((deliveryNumber) => ({
@@ -81,42 +82,29 @@ const PenyaluranElpiji = <TData extends {
     }));
 
     useEffect(() => {
-        // console.log(data)
         const filtered = data.filter((item) => {
             const matchesNoTrans = notrans ? item.bpeNumber === notrans : true;
             const matchesAgentName = agentName ? item.agentName === agentName : true;
             const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
     
-            const normalizeDateFrom = (date: Date) => {
-                const normalized = new Date(date);
-                normalized.setHours(0, 0, 0, 0);
-                return normalized;
-            };
-    
-            const normalizeDateTo = (date: Date) => {
-                const normalized = new Date(date);
-                normalized.setHours(23, 59, 59, 999);
-                return normalized;
-            };
-    
-            const matchesDate = dateRange?.from ? (
-                dateRange?.to ? (
+            const matchesDate = dateFilter?.from ? (
+                dateFilter?.to ? (
                     // For Range Dates
-                    item.giDate >= normalizeDateFrom(dateRange.from) &&
-                    item.giDate <= normalizeDateTo(dateRange.to)
+                    item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                    item.giDate <= normalizeDateTo(dateFilter.to)
                 ) : (
                     // For Single Dates
-                    item.giDate >= normalizeDateFrom(dateRange.from) &&
-                    item.giDate <= normalizeDateTo(dateRange.from)
+                    item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                    item.giDate <= normalizeDateTo(dateFilter.from)
                 )
             ) : true; 
     
-            setFiltered(true);
             return matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber;
         });
-    
+        
+        console.log(filtered)
         setFilteredData(filtered);
-    }, [notrans, agentName, doNumber, dateRange, data]);
+    }, [notrans, agentName, doNumber, dateFilter, data]);
 
     const chartConfig  = {
         qty: {
@@ -129,7 +117,7 @@ const PenyaluranElpiji = <TData extends {
         setAgentName("");
         setDoNumber("");
         setnotrans("");
-        setDateRange(null);
+        setDateFilter(null);
     
         setFilteredData(data);
     
@@ -195,35 +183,33 @@ const PenyaluranElpiji = <TData extends {
                     <div>
                         <Label htmlFor="date-search" className="text-lg">Tanggal</Label>
                         <DatePickerWithRange
-                            value={dateRange}
-                            onDateChange={setDateRange}
+                            value={dateFilter}
+                            onDateChange={setDateFilter}
                             placeholder="Pilih tanggal..."
                         />
                     </div>
                 </div>
 
-                <div className="flex justify-between items-center mb-3">
-                    <Button variant="default" asChild>
-                        <Link href="penyaluran-elpiji/form">
-                        <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Penyaluran Elpiji</Link>
-                    </Button>
-
-                    <Button variant="default" asChild>
-                        <PDFDownloadLink
-                            className="text-center"
-                            document={<RekapPenyaluran data={agentName != null ? filteredData : data} />}
-                            fileName={`Penyaluran Elpiji.pdf`}
-                        >
-                            <Printer className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
-                        </PDFDownloadLink> 
-                    </Button>
-                    
-                    <div className="flex space-x-2">
-                        {/* <Button variant="default" onClick={handleSearch}>
-                            <Search className="h-4 w-4 mr-2 cursor-pointer" /> Cari Penyaluran Elpiji
+                <div className="flex justify-between items-center mb-3 space-x-2">
+                    <div className="space-x-2">
+                        <Button variant="default" asChild>
+                            <Link href="penyaluran-elpiji/form">
+                            <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Penyaluran Elpiji</Link>
                         </Button>
-                         */}
-                        {filtered && (
+
+                        <Button variant="default" asChild>
+                            <PDFDownloadLink
+                                className="text-center"
+                                document={<RekapPenyaluran data={filteredData != null ? filteredData : data} />}
+                                fileName={`Penyaluran Elpiji.pdf`}
+                            >
+                                <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+                                <span>Cetak Rekap</span>
+                            </PDFDownloadLink> 
+                        </Button>
+                    </div>
+                    <div className="flex space-x-2">
+                        {(notrans || doNumber || agentName || dateFilter != null) &&(
                             <Button variant="default" onClick={handleClearSearch}>
                                 <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
                             </Button>

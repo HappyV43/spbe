@@ -17,7 +17,7 @@ interface AlokasiProps<TData, TValue> {
 
 const Alokasi = <TData extends {
     giDate: Date;
-    deliveryNumber: any;
+    deliveryNumber: string;
     allocatedQty: number;
     agentName: string;
     status: string;
@@ -31,24 +31,23 @@ const Alokasi = <TData extends {
     const [status, setStatus] = useState("Pending");
     const [agentName, setAgentName] = useState("");
     const [doNumber, setDoNumber] = useState("");
-    const [qty, setQty] = useState("");
     const [dateFilter, setDateFilter] = useState<any>(""); 
     const [filteredData, setFilteredData] = useState<TData[]>(data);
     const [filtered, setFiltered] = useState<Boolean>(false);
 
-  const statusOptions = Array.from(
-    new Set(data.map((item) => item.status))
-  ).map((status) => ({
-    label: status,
-    value: status,
-  }));
+    const statusOptions = Array.from(
+      new Set(data.map((item) => item.status))
+    ).map((status) => ({
+      label: status,
+      value: status,
+    }));
 
-  const agentNameOptions = Array.from(
-    new Set(data.map((item) => item.agentName))
-  ).map((agentName) => ({
-    label: agentName,
-    value: agentName,
-  }));
+    const agentNameOptions = Array.from(
+      new Set(data.map((item) => item.agentName))
+    ).map((agentName) => ({
+      label: agentName,
+      value: agentName,
+    }));
 
     const doNumberOptions = Array.from(
         new Set(data.map((item) => item.deliveryNumber)) 
@@ -57,39 +56,27 @@ const Alokasi = <TData extends {
         value: deliveryNumber,
     }));
 
-    // const chartAllocatedMonth = data
-    //     .filter((item) => item.updatedAt >= currentMonthStart && item.updatedAt <= currentMonthEnd)
-    //     .map((item) => ({
-    //         agentName: item.agentName, 
-    //         qty: item.allocatedQty, 
-    //     }));
-
-    // const chartAllocatedToday = data
-    //     .filter((item) => item.updatedAt >= normalizeDateFrom(today) && item.updatedAt <= normalizeDateTo(today))
-    //     .map((item) => ({
-    //         agentName: item.agentName, 
-    //         qty: item.allocatedQty, 
-    //     }));
-
-
     useEffect(() => {
         const filtered = data.filter((item) => {
-        const matchesStatus = status ? item.status === status : true;
-        const matchesAgentName = agentName ? item.agentName === agentName : true;
-        const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
+          const matchesStatus = status ? item.status === status : true;
+          const matchesAgentName = agentName ? item.agentName === agentName : true;
+          const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
 
-        const matchesDate = dateFilter?.from ? (
-            dateFilter?.to ? (
-            item.giDate >= normalizeDateFrom(dateFilter.from) &&
-            item.giDate <= normalizeDateTo(dateFilter.to)
-            ) : (
-            item.giDate >= normalizeDateFrom(dateFilter.from) &&
-            item.giDate <= normalizeDateTo(dateFilter.from)
-            )
-        ) : true;
+          const matchesDate = dateFilter?.from ? (
+              dateFilter?.to ? (
+                item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                item.giDate <= normalizeDateTo(dateFilter.to)
+              ) : (
+                item.giDate >= normalizeDateFrom(dateFilter.from) &&
+                item.giDate <= normalizeDateTo(dateFilter.from)
+              )
+          ) : true;
+          console.log(matchesAgentName, matchesDoNumber, matchesStatus,"DATe: ",  matchesDate);
 
-        return matchesStatus && matchesAgentName && matchesDoNumber && matchesDate;
+          return matchesStatus && matchesAgentName && matchesDoNumber && matchesDate;
         });
+        console.log(filtered)
+
         setFilteredData(filtered);
     }, [status, agentName, doNumber, dateFilter, data]);
 

@@ -15,11 +15,11 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
     header: "Tindakan",
     cell: ({ row }) => {
       return (
-        <div className="flex">
+        <div className="flex space-x-1">
           <Button
             variant="outline"
             asChild
-            className="text-center align-center justify-center"
+            className="text-center align-center justify-center w-1"
           >
             <PDFDownloadLink
               className="text-center"
@@ -80,10 +80,10 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-
+      // console.log(status)
       return (
         <span
-          className={status === "Pending" ? "text-orange-500" : "text-lime-500"}
+          className={status == "Pending" ? ("text-orange-500") : ("text-lime-500")}
         >
           {status}
         </span>
@@ -163,26 +163,6 @@ export const agentColumns: ColumnDef<Agents>[] = [
     accessorKey: "Tindakan",
     cell: ({ row }) => {
       return (
-        // <div className="flex">
-        //   <Button
-        //     variant="outline"
-        //     asChild
-        //     className="text-center align-center justify-center"
-        //   >
-        //     <span className="text-red-500">
-        //       <Trash2 className="h-4 w-4 text-center align-center  cursor-pointer" />
-        //     </span>
-        //   </Button>
-        //   <Button
-        //     variant="outline"
-        //     asChild
-        //     className="text-center align-center justify-center"
-        //   >
-        //     <span className="text-orange-500">
-        //       <Pencil className="h-4 w-4 text-center align-center cursor-pointer" />
-        //     </span>
-        //   </Button>
-        // </div>
         <EditFormAgents row={row.original} />
       );
     },

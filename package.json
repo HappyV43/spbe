@@ -12,6 +12,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@lucia-auth/adapter-prisma": "^4.0.1",
     "@neondatabase/serverless": "^0.9.5",
+    "@next/bundle-analyzer": "^15.0.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
     "@prisma/adapter-neon": "^5.20.0",
