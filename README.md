@@ -16,7 +16,7 @@ bun dev
 
 ```bash
 npm i
-# or 
+# or
 npm install
 
 npx prisma db push
@@ -27,13 +27,18 @@ npx prisma db push
 #command git semantara
 git pull origin <namabranch>
 
-#kalo ada error coba / tidak bisa coba 
+#kalo ada error coba / tidak bisa coba
 git config pull.rebase false
 
 # benerin conflict dan commit
 
-# kalo sudah 
+# kalo sudah
 git push origin <branchYgInginDipush>
+```
+
+```bash
+#env untuk db
+DATABASE_URL=""
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
