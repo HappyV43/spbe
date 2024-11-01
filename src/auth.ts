@@ -1,15 +1,11 @@
 import {
-  deleteSessionTokenCookie,
-  getSessionToken,
-  setSession,
-} from "@/lib/lucia";
-import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase,
 } from "@oslojs/encoding";
 import type { User, Session } from "@prisma/client";
 import { sha256 } from "@oslojs/crypto/sha2";
 import prisma from "./lib/db";
+import { redirect } from "next/navigation";
 
 export function generateSessionToken(): string {
   const bytes = new Uint8Array(20);
@@ -34,7 +30,6 @@ export async function createSession(
   return session;
 }
 
-
 export async function validateSessionToken(
   token: string
 ): Promise<SessionValidationResult> {
@@ -55,7 +50,7 @@ export async function validateSessionToken(
     await prisma.session.delete({ where: { id: sessionId } });
     return { session: null, user: null };
   }
-  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 24 * 4) {
+  if (Date.now() >= session.expiresAt.getTime() - 1000 * 60 * 60 * 4) {
     session.expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 1);
     await prisma.session.update({
       where: {

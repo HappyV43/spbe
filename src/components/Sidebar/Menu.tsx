@@ -16,6 +16,7 @@ import {
 import { getMenuList } from "@/lib/MenuItems";
 import { CollapseMenuButton } from "./ColapseMenuButton";
 import { logOut } from "@/app/actions/auth.actions";
+import { toast } from "@/hooks/use-toast";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -26,8 +27,14 @@ export function Menu({ isOpen }: MenuProps) {
   const handleClick = async () => {
     try {
       await logOut();
+      toast({
+        title: "Logout telah berhasil",
+      });
     } catch (error) {
-      console.error("Failed to call action:", error);
+      toast({
+        title: "Logout Gagal",
+        variant: "destructive",
+      });
     }
   };
 
