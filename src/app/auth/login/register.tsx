@@ -25,16 +25,7 @@ import { registerAction } from "@/app/actions/auth.actions";
 import { EyeOff, Eye } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-interface CompanyData {
-  id: number;
-  companyName: string;
-}
-
-interface SignUpFormProps {
-  data: CompanyData[];
-}
-
-const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
+const SignUpForm = () => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
@@ -47,16 +38,16 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
 
   async function onSubmit(values: SignInValues) {
     const res = await registerAction(values);
-    if (res.success) {
-      router.push("/dashboard/alokasi");
-      toast({
-        title: "Register has been succesfully",
-      });
-    } else {
+    if (res.error) {
       router.push("/auth/login");
       toast({
         variant: "destructive",
-        title: "Oops something went wrong",
+        title: res.error,
+      });
+    } else {
+      router.push("/dashboard/alokasi");
+      toast({
+        title: "Register has been succesfully",
       });
     }
   }
@@ -100,7 +91,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
                     <FormControl>
                       <div className="relative max-w-lg">
                         <Input
-                          type={showPassword ? "text" : "password"} 
+                          type={showPassword ? "text" : "password"}
                           placeholder="Enter your password..."
                           {...field}
                         />

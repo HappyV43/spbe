@@ -86,8 +86,7 @@ export const registerAction = async (values: SignInValues) => {
       data: {
         username: values.username,
         password: hashedPassword,
-        role: values.role,
-        companiesId: parseInt(values.company.id),
+        role: "USER",
       },
     });
 
