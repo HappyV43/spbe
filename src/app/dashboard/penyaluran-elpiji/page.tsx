@@ -1,7 +1,9 @@
+import { getCurrentSession } from "@/app/actions/auth.actions";
 import { getAllLpg } from "@/app/actions/lpg-distribution.action";
 import { ContentLayout } from "@/components/ContentLayout";
 import PenyaluranElpiji from "@/components/PenyaluranElpiji/PenyaluranElpiji";
 import { lpgDistributionColumns } from "@/lib/Column";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Penyaluran Elpiji PKMU",
@@ -9,11 +11,19 @@ export const metadata = {
 
 const PenyaluranElpijiPage = async () => {
   const data = await getAllLpg();
-  return (<ContentLayout  
-    home={"dashboard"}
-    mainpage={"penyaluran-elpiji"}
-    children={<PenyaluranElpiji columns={lpgDistributionColumns} data={data}/>}
-  />)
+  const dataUser = await getCurrentSession();
+  if (!dataUser.session && !dataUser.user) {
+    redirect("/auth/login");
+  }
+  return (
+    <ContentLayout
+      home={"dashboard"}
+      mainpage={"penyaluran-elpiji"}
+      children={
+        <PenyaluranElpiji columns={lpgDistributionColumns} data={data} />
+      }
+    />
+  );
 };
 
 export default PenyaluranElpijiPage;

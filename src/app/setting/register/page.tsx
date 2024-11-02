@@ -1,5 +1,5 @@
+import SignUpForm from "@/app/auth/login/register";
 import { ContentLayout } from "@/components/ContentLayout";
-import Register from "@/components/Register/Register";
 
 export const metadata = {
   title: "Register PKMU",
@@ -7,11 +7,12 @@ export const metadata = {
 
 const RegisterPage = () => {
   return (
-    <ContentLayout 
-      home={"setting"} 
-      mainpage={"register"} 
-      children={<Register/>}/>
-  )
+    <ContentLayout
+      home={"setting"}
+      mainpage={"register"}
+      children={<SignUpForm />}
+    />
+  );
 };
 
 export default RegisterPage;

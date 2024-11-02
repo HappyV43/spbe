@@ -20,6 +20,7 @@ import {
 import { getErrorMessage } from "./error.action";
 import { cookies } from "next/headers";
 import { cache } from "react";
+import { redirect } from "next/navigation";
 
 export const signIn = async (values: SignInValues) => {
   try {
@@ -50,16 +51,22 @@ export const signIn = async (values: SignInValues) => {
 };
 
 export const logOut = async () => {
+  // Retrieve the session token and compute session ID
   const sessionToken = getSessionToken();
   if (sessionToken) {
     const sessionId = encodeHexLowerCase(
       sha256(new TextEncoder().encode(sessionToken))
     );
 
+    // Invalidate the session using session ID
     await invalidateSession(sessionId);
   }
 
+  // Delete session token cookie
   deleteSessionTokenCookie();
+
+  // Redirect to login page
+  redirect("/auth/login");
 };
 
 export const registerAction = async (values: SignInValues) => {
@@ -79,8 +86,7 @@ export const registerAction = async (values: SignInValues) => {
       data: {
         username: values.username,
         password: hashedPassword,
-        role: values.role,
-        companiesId: parseInt(values.company.id),
+        role: "USER",
       },
     });
 
