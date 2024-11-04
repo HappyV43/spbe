@@ -74,9 +74,7 @@ export const registerAction = async (values: SignInValues) => {
   try {
     const existingUsers = await prisma.user.findMany();
 
-    // Check if there are any existing users
     if (existingUsers.length === 0) {
-      // If there are no existing users, assign the new user the "ADMIN" role
       const user = await prisma.user.create({
         data: {
           username: values.username,
@@ -87,7 +85,6 @@ export const registerAction = async (values: SignInValues) => {
       await setSession(user.id);
       return { success: true };
     } else {
-      // If there are existing users, assign the new user the "USER" role
       const existingUser = await prisma.user.findUnique({
         where: {
           username: values.username,
@@ -109,6 +106,30 @@ export const registerAction = async (values: SignInValues) => {
     }
   } catch (error) {
     return { error: getErrorMessage(error), success: false };
+  }
+};
+
+export const onlyRegister = async (values: SignInValues) => {
+  try {
+    const existingUser = await prisma.user.findUnique({
+      where: {
+        username: values.username,
+      },
+    });
+    if (existingUser) {
+      return { error: "User already exists", success: false };
+    }
+
+    const user = await prisma.user.create({
+      data: {
+        username: values.username,
+        password: await new Argon2id().hash(values.password),
+        role: "USER",
+      },
+    });
+    return { success: true, data: user };
+  } catch (error) {
+    return { error: "Terjadi kesalahan", success: false };
   }
 };
 

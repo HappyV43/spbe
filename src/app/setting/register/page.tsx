@@ -1,6 +1,6 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
-import SignUpForm from "@/app/auth/login/register";
 import { ContentLayout } from "@/components/ContentLayout";
+import Register from "@/components/Screens/Register/RegisterForm";
 
 export const metadata = {
   title: "Register PKMU",
@@ -13,7 +13,7 @@ const RegisterPage = async () => {
     <ContentLayout
       home={"setting"}
       mainpage={"register"}
-      children={<SignUpForm role={role} />}
+      children={<Register role={role} />}
     />
   );
 };

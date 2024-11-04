@@ -1,54 +1,68 @@
-"use client"
-import { EyeOff, Eye } from "lucide-react";
-import { Button } from "react-day-picker";
-import { Form, useForm } from "react-hook-form";
-import { registerAction } from "@/app/actions/auth.actions";
-import { toast } from "@/hooks/use-toast";
-import { SignInValues } from "@/lib/types";
-import { useState } from "react";
+"use client";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+
 import { Input } from "@/components/ui/input";
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
+import { SignInValues } from "@/lib/types";
+import { registerAction } from "@/app/actions/auth.actions";
+import { EyeOff, Eye, Loader2 } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import { ToggleMode } from "@/components/ToggleMode";
 
-
-interface CompanyData {
-  id: number;
-  companyName: string;
-}
-
-interface RegisterProps {
-  data: CompanyData[];
-}
-
-const Register = () => {
+const SignUpForm = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
     defaultValues: {
       username: "",
       password: "",
-      role: "",
     },
   });
 
   async function onSubmit(values: SignInValues) {
     const res = await registerAction(values);
-    if (res.success) {
+    if (res.error) {
+      router.push("/auth/login");
+      toast({
+        variant: "destructive",
+        title: res.error,
+      });
+    } else {
+      router.push("/dashboard/alokasi");
       toast({
         title: "Register has been succesfully",
       });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Oops something went wrong",
-      });
     }
   }
-  
+
   return (
-    <div className="flex w-full h-auto">
-    <Card className="p-6 m-6 justify-center items-center w-full">
-      <CardHeader>
-        <CardTitle>Register</CardTitle>
+    <Card className="w-screen justify-center items-center max-w-lg">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-2xl font-semibold flex justify-between">
+          Welcome back!
+          <ToggleMode />
+        </CardTitle>
+        <CardDescription className="text-gray-500">
+          Sign Up your account to continue.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -63,13 +77,11 @@ const Register = () => {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <div className="max-w-lg">
-
-                      <Input
-                        placeholder="Enter your username..."
-                        {...field}
-                        />
-                    </div>
+                    <Input
+                      // className="max-w-lg"
+                      placeholder="Enter your username..."
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -85,7 +97,7 @@ const Register = () => {
                   <FormControl>
                     <div className="relative max-w-lg">
                       <Input
-                        type={showPassword ? "text" : "password"} 
+                        type={showPassword ? "text" : "password"}
                         placeholder="Enter your password..."
                         {...field}
                       />
@@ -107,15 +119,21 @@ const Register = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="self-start">
-              Sign sUp
+            <Button
+              type="submit"
+              className="w-full bg-primary hover:bg-primary-dark"
+              disabled={isLoading}
+            >
+              Register
+              {isLoading && (
+                <Loader2 className="mr-2 h-4 w-4 px-3 animate-spin" />
+              )}
             </Button>
           </form>
         </Form>
       </CardContent>
     </Card>
-  </div>
   );
 };
 
-export default Register;
+export default SignUpForm;
