@@ -21,6 +21,7 @@ import { getErrorMessage } from "./error.action";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { redirect } from "next/navigation";
+import type { User } from "@prisma/client";
 
 export const signIn = async (values: SignInValues) => {
   try {
@@ -71,27 +72,41 @@ export const logOut = async () => {
 
 export const registerAction = async (values: SignInValues) => {
   try {
-    const existingUser = await prisma.user.findUnique({
-      where: {
-        username: values.username,
-      },
-    });
-    if (existingUser) {
-      return { error: "User already exists", success: false };
+    const existingUsers = await prisma.user.findMany();
+
+    // Check if there are any existing users
+    if (existingUsers.length === 0) {
+      // If there are no existing users, assign the new user the "ADMIN" role
+      const user = await prisma.user.create({
+        data: {
+          username: values.username,
+          password: await new Argon2id().hash(values.password),
+          role: "ADMIN",
+        },
+      });
+      await setSession(user.id);
+      return { success: true };
+    } else {
+      // If there are existing users, assign the new user the "USER" role
+      const existingUser = await prisma.user.findUnique({
+        where: {
+          username: values.username,
+        },
+      });
+      if (existingUser) {
+        return { error: "User already exists", success: false };
+      }
+
+      const user = await prisma.user.create({
+        data: {
+          username: values.username,
+          password: await new Argon2id().hash(values.password),
+          role: "USER",
+        },
+      });
+      await setSession(user.id);
+      return { success: true };
     }
-
-    const hashedPassword = await new Argon2id().hash(values.password);
-
-    const user = await prisma.user.create({
-      data: {
-        username: values.username,
-        password: hashedPassword,
-        role: "USER",
-      },
-    });
-
-    await setSession(user.id);
-    return { success: true };
   } catch (error) {
     return { error: getErrorMessage(error), success: false };
   }
@@ -108,3 +123,8 @@ export const getCurrentSession = cache(
     return result;
   }
 );
+
+export const checkUserDb = cache(async () => {
+  const checkUsername = await prisma.user.findMany();
+  return checkUsername as User[];
+});

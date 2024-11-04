@@ -1,7 +1,6 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import SignUpForm from "@/app/auth/login/register";
 import { ContentLayout } from "@/components/ContentLayout";
-import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Register PKMU",
