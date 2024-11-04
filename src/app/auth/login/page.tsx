@@ -1,14 +1,13 @@
 import React from "react";
-import { redirect } from "next/navigation";
-import { getCurrentSession } from "@/app/actions/auth.actions";
+import { LoginForm } from "./login";
+
 
 const Auth = async () => {
-  const user = await getCurrentSession();
-  if (user) {
-    redirect("/dashboard/penyaluran-elpiji");
-  }
-
-  return <div>403 Forbbiden</div>;
+  return (
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <LoginForm />
+    </div>
+  );
 };
 
 export default Auth;

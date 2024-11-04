@@ -32,8 +32,9 @@ export const generateColor = (index: number) => {
         "#E76F51", // Warm Terracotta
         "#264653", // Dark Slate Blue
         "#2A9D8F", // Cool Turquoise
+        "#141414",
     ];
-    return pastelColorPalette[index % pastelColorPalette.length];
+    return pastelColorPalette[index % pastelColorPalette.length];  
 };
 
 export const formatDate = (date:any) => {
