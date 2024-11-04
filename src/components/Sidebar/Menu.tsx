@@ -16,6 +16,7 @@ import {
 import { getMenuList } from "@/lib/MenuItems";
 import { CollapseMenuButton } from "./ColapseMenuButton";
 import { logOut } from "@/app/actions/auth.actions";
+import { toast } from "@/hooks/use-toast";
 
 interface MenuProps {
   isOpen: boolean | undefined;
@@ -26,8 +27,14 @@ export function Menu({ isOpen }: MenuProps) {
   const handleClick = async () => {
     try {
       await logOut();
+      toast({
+        title: "Logout telah berhasil",
+      });
     } catch (error) {
-      console.error("Failed to call action:", error);
+      toast({
+        title: "Logout Gagal",
+        variant: "destructive",
+      });
     }
   };
 
@@ -96,7 +103,7 @@ export function Menu({ isOpen }: MenuProps) {
                 <TooltipTrigger asChild>
                   <Button
                     onClick={handleClick}
-                    variant="outline"
+                    variant="default"
                     className="w-full justify-center h-10 mt-5"
                   >
                     <span className={cn(isOpen === false ? "" : "mr-4")}>

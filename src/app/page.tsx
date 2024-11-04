@@ -1,5 +1,13 @@
-import React from "react";
+import { getCurrentSession } from "./actions/auth.actions";
+import { redirect } from "next/navigation";
 
-export default function Home() {
-  return <></>;
-}
+const page = async () => {
+  const dataUser = await getCurrentSession();
+  if (!dataUser.session && !dataUser.user) {
+    redirect("/auth/login");
+  } else {
+    redirect("/dashboard/penyaluran-elpiji");
+  }
+};
+
+export default page;

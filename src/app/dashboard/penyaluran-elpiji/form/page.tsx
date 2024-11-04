@@ -1,9 +1,11 @@
+import { getCurrentSession } from "@/app/actions/auth.actions";
 import {
   getNextNumber,
   searchDeliveryNumber,
 } from "@/app/actions/lpg-distribution.action";
 import { ContentLayout } from "@/components/ContentLayout";
-import Form from "@/components/FormComponent/Form";
+import Form from "@/components/Screens/FormComponent/Form";
+import { redirect } from "next/navigation";
 import React from "react";
 
 export const metadata = {
@@ -20,6 +22,10 @@ const FormLpgPage = async ({
   const query = searchParams?.query || "";
   const data = await searchDeliveryNumber(query);
   const bpe = await getNextNumber();
+  const dataUser = await getCurrentSession();
+  if (!dataUser.session && !dataUser.user) {
+    redirect("/auth/login");
+  }
 
   return (
     <ContentLayout

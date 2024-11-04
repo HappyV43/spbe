@@ -13,9 +13,10 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
 import ActionButtons from "@/components/FeatureComponents/ActionButtons";
 import Link from "next/link";
-import EditFormAgents from "../components/CRUD/EditFormAgents";
-import EditFormLpg from "@/components/CRUD/EditFormLpg";
-import CetakPenyaluran from "@/components/CetakDistribusi/CetakPenyaluran";
+import EditFormAgents from "../components/FeatureComponents/CRUD/EditFormAgents";
+import EditFormLpg from "@/components/FeatureComponents/CRUD/EditFormLpg";
+import CetakPenyaluran from "@/components/FeatureComponents/CetakDistribusi/CetakPenyaluran";
+import { formatDate } from "@/utils/page";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
@@ -48,6 +49,23 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     accessorKey: "giDate",
     header: "Tanggal",
+    cell: ({ row }) => {
+      const date = row.original.giDate
+        ? new Date(row.original.giDate)
+        : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "agentName",
@@ -63,7 +81,7 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   },
   {
     accessorKey: "allocatedQty",
-    header: "Kuantitas",
+    header: "Jumlah Alokasi",
   },
   {
     accessorKey: "distributionQty",
@@ -78,6 +96,10 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
     header: "Diperbarui",
     sortingFn: "datetime",
     sortDescFirst: true,
+    cell: ({ row }) => {
+      const date = row.original.updatedAt; 
+      return <div>{formatDate(date)}</div>;
+    },
   },
 ];
 
@@ -87,7 +109,6 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-      // console.log(status)
       return (
         <span
           className={status == "Pending" ? ("text-orange-500") : ("text-lime-500")}
@@ -121,30 +142,58 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     accessorKey: "plannedGiDate",
     header: "Planned GI Date",
     cell: ({ row }) => {
-      const rawDate = row.getValue("plannedGiDate") as string; // Get the string date (e.g., "01102024")
-
-      // Extract the day, month, and year from the string
-      const day = rawDate.slice(0, 2); // "01"
-      const month = rawDate.slice(2, 4); // "10"
-      const year = rawDate.slice(4); // "2024"
-
-      const formattedDate = `${day}-${month}-${year}`; // Format to "dd-MM-yyyy"
-
-      return <span>{formattedDate}</span>; // Return the formatted date
+      const rawDate = row.original.plannedGiDate;
+      if (rawDate) {
+        const day = rawDate.slice(0, 2);
+        const month = rawDate.slice(2, 4);
+        const year = rawDate.slice(4);
+        const formattedDate = `${day}-${month}-${year}`;
+        return <span>{formattedDate}</span>;
+      }
+      return <span>-</span>;
     },
   },
   {
     accessorKey: "giDate",
     header: "GI Date",
+    cell: ({ row }) => {
+      const date = row.original.giDate
+        ? new Date(row.original.giDate)
+        : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "bpeNumber",
     header: "Nomer BPE",
+    cell: ({ row }) => {
+      const bpe = row.original.bpeNumber;
+      return (
+        <>
+          {bpe ? bpe : "-" }
+        </>
+      )
+    }
   },
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    // cell: ({ row }) => new Date(row.original.updatedAt).toLocaleString(), // Format tanggal
+    size: 1,
+    cell: ({ row }) => {
+      const date = row.original.updatedAt; 
+      return <div>{formatDate(date)}</div>;
+    },
   },
   {
     header: "Tindakan",
@@ -173,21 +222,46 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
 
 export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
+    accessorKey: "date",
+    header: "Tanggal",
+    size: 1,
+    cell: ({ row }) => {
+      return (
+        <div className="flex-[1]">
+          {row.original.date ? new Date(row.original.date).toLocaleDateString("id-ID") : "-"}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "totalElpiji",
     header: "Jumlah",
+    size: 3,
+    cell: ({ row }) => {
+      return (
+        <div className="flex-[3]">{row.original.totalElpiji}</div>
+      )
+    },
   },
   {
     accessorKey: "volume",
-    header: "Total Volume ",
+    header: "Total Volume",
+    size: 3,
+    cell: ({ row }) => {
+      return (
+        <div className="flex-[3]">{row.original.totalElpiji*3}</div>
+      )
+    },
   },
   {
-    accessorKey: "date",
-    header: "Tanggal",
-  },
-  {
-    accessorKey: "createdAt",
+    accessorKey: "updatedAt",
     header: "Diperbarui",
-  },
+    size: 1,
+    cell: ({ row }) => {
+      const date = row.original.updatedAt; 
+      return <div>{formatDate(date)}</div>;
+    },
+  }
 ];
 
 export const agentColumns: ColumnDef<Agents>[] = [
@@ -226,10 +300,18 @@ export const agentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "createdAt",
     header: "Dibuat",
+    cell: ({ row }) => {
+      const date = row.original.createdAt; 
+      return <div>{formatDate(date)}</div>;
+    },
   },
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    cell: ({ row }) => {
+      const date = row.original.updatedAt; 
+      return <div>{formatDate(date)}</div>;
+    },
   },
 ];
 
@@ -249,10 +331,20 @@ export const companiesColumns: ColumnDef<Companies>[] = [
   {
     accessorKey: "createdAt",
     header: "Dibuat",
+    size: 1,
+    cell: ({ row }) => {
+      const date = row.original.createdAt; 
+      return <div>{formatDate(date)}</div>;
+    },
   },
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    size: 1,
+    cell: ({ row }) => {
+      const date = row.original.updatedAt; 
+      return <div>{formatDate(date)}</div>;
+    },
   },
 ];
 

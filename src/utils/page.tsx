@@ -32,10 +32,25 @@ export const generateColor = (index: number) => {
         "#E76F51", // Warm Terracotta
         "#264653", // Dark Slate Blue
         "#2A9D8F", // Cool Turquoise
+        "#141414",
     ];
-    return pastelColorPalette[index % pastelColorPalette.length];
+    return pastelColorPalette[index % pastelColorPalette.length];  
 };
 
+export const formatDate = (date:any) => {
+    return date
+        ? `${date.toLocaleDateString("id-ID", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+        })}, ${date.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        })}`
+        : "-"; 
+};
 
 export const normalizeDateFrom = (date: Date) => {
     const normalized = new Date(date);

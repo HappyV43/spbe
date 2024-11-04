@@ -20,7 +20,7 @@ import {
 } from "../ui/dialog";
 import { EditForm } from "./EditForm";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import CetakPenyaluran from "../CetakDistribusi/CetakPenyaluran";
+import CetakPenyaluran from "./CetakDistribusi/CetakPenyaluran";
 
 interface ActionButtonProps {
   data?: any;

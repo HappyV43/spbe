@@ -1,6 +1,5 @@
 import "server-only";
 import { createSession, generateSessionToken } from "@/auth";
-import { cache } from "react";
 import { cookies } from "next/headers";
 
 const SESSION_COOKIE_NAME = "spbe-auth-cookies";

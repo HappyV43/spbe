@@ -4,6 +4,7 @@ import { format, parse } from 'date-fns';
 
 interface RekapPenyaluranProps {
     data: any;
+    data2: any;
 }
 
 const styles = StyleSheet.create({
@@ -70,8 +71,9 @@ const groupDataByDate = (data:any) => {
     }, {} as { [key: string]: any });
 };
 
-const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
+const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [], data2 = [] }) => {
     const groupedData = groupDataByDate(data);
+    const groupedData2 = groupDataByDate(data2);
 
     return (
         <Document>
@@ -87,7 +89,6 @@ const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
                 <Text style={[styles.title, { textAlign: 'center', fontFamily: "Times-Bold" }]}>
                     Penyaluran Elpiji 3 Kg
                 </Text>
-                {/* <Text style={{ textAlign: 'center', fontSize: 10, fontFamily: "Times-Bold"}}>Periode {format(new Date(), "MMyy")}</Text> */}
 
                 {/* Render a table for each day */}
                 {data && data.length > 0 ? (
@@ -95,15 +96,26 @@ const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
                         const parsedDate = parse(giDate, "dd-MM-yyyy", new Date());
                         const formattedDate = format(parsedDate, "EEEE, dd MMMM yyyy");
 
-                        const dailyTotalQty = groupedData[giDate].reduce((total: any, item: { allocatedQty: any; }) => total + item.allocatedQty, 0);
-                        const dailyTotalVolume = groupedData[giDate].reduce((total: any, item: { volume: any; }) => total + item.volume, 0);
+                        let dailyTotalQty = 0;
+                        let dailyTotalPending = 0;
+                        let dailyTotalFakultatif = 0;
 
-                        const dailyTotalPending = groupedData[giDate].reduce((total: any, item: { allocatedQty: any; }) => total + item.allocatedQty, 0);
-                        const dailyTotalPendingVol = groupedData[giDate].reduce((total: any, item: { volume: any; }) => total + item.volume, 0);
+                        groupedData[giDate].forEach((item: any) => {
+                            dailyTotalQty += item.allocatedQty || 0;
+                        });
 
-                        const dailyTotalFakultatif = groupedData[giDate].reduce((total: any, item: { allocatedQty: any; }) => total + item.allocatedQty, 0);
-                        const dailyTotalFakultatifVol = groupedData[giDate].reduce((total: any, item: { volume: any; }) => total + item.volume, 0);
+                        const allocatedMonth = groupedData2[giDate];
+                        if (allocatedMonth) {
+                            const allocatedMonthQty = allocatedMonth.reduce((sum: number, monthItem: any) => sum + (monthItem.allocatedQty || 0), 0);
 
+                            const difference = allocatedMonthQty - dailyTotalQty;
+                        
+                            if (allocatedMonthQty > dailyTotalQty) {
+                                dailyTotalPending = difference;  
+                            } else if (allocatedMonthQty < dailyTotalQty) {
+                                dailyTotalFakultatif = -difference; 
+                            }
+                        }
                         return (
                             <View key={giDate} style={{ marginBottom: 20 }} wrap={false}>
                                 <Text style={{ marginTop: 5 }}>Penyaluran Tanggal: <Text style={{ fontFamily: "Times-Bold" }}>{formattedDate}</Text></Text>
@@ -121,36 +133,36 @@ const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
                                     </View>
 
                                     {/* Table Rows */}
-                                    {groupedData[giDate].map((item: any, index: any) => (
+                                    {groupedData[giDate].map((item: any, index: number) => (
                                         <View style={styles.tableRow} key={index}>
                                             <Text style={[styles.tableCell, { flex: 2 }]}>{item.bpeNumber}</Text>
-                                            <Text style={[styles.tableCell, { flex: 3, fontSize:9}]}>{item.agentName}</Text>
+                                            <Text style={[styles.tableCell, { flex: 3, fontSize: 9 }]}>{item.agentName}</Text>
                                             <Text style={[styles.tableCell, { flex: 1 }]}>{item.driverName}</Text>
                                             <Text style={[styles.tableCell, { flex: 1 }]}>{item.licensePlate}</Text>
                                             <Text style={[styles.tableCell, { flex: 1.5 }]}>{item.deliveryNumber}</Text>
-                                            <Text style={[styles.tableCell, { flex: 1 }]}>{"Refill"}</Text>
+                                            <Text style={[styles.tableCell, { flex: 1 }]}>Refill</Text>
                                             <Text style={[styles.tableCell, { flex: 1 }]}>{item.allocatedQty}</Text>
                                             <Text style={[styles.tableCell, { flex: 1 }]}>{item.volume}</Text>
                                         </View>
                                     ))}
 
-                                    {/* Summary Row */}
+                                    {/* Summary Rows */}
                                     <View style={[styles.tableRow, styles.summaryRow]}>
                                         <Text style={[styles.tableCell, { flex: 11, fontWeight: 'bold', textAlign: "left", fontFamily: "Times-Bold" }]}>Total</Text>
                                         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalQty}</Text>
-                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalVolume}</Text>
+                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalQty * 3}</Text>
                                     </View>
 
                                     <View style={[styles.tableRow, styles.summaryRow]}>
                                         <Text style={[styles.tableCell, { flex: 11, fontWeight: 'bold', textAlign: "left", fontFamily: "Times-Bold" }]}>Total Pending</Text>
                                         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalPending}</Text>
-                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalPendingVol}</Text>
+                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalPending * 3}</Text>
                                     </View>
 
                                     <View style={[styles.tableRow, styles.summaryRow]}>
                                         <Text style={[styles.tableCell, { flex: 11, fontWeight: 'bold', textAlign: "left", fontFamily: "Times-Bold" }]}>Total Fakultatif</Text>
                                         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalFakultatif}</Text>
-                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalFakultatifVol}</Text>
+                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalFakultatif * 3}</Text>
                                     </View>
                                 </View>
                             </View>
@@ -164,4 +176,4 @@ const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
     );
 };
 
-export default RekapPenyaluran
+export default RekapPenyaluran;

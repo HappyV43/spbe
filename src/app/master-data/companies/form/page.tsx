@@ -1,20 +1,26 @@
-import { ContentLayout } from '@/components/ContentLayout';
-import Form from '@/components/FormComponent/Form';
-import React from 'react'
+import { getCurrentSession } from "@/app/actions/auth.actions";
+import { ContentLayout } from "@/components/ContentLayout";
+import Form from "@/components/Screens/FormComponent/Form";
+import { redirect } from "next/navigation";
+import React from "react";
 
 export const metadata = {
-    title: "Form PKMU",
-  };
+  title: "Form PKMU",
+};
 
-const FormCompanyPage = () => {
-    return (
-        <ContentLayout  
-             home={"master-data"}
-             mainpage={"companies"}
-             childpage={"form"}
-             children={<Form page={"companies"}/>}
-        />
-    )
-}
+const FormCompanyPage = async () => {
+  const dataUser = await getCurrentSession();
+  if (!dataUser.session && !dataUser.user) {
+    redirect("/auth/login");
+  }
+  return (
+    <ContentLayout
+      home={"master-data"}
+      mainpage={"companies"}
+      childpage={"form"}
+      children={<Form page={"companies"} />}
+    />
+  );
+};
 
-export default FormCompanyPage
+export default FormCompanyPage;

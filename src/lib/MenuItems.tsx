@@ -66,12 +66,12 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [
             {
               href: "/master-data/agents",
-              label: "Agents",
+              label: "Agen",
               active: pathname === "/master-data/agents",
             },
             {
               href: "/master-data/companies",
-              label: "Companies",
+              label: "Perusahaan",
               active: pathname === "/master-data/companies",
             },
           ],
@@ -89,7 +89,7 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [
             {
               href: "/setting/register",
-              label: "Register",
+              label: "Registrasi",
               active: pathname === "/setting/register",
             },
           ],

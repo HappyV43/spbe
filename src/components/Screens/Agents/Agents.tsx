@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "../ui/data-table";
-import { Button } from "../ui/button";
+import { DataTable } from "../../ui/data-table";
+import { Button } from "../../ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -14,7 +14,7 @@ const Agents = <TData, TValue>({columns, data}: AgentsProps<TData, TValue>) => {
         <div className="w-full">
             <div className="items-center py-4 mx-4">
                 <div className="justify-start mb-1">
-                    <Button variant="outline" className="ml-auto justify-start" asChild>
+                    <Button variant="default" className="ml-auto justify-start" asChild>
                         <Link href="agents/form">
                         <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Agen</Link> 
                     </Button>
