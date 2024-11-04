@@ -1,26 +1,23 @@
 import * as React from "react";
-import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, LabelList } from "recharts";
+import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, LabelList, Line } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
-  ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { generateColor } from "@/utils/page";
-import { format, eachDayOfInterval, eachMonthOfInterval, startOfMonth, endOfMonth, getDay, startOfWeek, endOfWeek, startOfYear, endOfYear } from "date-fns";
+import { format, startOfWeek, endOfWeek } from "date-fns";
 
-// Interface for the data item
 interface DataItem {
   qty: number;
   agentName?: string;
   giDate: Date;
 }
 
-// Adjusted ChartProps to handle both daily and monthly data
 interface ChartProps<TData> {
   config: ChartConfig;
-  data: Array<{ giDate: string; qty: number }>; // allow day or month
-  data2: Array<{ giDate: string; qty: number }>; // allow day or month
+  data: Array<{ giDate: string; qty: number }>;
+  data2: Array<{ giDate: string; qty: number }>; 
   title?: string;
   timeFrame: "weekdays" | "monthly"; 
 }
@@ -35,8 +32,6 @@ export function ChartComponent<TData extends DataItem>({
   if (!data || data.length === 0) {
     return <div className="text-center text-gray-500 py-4">No data</div>;
   }
-  // console.log(data)
-  // console.log(data2)
 
   const startDate = startOfWeek(new Date());
   const endDate = endOfWeek(new Date());
@@ -105,32 +100,45 @@ export function ChartComponent<TData extends DataItem>({
     });
   
     const result = Array.from(map.values());
-    console.log("Combined Data:", result);
     return result;
   }, [data, data2]);
 
   const formatXAxis = (tickItem: string) => {
     if (timeFrame === "monthly") {
       const date = new Date(tickItem);
-      return format(date, "MMM yyyy"); // Format for months
+      return format(date, "MMM yyyy"); 
     }
-    // Default to daily formatting
     return format(new Date(tickItem), "dd-MM-yyyy"); 
   };
   
   return (
     <div className="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 md:space-x-4 py-4">
       <div className="flex-grow my-5">
-      <ChartContainer config={config} className="mx-auto w-full max-w-[600px] md:max-w-full aspect-square" style={{ height: '400px', maxHeight: '400px' }}>
-      <AreaChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="giDate" />
-        <YAxis />
-        <Tooltip content={<ChartTooltipContent />} />
-        <Area type="monotone" dataKey="dailyQty" stroke={generateColor(0)} fill="url(#colorQty)" />
-        <Area type="monotone" dataKey="monthlyQty" stroke={generateColor(10)} fill="url(#colorQty)" />
-        <LabelList dataKey="dailyQty" position="top" />
-      </AreaChart>
+        <ChartContainer config={config} className="mx-auto w-full max-w-[600px] md:max-w-full aspect-square" style={{ height: '400px', maxHeight: '400px' }}>
+          <AreaChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="giDate" />
+            <YAxis />
+            <Tooltip content={<ChartTooltipContent indicator="dot" />} />
+            <Area
+              type="monotone"
+              dataKey="dailyQty"
+              stroke={generateColor(0)}
+              fill="url(#colorQty)"
+              dot={{ r: 4 }} 
+            />
+            <Area
+              type="monotone"
+              dataKey="monthlyQty"
+              stroke={generateColor(10)}
+              strokeWidth={2}
+              fill="url(#colorQty)"
+              dot={{ r: 4 }} 
+              activeDot={{
+                r: 6,
+              }}
+            /><LabelList dataKey="dailyQty" position="top" />
+          </AreaChart>
         </ChartContainer>
       </div>
     </div>

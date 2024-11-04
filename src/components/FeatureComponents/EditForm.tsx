@@ -1,12 +1,3 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@radix-ui/react-dialog";
-import { Button } from "../ui/button";
-import { DialogFooter, DialogHeader } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 

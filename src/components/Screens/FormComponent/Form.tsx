@@ -23,9 +23,8 @@ import { toast } from "@/hooks/use-toast";
 import { postLpgData } from "@/app/actions/lpg-distribution.action";
 import { useFormStatus } from "react-dom";
 import { postCompaniesData } from "@/app/actions/companies.action";
-import CetakPenyaluran from "../CetakDistribusi/CetakPenyaluran";
+import CetakPenyaluran from "../../FeatureComponents/CetakDistribusi/CetakPenyaluran";
 import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
-import { Printer } from "lucide-react";
 
 // TODO: kasih toast jika delivNumbernya gak ada
 

@@ -1,6 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "../ui/data-table";
-import { Button } from "../ui/button";
+import { DataTable } from "../../ui/data-table";
+import { Button } from "../../ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 

@@ -1,6 +1,6 @@
 import { getAgentsAll } from "@/app/actions/agent.action";
 import { getCurrentSession } from "@/app/actions/auth.actions";
-import Agents from "@/components/Agents/Agents";
+import Agents from "@/components/Screens/Agents/Agents";
 import { ContentLayout } from "@/components/ContentLayout";
 import { agentColumns } from "@/lib/Column";
 import { redirect } from "next/navigation";

@@ -2,13 +2,13 @@
 import { EyeOff, Eye } from "lucide-react";
 import { Button } from "react-day-picker";
 import { Form, useForm } from "react-hook-form";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/form";
 import { registerAction } from "@/app/actions/auth.actions";
 import { toast } from "@/hooks/use-toast";
 import { SignInValues } from "@/lib/types";
 import { useState } from "react";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 
 interface CompanyData {

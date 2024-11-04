@@ -13,9 +13,9 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
 import ActionButtons from "@/components/FeatureComponents/ActionButtons";
 import Link from "next/link";
-import EditFormAgents from "../components/CRUD/EditFormAgents";
-import EditFormLpg from "@/components/CRUD/EditFormLpg";
-import CetakPenyaluran from "@/components/CetakDistribusi/CetakPenyaluran";
+import EditFormAgents from "../components/FeatureComponents/CRUD/EditFormAgents";
+import EditFormLpg from "@/components/FeatureComponents/CRUD/EditFormLpg";
+import CetakPenyaluran from "@/components/FeatureComponents/CetakDistribusi/CetakPenyaluran";
 import { formatDate } from "@/utils/page";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
@@ -81,7 +81,7 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   },
   {
     accessorKey: "allocatedQty",
-    header: "Kuantitas",
+    header: "Jumlah Alokasi",
   },
   {
     accessorKey: "distributionQty",
@@ -109,7 +109,6 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Status",
     cell: ({ row }) => {
       const status = row.original.status;
-      // console.log(status)
       return (
         <span
           className={status == "Pending" ? ("text-orange-500") : ("text-lime-500")}

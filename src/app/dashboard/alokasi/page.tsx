@@ -1,6 +1,6 @@
 import { getAllokasiAll } from "@/app/actions/alokasi.action";
 import { getCurrentSession } from "@/app/actions/auth.actions";
-import Alokasi from "@/components/Alokasi/Alokasi";
+import Alokasi from "@/components/Screens/Alokasi/Alokasi";
 import { ContentLayout } from "@/components/ContentLayout";
 import { allocationColumns } from "@/lib/Column";
 import { redirect } from "next/navigation";

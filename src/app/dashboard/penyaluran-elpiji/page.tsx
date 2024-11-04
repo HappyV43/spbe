@@ -1,7 +1,7 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import { getAllLpg } from "@/app/actions/lpg-distribution.action";
 import { ContentLayout } from "@/components/ContentLayout";
-import PenyaluranElpiji from "@/components/PenyaluranElpiji/PenyaluranElpiji";
+import PenyaluranElpiji from "@/components/Screens/PenyaluranElpiji/PenyaluranElpiji";
 import { lpgDistributionColumns } from "@/lib/Column";
 import { redirect } from "next/navigation";
 

@@ -4,7 +4,7 @@ import {
   searchDeliveryNumber,
 } from "@/app/actions/lpg-distribution.action";
 import { ContentLayout } from "@/components/ContentLayout";
-import Form from "@/components/FormComponent/Form";
+import Form from "@/components/Screens/FormComponent/Form";
 import { redirect } from "next/navigation";
 import React from "react";
 

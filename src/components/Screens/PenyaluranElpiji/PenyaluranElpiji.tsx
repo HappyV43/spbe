@@ -1,23 +1,22 @@
 "use client";
 
-import { Button } from "../ui/button"
-import { DataTable } from "../ui/data-table"
 import Link from "next/link"
-import ComboBox from "../FeatureComponents/ComboBox"
-import { Label } from "../ui/label"
-import { DatePickerWithRange } from "../FeatureComponents/DateRange"
 import { useEffect, useState } from "react"
 import { ColumnDef } from "@tanstack/react-table"
-import { toast } from "@/hooks/use-toast"
 import { Plus, Printer, Search, SearchX } from "lucide-react"
 import { getMonthlyTotalQty, getTodayTotalQty, getWeekTotalQty, normalizeDateFrom, normalizeDateTo } from "@/utils/page"
-import { ChartComponent } from "../FeatureComponents/Chart";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "../ui/card";
 import { format } from "date-fns";
-import { ChartConfig } from "../ui/chart";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import RekapPenyaluran from "../CetakDistribusi/RekapPenyaluran";
 import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
+import { ChartConfig } from "@/components/ui/chart";
+import { ChartComponent } from "@/components/FeatureComponents/Chart";
+import RekapPenyaluran from "@/components/FeatureComponents/CetakDistribusi/RekapPenyaluran";
+import ComboBox from "@/components/FeatureComponents/ComboBox";
+import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { DataTable } from "@/components/ui/data-table";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Label } from "@radix-ui/react-label";
+import { Button } from "@/components/ui/button";
 
 interface Records {
     bpeNumber :String
@@ -35,7 +34,7 @@ interface Records {
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  data2: TData[];
+  data2?: TData[];
 }
 
 const PenyaluranElpiji = <TData extends {
@@ -61,8 +60,6 @@ const PenyaluranElpiji = <TData extends {
     const monthlyData = getMonthlyTotalQty(data);
     const weeklyData = getWeekTotalQty(data);
 
-    console.log(monthlyData)
-    console.log(weeklyData)
     const weeklyDataMontly = getWeekTotalQty(allocationMonthly);
     const monthlyDataMonthly = getMonthlyTotalQty(allocationMonthly);
 
@@ -80,7 +77,6 @@ const PenyaluranElpiji = <TData extends {
         value: agentName,
     }));
 
-    // console.log(agentNameOptions)
     const doNumberOptions = Array.from(
         new Set(data.map((item) => item.deliveryNumber)) 
     ).map((deliveryNumber) => ({
@@ -154,7 +150,7 @@ const PenyaluranElpiji = <TData extends {
                 <h1 className="text-lg font-semibold">Chart Jumlah Tabung</h1>
             </div>
             <div className=" m-4">
-                <Card className="flex flex-col w-full md:h-[500px] px-2 my-5">   
+                <Card className="flex flex-col w-full md:h-[520px] px-2 my-5">   
                     <CardHeader className="items-center pb-0">
                         <CardTitle>Minggu ini</CardTitle>
                         <CardDescription>Mingguan ({format(new Date(), "dd MMMM yyyy")})</CardDescription>
@@ -164,7 +160,7 @@ const PenyaluranElpiji = <TData extends {
                     </CardContent>
                 </Card>
 
-                <Card className="flex flex-col w-full md:h-[500px] px-2 my-5">   
+                <Card className="flex flex-col w-full md:h-[520px] px-2 my-5">   
                     <CardHeader className="items-center pb-0">
                         <CardTitle>Tahun ini</CardTitle>
                         <CardDescription>Tahunan ({format(new Date(), "MMMM yyyy")})</CardDescription>
@@ -175,70 +171,75 @@ const PenyaluranElpiji = <TData extends {
                 </Card>
             </div>
             <div className=" items-center py-4 mx-4">
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
-                    <div>
-                        <Label htmlFor="notrans-search" className="text-lg">Nomer Transaksi</Label>
-                        <ComboBox
-                            data={notransOptions} 
-                            value={notrans}
-                            setValue={setnotrans}
-                            placeholder="Pilih nomer BPE..."
-                        />
+                <Card className="px-4 py-5 mb-4">
+                    <div className="px-4 text-center">
+                        <h1 className="text-lg font-semibold py-2 pb-4">Filter Penyaluran Elpiji</h1>
                     </div>
-                    <div>
-                        <Label htmlFor="agent-search" className="text-lg">Name Agen</Label>
-                        <ComboBox
-                            data={agentNameOptions} 
-                            value={agentName}
-                            setValue={setAgentName}
-                            placeholder="Pilih agen..."
-                        />
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
+                        <div>
+                            <Label htmlFor="notrans-search" className="text-lg">Nomer Transaksi</Label>
+                            <ComboBox
+                                data={notransOptions} 
+                                value={notrans}
+                                setValue={setnotrans}
+                                placeholder="Pilih nomer BPE..."
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="agent-search" className="text-lg">Name Agen</Label>
+                            <ComboBox
+                                data={agentNameOptions} 
+                                value={agentName}
+                                setValue={setAgentName}
+                                placeholder="Pilih agen..."
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="do-search" className="text-lg">Nomer DO</Label>
+                            <ComboBox
+                                data={doNumberOptions} 
+                                value={doNumber}
+                                setValue={setDoNumber}
+                                placeholder="Pilih delivery number..."
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="date-search" className="text-lg">Tanggal</Label>
+                            <DatePickerWithRange
+                                value={dateFilter}
+                                onDateChange={setDateFilter}
+                                placeholder="Pilih tanggal..."
+                            />
+                        </div>
                     </div>
-                    <div>
-                        <Label htmlFor="do-search" className="text-lg">Nomer DO</Label>
-                        <ComboBox
-                            data={doNumberOptions} 
-                            value={doNumber}
-                            setValue={setDoNumber}
-                            placeholder="Pilih delivery number..."
-                        />
-                    </div>
-                    <div>
-                        <Label htmlFor="date-search" className="text-lg">Tanggal</Label>
-                        <DatePickerWithRange
-                            value={dateFilter}
-                            onDateChange={setDateFilter}
-                            placeholder="Pilih tanggal..."
-                        />
-                    </div>
-                </div>
 
-                <div className="flex justify-between items-center mb-3 space-x-2">
-                    <div className="space-x-2">
-                        <Button variant="default" asChild>
-                            <Link href="penyaluran-elpiji/form">
-                            <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Penyaluran Elpiji</Link>
-                        </Button>
-
-                        <Button variant="default" asChild>
-                            <PDFDownloadLink
-                                className="text-center"
-                                document={<RekapPenyaluran data={filteredData != null ? filteredData : data} data2={data2}/>}
-                                fileName={`Penyaluran Elpiji.pdf`}
-                            >
-                                <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-                                <span>Cetak Rekap</span>
-                            </PDFDownloadLink> 
-                        </Button>
-                    </div>
-                    <div className="flex space-x-2">
-                        {(notrans || doNumber || agentName || dateFilter != null) &&(
-                            <Button variant="default" onClick={handleClearSearch}>
-                                <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
+                    <div className="flex justify-between items-center mb-3 space-x-2">
+                        <div className="space-x-2">
+                            <Button variant="default" asChild>
+                                <Link href="penyaluran-elpiji/form">
+                                <Plus className="h-4 w-4 mr-2 cursor-pointer"/>New Penyaluran Elpiji</Link>
                             </Button>
-                        )}
+
+                            <Button variant="default" asChild>
+                                <PDFDownloadLink
+                                    className="text-center"
+                                    document={<RekapPenyaluran data={filteredData != null ? filteredData : data} data2={allocationMonthly}/>}
+                                    fileName={`Penyaluran Elpiji.pdf`}
+                                >
+                                    <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+                                    <span>Cetak Rekap</span>
+                                </PDFDownloadLink> 
+                            </Button>
+                        </div>
+                        <div className="flex space-x-2">
+                            {(notrans || doNumber || agentName || dateFilter != null) &&(
+                                <Button variant="default" onClick={handleClearSearch}>
+                                    <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
+                                </Button>
+                            )}
+                        </div>
                     </div>
-                </div>
+                </Card>
                 <DataTable columns={columns} data={filteredData} />        
             </div>
         </div>

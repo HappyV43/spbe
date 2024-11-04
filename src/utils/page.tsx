@@ -131,7 +131,6 @@ export const getWeekTotalQty = (data: any[]) => {
     return data
         .filter((item) => {
             const itemDate = new Date(item.giDate);
-            // console.log(itemDate)
             // Check if the item's date is within this week's range
             return isWithinInterval(itemDate, { start: startOfWeekDate, end: endOfWeekDate });
         })

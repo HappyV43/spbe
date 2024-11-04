@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Allocation, RawDataMap } from "@/lib/types";
 import { read, utils } from "xlsx";
 import { uploadBulkExcel } from "@/app/actions/upload-file.action";
@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Loader } from "lucide-react";
 
 export default function UploadAlokasi({
   user,
@@ -24,9 +25,11 @@ export default function UploadAlokasi({
     username: string;
   };
 }) {
+  const router = useRouter(); 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tableData, setTableData] = useState<Allocation[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false); 
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -97,8 +100,10 @@ export default function UploadAlokasi({
   };
   
   const uploadExcel = async () => {
+    setLoading(true);
     if (selectedFile && tableData.length > 0) {
       const result = await uploadBulkExcel(tableData);
+      setLoading(false);
       if (result?.error) {
         toast({
           title: "Gagal",
@@ -106,6 +111,7 @@ export default function UploadAlokasi({
           variant: "destructive",
         });
       } else {
+        router.back();
         toast({
           title: "Berhasil",
           description: "Alokasi Bulanan berhasil ditambahkan",
@@ -176,8 +182,20 @@ export default function UploadAlokasi({
             value={selectedFile ? selectedFile.name : "Upload File"}
             className="text-primary"
           />
-          <Button onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}>
+          {/* <Button onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}>
             {tableData.length > 0 ? "Upload" : "Impor"} Data
+          </Button> */}
+          <Button
+            onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}
+            disabled={loading} // Disable button when loading
+          >
+            {loading ? (
+              <div className="flex items-center">
+                <Loader className="mr-2 animate-spin"/> Uploading...
+              </div>
+            ) : (
+              tableData.length > 0 ? "Upload" : "Impor"
+            )}
           </Button>
         </div>
       </div>

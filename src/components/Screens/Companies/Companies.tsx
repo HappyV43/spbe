@@ -1,9 +1,5 @@
+import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
-import { DataTable } from "../ui/data-table";
-import { companiesColumns } from "@/lib/Column";
-import { Button } from "../ui/button";
-import Link from "next/link";
-import { Plus } from "lucide-react";
 
 interface CompaniesProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
