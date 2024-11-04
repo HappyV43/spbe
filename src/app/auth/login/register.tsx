@@ -1,6 +1,6 @@
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -19,16 +19,25 @@ import { registerAction } from "@/app/actions/auth.actions";
 import { EyeOff, Eye } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
-const SignUpForm = () => {
+const SignUpForm = ({ role }: { role: string }) => {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
     defaultValues: {
       username: "",
       password: "",
-      role: "",
     },
   });
+
+  useEffect(() => {
+    if (role != "ADMIN") {
+      toast({
+        variant: "destructive",
+        title: "Hanya admin yang bisa akses",
+      });
+      router.push("/dashboard/penyaluran-elpiji");
+    }
+  }, [role, router]);
 
   async function onSubmit(values: SignInValues) {
     const res = await registerAction(values);
