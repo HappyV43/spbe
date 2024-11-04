@@ -31,7 +31,7 @@ export const signIn = async (values: SignInValues) => {
 
     if (!user || !user.password) {
       console.log(`Failed login attempt for username: ${values.username}`);
-      return { success: false, error: "Invalid credentials" };
+      return { success: false, error: "Salah password atau username" };
     }
 
     const passwordMatch = await new Argon2id().verify(
@@ -41,12 +41,11 @@ export const signIn = async (values: SignInValues) => {
 
     if (!passwordMatch) {
       console.log(`Failed login attempt for username: ${values.username}`);
-      return { success: false, error: "Invalid credentials" };
+      return { success: false, error: "Salah password atau username" };
     }
     await setSession(user.id);
     return { success: true };
   } catch (error) {
-    console.error("Error during sign in:", error);
     return { success: false, error: "An unexpected error occurred" };
   }
 };
@@ -117,7 +116,7 @@ export const onlyRegister = async (values: SignInValues) => {
       },
     });
     if (existingUser) {
-      return { error: "User already exists", success: false };
+      return { error: "Sudah ada username", success: false };
     }
 
     const user = await prisma.user.create({

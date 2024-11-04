@@ -15,10 +15,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 const Register = ({ role }: { role?: string }) => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
@@ -31,15 +32,15 @@ const Register = ({ role }: { role?: string }) => {
 
   async function onSubmit(values: SignInValues) {
     const res = await onlyRegister(values);
-    if (res.success) {
-      toast({
-        title: "Register has been succesfully",
-      });
-      redirect("/dashboard/penyaluran-elpiji");
-    } else {
+    if (res.error) {
       toast({
         variant: "destructive",
-        title: "Terjadi kesalahan pada saat membuat akun",
+        title: res.error,
+      });
+    } else {
+      router.push("/dashboard/penyaluran-elpiji");
+      toast({
+        title: "Register has been succesfully",
       });
     }
   }

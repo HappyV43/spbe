@@ -44,17 +44,17 @@ export function LoginForm() {
     setIsLoading(true); // Set loading state to true when submitting
     const result = await signIn(values);
     setIsLoading(false); // Set loading state to false after submission
-    if (result.success) {
+    if (result.error) {
+      toast({
+        variant: "destructive",
+        title: result.error,
+      });
+      router.push("/auth/login");
+    } else {
       router.push("/dashboard/alokasi");
       toast({
         title: "Login has been successfully",
       });
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Username Password salah",
-      });
-      router.push("/auth/login");
     }
   }
 
@@ -137,7 +137,10 @@ export function LoginForm() {
               className="w-full bg-primary hover:bg-primary-dark"
               disabled={isLoading}
             >
-                Login {isLoading && <Loader2 className="mr-2 h-4 w-4 px-3 animate-spin" />}
+              Login{" "}
+              {isLoading && (
+                <Loader2 className="mr-2 h-4 w-4 px-3 animate-spin" />
+              )}
             </Button>
           </form>
         </Form>
