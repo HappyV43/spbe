@@ -68,8 +68,9 @@ export const uploadBulkExcel = async (datas: Allocation[]) => {
     }
     revalidatePath("/dashboard/alokasi");
   } catch (error) {
-    console.error(error);
-    throw new Error("Bulk upload failed");
+    return {
+      error: "Terjadi masalah saat upload excel",
+    };
   }
 };
 
@@ -77,9 +78,9 @@ export const uploadExcelMonthly = async (data: MonthlyAllocation) => {
   try {
     const excelMonthly = await prisma.monthlyAllocations.create({
       data: {
-        date: data.Tanggal,
-        totalElpiji: data.Total_Elpiji,
-        volume: data.Volume_Total_Elpiji,
+        date: data.date,
+        totalElpiji: data.totalElpiji,
+        volume: data.volume,
         updatedBy: data.updatedBy,
         createdBy: data.createdBy,
       },
@@ -99,7 +100,7 @@ export const uploadBulkExcelMonthly = async (datas: MonthlyAllocation[]) => {
     revalidatePath("/dashboard/alokasi-bulanan");
   } catch (error) {
     return {
-      error: "Terjadi masalah saat import excel",
+      error: "Terjadi masalah saat upload excel",
     };
   }
 };

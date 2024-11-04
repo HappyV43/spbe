@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import * as XLSX from "xlsx";
@@ -12,9 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table"; // import shadcn table components
 import { toast } from "@/hooks/use-toast";
-import { MonthlyAllocation } from "@/lib/types";
+import { MonthlyAllocation, RawDataMapMonthly } from "@/lib/types";
 import { uploadBulkExcelMonthly } from "@/app/actions/upload-file.action";
-import { redirect } from "next/navigation";
 
 export default function UploadAlokasiBulanan({
   user,
@@ -26,12 +25,12 @@ export default function UploadAlokasiBulanan({
 }) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tableData, setTableData] = useState<MonthlyAllocation[]>([]);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
 
-      // Validasi jenis file
       const validTypes = [
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         "application/vnd.ms-excel",
@@ -60,6 +59,10 @@ export default function UploadAlokasiBulanan({
     }
   };
 
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   const excelDateToJSDate = (serial: number) => {
     const excelStartDate = new Date(1900, 0, 1); // January 1, 1900
     const dateInMs =
@@ -76,15 +79,15 @@ export default function UploadAlokasiBulanan({
         const sheetName = workbook.SheetNames[0];
         const workSheet = workbook.Sheets[sheetName];
         const json = XLSX.utils.sheet_to_json(workSheet);
-        const uploadedData = json as MonthlyAllocation[];
+        const uploadedData = json as RawDataMapMonthly[];
 
         const transformedData = uploadedData.map((row) => ({
-          Tanggal:
+          date:
             typeof row.Tanggal === "number"
               ? excelDateToJSDate(row.Tanggal)
               : row.Tanggal,
-          Total_Elpiji: row.Total_Elpiji,
-          Volume_Total_Elpiji: row.Volume_Total_Elpiji,
+          totalElpiji: row.Total_Elpiji,
+          volume: row.Volume_Total_Elpiji,
           createdBy: user.id,
           updatedBy: user.id,
         }));
@@ -96,14 +99,7 @@ export default function UploadAlokasiBulanan({
   };
 
   const uploadExcel = async () => {
-    if (selectedFile != null && tableData.length > 0) {
-      toast({
-        title:
-          selectedFile == null
-            ? "Harap pilih file untuk diunggah."
-            : "Data tidak ditemukan. Harap periksa format file.",
-        variant: "destructive",
-      });
+    if (selectedFile && tableData.length > 0) {
       const result = await uploadBulkExcelMonthly(tableData);
       if (result?.error) {
         toast({
@@ -117,6 +113,14 @@ export default function UploadAlokasiBulanan({
           description: "Alokasi Bulanan berhasil ditambahkan",
         });
       }
+    } else {
+      toast({
+        title:
+          selectedFile == null
+            ? "Harap pilih file untuk diunggah."
+            : "Data tidak ditemukan. Harap periksa format file.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -164,6 +168,7 @@ export default function UploadAlokasiBulanan({
               accept=".xlsx, .xls"
               className="hidden"
               onChange={handleFileChange}
+              ref={fileInputRef}
             />
           </label>
         </div>
@@ -174,33 +179,35 @@ export default function UploadAlokasiBulanan({
             value={selectedFile ? selectedFile.name : "Upload File"}
             className="text-primary"
           />
-          <Button onClick={uploadExcel}>
+          <Button onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}>
             {tableData.length > 0 ? "Upload" : "Impor"} Data
           </Button>
         </div>
       </div>
 
       {tableData.length > 0 && (
-        <div className="mt-8 w-full max-w-4xl">
+        <div className="mt-8 w-full">
           <h2 className="text-2xl font-semibold">Pratinjau Excel</h2>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nomor</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Total</TableHead>
-                <TableHead>Volume</TableHead>
+                <TableHead className="text-lg">Nomor</TableHead>
+                <TableHead className="text-lg">Date</TableHead>
+                <TableHead className="text-lg">Total</TableHead>
+                <TableHead className="text-lg">Volume</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {tableData.map((row, index) => (
                 <TableRow key={index} className="my-6">
                   <TableCell>{index + 1}</TableCell>
-                  {row.Tanggal instanceof Date
-                    ? row.Tanggal.toLocaleDateString()
-                    : row.Tanggal}
-                  <TableCell>{row.Total_Elpiji}</TableCell>
-                  <TableCell>{row.Volume_Total_Elpiji}</TableCell>
+                  <TableCell>
+                    {row.date instanceof Date
+                      ? row.date.toLocaleDateString("en-GB") // "en-GB" for dd/mm/yyyy format
+                      : new Date(row.date).toLocaleDateString("en-GB")}
+                  </TableCell>
+                  <TableCell>{row.totalElpiji}</TableCell>
+                  <TableCell>{row.volume}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

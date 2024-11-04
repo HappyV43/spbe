@@ -31,7 +31,7 @@ interface CompanyData {
 }
 
 interface SignUpFormProps {
-  data: CompanyData[];
+  data?: CompanyData[];
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
@@ -123,7 +123,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ data }) => {
                 )}
               />
               <Button type="submit" className="self-start">
-                Sign Up
+                Signs Up
               </Button>
             </form>
           </Form>

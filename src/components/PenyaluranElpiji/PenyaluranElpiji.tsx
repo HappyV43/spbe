@@ -17,6 +17,7 @@ import { format } from "date-fns";
 import { ChartConfig } from "../ui/chart";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import RekapPenyaluran from "../CetakDistribusi/RekapPenyaluran";
+import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
 
 interface Records {
     bpeNumber :String
@@ -34,6 +35,7 @@ interface Records {
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  data2: TData[];
 }
 
 const PenyaluranElpiji = <TData extends {
@@ -46,6 +48,7 @@ const PenyaluranElpiji = <TData extends {
 }, TValue>({
     columns,
     data,
+    data2,
 }: DistributionProps<TData, TValue>) => {
     const [notrans, setnotrans] = useState("");
     const [agentName, setAgentName] = useState("");
@@ -53,11 +56,15 @@ const PenyaluranElpiji = <TData extends {
     const [dateFilter, setDateFilter] = useState<any>(null); 
     const [filteredData, setFilteredData] = useState<TData[]>(data);
     const [filtered, setFiltered] = useState<Boolean>(false);
+    const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]); 
 
-    console.log(dateFilter)
     const monthlyData = getMonthlyTotalQty(data);
     const weeklyData = getWeekTotalQty(data);
-    const todayData = [getTodayTotalQty(data)];
+
+    console.log(monthlyData)
+    console.log(weeklyData)
+    const weeklyDataMontly = getWeekTotalQty(allocationMonthly);
+    const monthlyDataMonthly = getMonthlyTotalQty(allocationMonthly);
 
     const notransOptions = Array.from(
         new Set(data.map((item) => item.bpeNumber)) 
@@ -102,14 +109,30 @@ const PenyaluranElpiji = <TData extends {
             return matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber;
         });
         
-        console.log(filtered)
         setFilteredData(filtered);
     }, [notrans, agentName, doNumber, dateFilter, data]);
 
+    useEffect(() => {
+      getMonthly();
+    }, []);
+    
+    const getMonthly = async () => {
+        const data = await getMonthlyAllocation();
+        const monthlyData = data.map(item => ({
+            giDate: item.date,
+            allocatedQty: item.totalElpiji,
+        }));
+        setAllocationMonthly(monthlyData);
+    };
+    
     const chartConfig  = {
-        qty: {
-            label: "Kuantitas",
+        monthlyQty: {
+            label: "Bulanan",
             color: "hsl(var(--chart-1))",
+        },
+        dailyQty: {
+            label: "Harian",
+            color: "hsl(var(--chart-2))",
         },
     } satisfies ChartConfig;
 
@@ -137,7 +160,7 @@ const PenyaluranElpiji = <TData extends {
                         <CardDescription>Mingguan ({format(new Date(), "dd MMMM yyyy")})</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 pb-0 pl-2">
-                        <ChartComponent data={weeklyData} config={chartConfig} title={"Tabung Elpiji"} timeFrame={"weekdays"}/>
+                        <ChartComponent data={weeklyData} data2={weeklyDataMontly} config={chartConfig} title={"Tabung Elpiji"} timeFrame={"weekdays"}/>
                     </CardContent>
                 </Card>
 
@@ -147,7 +170,7 @@ const PenyaluranElpiji = <TData extends {
                         <CardDescription>Tahunan ({format(new Date(), "MMMM yyyy")})</CardDescription>
                     </CardHeader>
                     <CardContent className="flex-1 pb-0 pl-2">
-                        <ChartComponent data={monthlyData} config={chartConfig} title={"Tabung Elpiji"} timeFrame={"monthly"} />
+                        <ChartComponent data={monthlyData} data2={monthlyDataMonthly} config={chartConfig} title={"Tabung Elpiji"} timeFrame={"monthly"} />
                     </CardContent>
                 </Card>
             </div>
@@ -200,7 +223,7 @@ const PenyaluranElpiji = <TData extends {
                         <Button variant="default" asChild>
                             <PDFDownloadLink
                                 className="text-center"
-                                document={<RekapPenyaluran data={filteredData != null ? filteredData : data} />}
+                                document={<RekapPenyaluran data={filteredData != null ? filteredData : data} data2={data2}/>}
                                 fileName={`Penyaluran Elpiji.pdf`}
                             >
                                 <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />

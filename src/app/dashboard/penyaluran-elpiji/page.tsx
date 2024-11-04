@@ -1,3 +1,4 @@
+import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
 import { getAllLpg } from "@/app/actions/lpg-distribution.action";
 import { ContentLayout } from "@/components/ContentLayout";
 import PenyaluranElpiji from "@/components/PenyaluranElpiji/PenyaluranElpiji";
@@ -9,6 +10,7 @@ export const metadata = {
 
 const PenyaluranElpijiPage = async () => {
   const data = await getAllLpg();
+
   return (<ContentLayout  
     home={"dashboard"}
     mainpage={"penyaluran-elpiji"}

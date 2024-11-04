@@ -36,6 +36,20 @@ export const generateColor = (index: number) => {
     return pastelColorPalette[index % pastelColorPalette.length];
 };
 
+export const formatDate = (date:any) => {
+    return date
+        ? `${date.toLocaleDateString("id-ID", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+        })}, ${date.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        })}`
+        : "-"; 
+};
 
 export const normalizeDateFrom = (date: Date) => {
     const normalized = new Date(date);
@@ -116,6 +130,7 @@ export const getWeekTotalQty = (data: any[]) => {
     return data
         .filter((item) => {
             const itemDate = new Date(item.giDate);
+            // console.log(itemDate)
             // Check if the item's date is within this week's range
             return isWithinInterval(itemDate, { start: startOfWeekDate, end: endOfWeekDate });
         })

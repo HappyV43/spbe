@@ -41,12 +41,9 @@ const AlokasiBulanan = <TData extends {
                         </Link>
                     </Button>
                 </div>
-
                 <DataTable columns={columns} data={data} />
             </div>
         </div>
-
-        
     );
 };
 

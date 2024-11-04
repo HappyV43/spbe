@@ -7,7 +7,6 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "../ui/
 import { registerAction } from "@/app/actions/auth.actions";
 import { toast } from "@/hooks/use-toast";
 import { SignInValues } from "@/lib/types";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { Input } from "../ui/input";
 
@@ -21,7 +20,7 @@ interface RegisterProps {
   data: CompanyData[];
 }
 
-const Register: React.FC<RegisterProps> = ({ data })  => {
+const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
     defaultValues: {
@@ -64,11 +63,13 @@ const Register: React.FC<RegisterProps> = ({ data })  => {
                 <FormItem>
                   <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input
-                      // className="max-w-lg"
-                      placeholder="Enter your username..."
-                      {...field}
-                    />
+                    <div className="max-w-lg">
+
+                      <Input
+                        placeholder="Enter your username..."
+                        {...field}
+                        />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -107,7 +108,7 @@ const Register: React.FC<RegisterProps> = ({ data })  => {
               )}
             />
             <Button type="submit" className="self-start">
-              Sign Up
+              Sign sUp
             </Button>
           </form>
         </Form>

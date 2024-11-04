@@ -4,6 +4,7 @@ import { format, parse } from 'date-fns';
 
 interface RekapPenyaluranProps {
     data: any;
+    data2: any;
 }
 
 const styles = StyleSheet.create({
@@ -60,6 +61,7 @@ const styles = StyleSheet.create({
 });
 
 const groupDataByDate = (data:any) => {
+    console.log()
     if (!Array.isArray(data)) return {};
     
     return data.reduce((acc, record) => {
@@ -70,9 +72,11 @@ const groupDataByDate = (data:any) => {
     }, {} as { [key: string]: any });
 };
 
-const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
+const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [], data2 = [] }) => {
     const groupedData = groupDataByDate(data);
-
+    const groupedData2 = groupDataByDate(data2);
+// console.log(groupedData2)
+// console.log(groupedData)
     return (
         <Document>
             <Page size="A4" style={styles.page}>
@@ -96,13 +100,10 @@ const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
                         const formattedDate = format(parsedDate, "EEEE, dd MMMM yyyy");
 
                         const dailyTotalQty = groupedData[giDate].reduce((total: any, item: { allocatedQty: any; }) => total + item.allocatedQty, 0);
-                        const dailyTotalVolume = groupedData[giDate].reduce((total: any, item: { volume: any; }) => total + item.volume, 0);
 
                         const dailyTotalPending = groupedData[giDate].reduce((total: any, item: { allocatedQty: any; }) => total + item.allocatedQty, 0);
-                        const dailyTotalPendingVol = groupedData[giDate].reduce((total: any, item: { volume: any; }) => total + item.volume, 0);
 
                         const dailyTotalFakultatif = groupedData[giDate].reduce((total: any, item: { allocatedQty: any; }) => total + item.allocatedQty, 0);
-                        const dailyTotalFakultatifVol = groupedData[giDate].reduce((total: any, item: { volume: any; }) => total + item.volume, 0);
 
                         return (
                             <View key={giDate} style={{ marginBottom: 20 }} wrap={false}>
@@ -138,19 +139,19 @@ const RekapPenyaluran: React.FC<RekapPenyaluranProps> = ({ data = [] }) => {
                                     <View style={[styles.tableRow, styles.summaryRow]}>
                                         <Text style={[styles.tableCell, { flex: 11, fontWeight: 'bold', textAlign: "left", fontFamily: "Times-Bold" }]}>Total</Text>
                                         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalQty}</Text>
-                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalVolume}</Text>
+                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalQty*3}</Text>
                                     </View>
 
                                     <View style={[styles.tableRow, styles.summaryRow]}>
                                         <Text style={[styles.tableCell, { flex: 11, fontWeight: 'bold', textAlign: "left", fontFamily: "Times-Bold" }]}>Total Pending</Text>
                                         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalPending}</Text>
-                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalPendingVol}</Text>
+                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalPending*3}</Text>
                                     </View>
 
                                     <View style={[styles.tableRow, styles.summaryRow]}>
                                         <Text style={[styles.tableCell, { flex: 11, fontWeight: 'bold', textAlign: "left", fontFamily: "Times-Bold" }]}>Total Fakultatif</Text>
                                         <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalFakultatif}</Text>
-                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalFakultatifVol}</Text>
+                                        <Text style={[styles.tableCell, { flex: 1, fontWeight: 'bold' }]}>{dailyTotalFakultatif*3}</Text>
                                     </View>
                                 </View>
                             </View>
