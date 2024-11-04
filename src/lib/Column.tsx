@@ -249,7 +249,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     size: 3,
     cell: ({ row }) => {
       return (
-        <div className="flex-[3]">{row.original.totalElpiji}</div>
+        <div className="flex-[3]">{row.original.totalElpiji*3}</div>
       )
     },
   },

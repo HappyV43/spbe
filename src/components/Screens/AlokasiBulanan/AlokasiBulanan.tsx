@@ -3,16 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../../ui/button";
 import { DataTable } from "../../ui/data-table";
 import Link from "next/link";
-import { Label } from "../../ui/label";
-import ComboBox from "../../FeatureComponents/ComboBox";
-import { Search, SearchX, Upload } from "lucide-react";
-import { useEffect, useState } from "react";
-import { DatePickerWithRange } from "../../FeatureComponents/DateRange";
-import { toast } from "@/hooks/use-toast";
-import { ChartComponent } from "../../FeatureComponents/Chart";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../ui/card";
-import { ChartConfig } from "../../ui/chart";
-import { endOfMonth, format, getYear, startOfMonth } from "date-fns";
+import { Upload } from "lucide-react";
 
 interface AlokasiBulananProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

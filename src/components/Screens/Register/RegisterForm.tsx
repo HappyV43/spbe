@@ -1,7 +1,7 @@
 "use client";
-import { EyeOff, Eye, Loader2 } from "lucide-react";
+import { EyeOff, Eye, Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
-import { onlyRegister, registerAction } from "@/app/actions/auth.actions";
+import { onlyRegister } from "@/app/actions/auth.actions";
 import { toast } from "@/hooks/use-toast";
 import { SignInValues } from "@/lib/types";
 import { useState } from "react";
@@ -31,13 +31,16 @@ const Register = ({ role }: { role?: string }) => {
   });
 
   async function onSubmit(values: SignInValues) {
+    setIsLoading(true); 
     const res = await onlyRegister(values);
     if (res.error) {
+      setIsLoading(false); 
       toast({
         variant: "destructive",
         title: res.error,
       });
     } else {
+      setIsLoading(false); 
       router.push("/dashboard/penyaluran-elpiji");
       toast({
         title: "Register has been succesfully",
@@ -116,10 +119,10 @@ const Register = ({ role }: { role?: string }) => {
                 )}
               />
               <Button type="submit" disabled={isLoading} className="self-start">
-                Register
                 {isLoading && (
-                  <Loader2 className="mr-2 h-4 w-4 px-3 animate-spin" />
+                  <Loader className="mr-2 h-4 w-4 px-3 animate-spin" />
                 )}
+                Register
               </Button>
             </form>
           </Form>

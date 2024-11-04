@@ -103,14 +103,16 @@ export default function UploadAlokasi({
     setLoading(true);
     if (selectedFile && tableData.length > 0) {
       const result = await uploadBulkExcel(tableData);
-      setLoading(false);
       if (result?.error) {
+        setLoading(false);
+
         toast({
           title: "Gagal",
           description: result.error,
           variant: "destructive",
         });
       } else {
+        setLoading(false);
         router.back();
         toast({
           title: "Berhasil",
@@ -118,6 +120,7 @@ export default function UploadAlokasi({
         });
       }
     } else {
+      setLoading(false);
       toast({
         title:
           selectedFile == null

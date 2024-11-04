@@ -19,7 +19,7 @@ const CompanyPage = async () => {
   return (
     <ContentLayout
       home={"master-data"}
-      mainpage={"companies"}
+      mainpage={"perusahaan"}
       children={<Companies columns={companiesColumns} data={data} />}
     />
   );

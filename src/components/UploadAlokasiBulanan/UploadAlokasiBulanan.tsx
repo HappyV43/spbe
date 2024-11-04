@@ -106,14 +106,15 @@ export default function UploadAlokasiBulanan({
     setLoading(true);
     if (selectedFile && tableData.length > 0) {
       const result = await uploadBulkExcelMonthly(tableData);
-      setLoading(false); 
       if (result?.error) {
+        setLoading(false); 
         toast({
           title: "Gagal",
           description: result.error,
           variant: "destructive",
         });
       } else {
+        setLoading(false); 
         router.back();
         toast({
           title: "Berhasil",
@@ -121,6 +122,7 @@ export default function UploadAlokasiBulanan({
         });
       }
     } else {
+      setLoading(false); 
       toast({
         title:
           selectedFile == null
@@ -186,12 +188,9 @@ export default function UploadAlokasiBulanan({
             value={selectedFile ? selectedFile.name : "Upload File"}
             className="text-primary"
           />
-          {/* <Button onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}>
-            {tableData.length > 0 ? "Upload" : "Impor"} Data
-          </Button> */}
           <Button
             onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}
-            disabled={loading} // Disable button when loading
+            disabled={loading}
           >
             {loading ? (
               <div className="flex items-center">

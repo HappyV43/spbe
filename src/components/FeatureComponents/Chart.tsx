@@ -32,52 +32,8 @@ export function ChartComponent<TData extends DataItem>({
   if (!data || data.length === 0) {
     return <div className="text-center text-gray-500 py-4">No data</div>;
   }
-
   const startDate = startOfWeek(new Date());
   const endDate = endOfWeek(new Date());
-
-  // Aggregate data based on weekdays or monthly selection
-  // const [aggregatedData, aggregatedData2] = React.useMemo(() => {
-  //   const processData = (inputData: typeof data) => {
-  //     const result: Record<string, number> = {};
-
-  //     if (timeFrame === "monthly") {
-  //       const months = eachMonthOfInterval({
-  //         start: startOfYear(new Date()),
-  //         end: endOfYear(new Date()),
-  //       }).map((monthDate) => format(monthDate, "MMMM"));
-
-  //       inputData.forEach(({ qty, giDate }) => {
-  //         const month = giDate;
-  //         result[month] = (result[month] || 0) + qty;
-  //       });
-
-  //       return months.map((month) => ({
-  //         month,
-  //         qty: result[month] || 0,
-  //       }));
-  //     } else if (timeFrame === "weekdays") {
-  //       const weekdays = eachDayOfInterval({ start: startDate, end: endDate })
-  //         .map((day) => format(day, "dd-MM-yyyy"));
-
-  //       inputData.forEach(({ qty, giDate }) => {
-  //         const day = giDate;
-  //         result[day] = (result[day] || 0) + qty;
-  //       });
-
-  //       return weekdays.map((day) => ({
-  //         day,
-  //         qty: result[day] || 0,
-  //       }));
-  //     }
-
-  //     return [];
-  //   };
-
-  //   return [processData(data), processData(data2)];
-  // }, [data, data2, timeFrame]);
-
-
   const combinedData = React.useMemo(() => {
     const map = new Map<string, { giDate: string; dailyQty?: number; monthlyQty?: number }>();
   

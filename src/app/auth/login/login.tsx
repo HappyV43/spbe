@@ -15,7 +15,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -23,7 +22,7 @@ import { useRouter } from "next/navigation";
 import { SignInValues } from "@/lib/types";
 import { signIn } from "@/app/actions/auth.actions";
 import { useState } from "react";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader } from "lucide-react";
 import { ToggleMode } from "@/components/ToggleMode";
 import { toast } from "@/hooks/use-toast";
 
@@ -31,7 +30,6 @@ export function LoginForm() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  // 1. Define your form.
   const form = useForm<SignInValues>({
     defaultValues: {
       username: "",
@@ -39,18 +37,18 @@ export function LoginForm() {
     },
   });
 
-  // 2. Define a submit handler.
   async function onSubmit(values: SignInValues) {
-    setIsLoading(true); // Set loading state to true when submitting
+    setIsLoading(true); 
     const result = await signIn(values);
-    setIsLoading(false); // Set loading state to false after submission
     if (result.error) {
+      setIsLoading(false); 
       toast({
         variant: "destructive",
         title: result.error,
       });
       router.push("/auth/login");
     } else {
+      setIsLoading(false); 
       router.push("/dashboard/alokasi");
       toast({
         title: "Login has been successfully",
@@ -137,10 +135,10 @@ export function LoginForm() {
               className="w-full bg-primary hover:bg-primary-dark"
               disabled={isLoading}
             >
-              Login{" "}
               {isLoading && (
-                <Loader2 className="mr-2 h-4 w-4 px-3 animate-spin" />
+                <Loader className="mr-2 h-4 w-4 px-3 animate-spin" />
               )}
+              Login
             </Button>
           </form>
         </Form>
