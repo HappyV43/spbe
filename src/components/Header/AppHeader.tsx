@@ -4,6 +4,10 @@ import { BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, Br
 import { ToggleMode } from "../ToggleMode";
 import React from "react";
 import { toNormalCase } from "@/utils/page";
+import { Avatar, AvatarImage } from "../ui/avatar";
+import { CircleUserRound } from "lucide-react";
+import { Profile } from "./Profile";
+
 
 interface HeaderProps {
   home: string;
@@ -82,8 +86,9 @@ export default function AppHeader({ home, mainpage, childpage, childrenpage }: H
             </BreadcrumbList>
           </Breadcrumb>
         </div>
-        <div className="flex flex-1 items-center justify-end">
-          <ToggleMode />
+        <div className="flex flex-1 items-center justify-end gap-5">
+          <ToggleMode/>
+          <Profile/>
         </div>
       </div>
     </header>
