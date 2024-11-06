@@ -1,7 +1,7 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import { getCompaniesAll } from "@/app/actions/companies.action";
-import Companies from "@/components/Companies/Companies";
 import { ContentLayout } from "@/components/ContentLayout";
+import Companies from "@/components/Screens/Companies/Companies";
 import { companiesColumns } from "@/lib/Column";
 import { redirect } from "next/navigation";
 
@@ -19,7 +19,7 @@ const CompanyPage = async () => {
   return (
     <ContentLayout
       home={"master-data"}
-      mainpage={"companies"}
+      mainpage={"perusahaan"}
       children={<Companies columns={companiesColumns} data={data} />}
     />
   );

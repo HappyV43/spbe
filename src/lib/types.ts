@@ -18,9 +18,9 @@ export interface Allocation {
 }
 
 export interface MonthlyAllocation {
-  Tanggal: Date;
-  Total_Elpiji: number;
-  Volume_Total_Elpiji: number;
+  date: Date;
+  totalElpiji: number;
+  volume: number;
   createdBy: string;
   updatedBy: string;
   updatedAt?: Date;
@@ -118,4 +118,14 @@ export interface RawDataMap {
   bpe?: string | null;
   createdBy: string;
   updatedBy: string;
+}
+
+export interface RawDataMapMonthly {
+  Tanggal: Date;
+  Total_Elpiji: number;
+  Volume_Total_Elpiji: number;
+  createdBy: string;
+  updatedBy: string;
+  updatedAt?: Date;
+  createdAt?: Date;
 }

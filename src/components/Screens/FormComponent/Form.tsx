@@ -23,11 +23,7 @@ import { toast } from "@/hooks/use-toast";
 import { postLpgData } from "@/app/actions/lpg-distribution.action";
 import { useFormStatus } from "react-dom";
 import { postCompaniesData } from "@/app/actions/companies.action";
-import CetakPenyaluran from "../CetakDistribusi/CetakPenyaluran";
-import { pdf, PDFDownloadLink } from "@react-pdf/renderer";
-import { Printer } from "lucide-react";
-
-// TODO: kasih toast jika delivNumbernya gak ada
+import { postAgentData } from "@/app/actions/agent.action";
 
 interface Props {
   page: string;
@@ -38,6 +34,7 @@ interface Props {
 
 const Form = ({ page, data, companyName, bpe }: Props) => {
   const [selectedCompanyId, setSelectedCompanyId] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCompanySelect = (value: any) => {
     const selectedCompany = companyName?.find(
@@ -45,78 +42,6 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
     );
     setSelectedCompanyId(Number(selectedCompany?.id) || 0);
   };
-
-  // useEffect(() => {
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     nomorTransaksi: generateNomorTransaksi(),
-  //   }));
-  // }, [counter]);
-
-  // useEffect(() => {
-  //   setIsFormValid(validateForm());
-  // }, [formData]);
-
-  // const validateForm = () => {
-  //   const {
-  //     nomorTransaksi,
-  //     nomorDo,
-  //     platKendaraan,
-  //     namaSopir,
-  //     namaAgen,
-  //     waktuPengambilan,
-  //     status,
-  //     jumlahTabung,
-  //     volumeTabung,
-  //   } = formData;
-
-  //   if (
-  //     !nomorTransaksi ||
-  //     !nomorDo ||
-  //     !platKendaraan ||
-  //     !namaSopir ||
-  //     !namaAgen ||
-  //     !waktuPengambilan ||
-  //     !status ||
-  //     !jumlahTabung ||
-  //     !volumeTabung
-  //   ) {
-  //     setErrorMessage("Ada field yang belum diisi");
-  //     return false;
-  //   }
-
-  //   setErrorMessage("");
-  //   return true;
-  // };
-
-  // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-
-  //   setFormData((prevData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //     nomorDo: data && data.length > 0 ? data[0].deliveryNumber : "", // Update nomorDo dengan data atau value dari input
-  //     namaAgen: data && data.length > 0 ? data[0].agentName : "",
-  //     jumlahTabung: data && data.length > 0 ? Number(data[0].allocatedQty) : 0,
-  //     volumeTabung:
-  //       data && data.length > 0 ? Number(data[0].allocatedQty) * 3 : 0,
-  //   }));
-
-  //   console.log("Updated form data:", {
-  //     ...formData,
-  //     [name]: value, // Untuk melihat hasil sementara
-  //   });
-  // };
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   if (validateForm()) {
-  //     console.log("Form data submitted", formData);
-  //     alert("Form data submitted");
-
-  //     setCounter(counter + 1);
-  //   }
-  // };
 
   const searchParams = useSearchParams();
   const pathName = usePathname();
@@ -128,68 +53,72 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
     replace(`${pathName}?${params.toString()}`);
   }, 400);
 
-  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
   const ref = useRef<HTMLFormElement>(null);
   const [loading, setLoading] = useState(false);
   const { pending } = useFormStatus();
   const nonReq =
     "cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300";
   
-    const handleSubmit = async (formData: FormData) => {
-      setLoading(true);
-  
-      // Submit the form data to the backend
-      const result = await postLpgData(formData);
-  
-      if (result?.error) {
-        toast({
-          title: "Gagal",
-          description: result.error,
-          variant: "destructive",
-        });
-        setLoading(false);
-      } else {
-        ref.current?.reset();
-        toast({
-          title: "Berhasil",
-          description: "Distribusi berhasil ditambahkan",
-        });
-  
-        // Generate the PDF after successful form submission
-        // const pdfDoc = pdf(<CetakPenyaluran data={data} />);
-        // console.log(pdfBlob)
-        // const blob = await pdfDoc.toBlob();
-        // setPdfBlob(blob);
-        // handleDownload();
-        redirect("/dashboard/penyaluran-elpiji");
-  
-      }
-    };
-  
-
-  const handleDownload = () => {
-    <PDFDownloadLink
-      document={<CetakPenyaluran data={data} />}
-      fileName={`Penyaluran Elpiji ${searchParams.get("query")?.toString()}.pdf`}
-    />
-  };
-
-  const handleSubmitAgents = async (formData: FormData) => {};
-
-  const handleSubmitCompany = async (formData: FormData) => {
-    const result = await postCompaniesData(formData);
-
+  const handleSubmitDistribution = async (formData: FormData) => {
+    setLoading(true);
+    const result = await postLpgData(formData);
     if (result?.error) {
+      setLoading(false);
       toast({
         title: "Gagal",
         description: result.error,
         variant: "destructive",
       });
     } else {
+      setLoading(false);
       ref.current?.reset();
       toast({
         title: "Berhasil",
-        description: "Company berhasil ditambahkan",
+        description: "Distribusi elpiji berhasil ditambahkan",
+      });
+      redirect("/dashboard/penyaluran-elpiji");
+    }
+  };
+  
+  const handleSubmitAgents = async (formData: FormData) => {
+    setLoading(true);
+    const result = await postAgentData(formData);
+
+    if (result?.error) {
+      setLoading(false);
+      toast({
+        title: "Gagal",
+        description: result.error,
+        variant: "destructive",
+      });
+    } else {
+      setLoading(false);
+      ref.current?.reset();
+      toast({
+        title: "Berhasil",
+        description: "Agen berhasil ditambahkan",
+      });
+      redirect("/master-data/agents");
+    }
+  };
+  
+
+  const handleSubmitCompany = async (formData: FormData) => {
+    setLoading(true);
+    const result = await postCompaniesData(formData);
+    if (result?.error) {
+      setLoading(false);
+      toast({
+        title: "Gagal",
+        description: result.error,
+        variant: "destructive",
+      });
+    } else {
+      setLoading(false);
+      ref.current?.reset();
+      toast({
+        title: "Berhasil",
+        description: "Perusahaan berhasil ditambahkan",
       });
       redirect("/master-data/companies");
     }
@@ -202,7 +131,7 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
           <form
             ref={ref}
             action={async (formData) => {
-              await handleSubmit(formData);
+              await handleSubmitDistribution(formData);
             }}
           >
             <div className="grid grid-cols-2 gap-6 p-9">
@@ -350,18 +279,6 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
               <Button type="submit" className="mx-9 px-9" disabled={loading}>
                 {pending ? "Menambahkan.. " : "Submit"}
               </Button>
-              {/* <Button
-                  type="submit"
-                  className="mx-9 px-9"
-                  onClick={async (e) => {
-                    e.preventDefault(); // Prevent default form action
-                    const formData = new FormData(ref.current as HTMLFormElement);
-                    await handleSubmit(formData);
-                  }}
-                  disabled={loading}
-                >
-                  {loading ? "Processing..." : "Submit & Download"}
-                </Button> */}
             </div>
           </form>
         </div>

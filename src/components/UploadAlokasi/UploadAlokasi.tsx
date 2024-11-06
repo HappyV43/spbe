@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Allocation, RawDataMap } from "@/lib/types";
 import { read, utils } from "xlsx";
 import { uploadBulkExcel } from "@/app/actions/upload-file.action";
@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
+import { Loader } from "lucide-react";
 
 export default function UploadAlokasi({
   user,
@@ -24,9 +25,11 @@ export default function UploadAlokasi({
     username: string;
   };
 }) {
+  const router = useRouter(); 
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tableData, setTableData] = useState<Allocation[]>([]);
-  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false); 
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -50,6 +53,9 @@ export default function UploadAlokasi({
     }
   };
   
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
 
   const previewExcel = (file: File) => {
     const reader = new FileReader();
@@ -94,26 +100,35 @@ export default function UploadAlokasi({
   };
   
   const uploadExcel = async () => {
-    if(selectedFile == null || tableData.length <= 0){
-      toast({ 
-        title: selectedFile == null 
-          ? "Harap pilih file untuk diunggah." 
-          : "Data tidak ditemukan. Harap periksa format file.",
-        variant: "destructive" 
-      });
-      return
-    }
+    setLoading(true);
+    if (selectedFile && tableData.length > 0) {
+      const result = await uploadBulkExcel(tableData);
+      if (result?.error) {
+        setLoading(false);
 
-      console.log(selectedFile)
-      console.log(tableData.length)
-      const te = await uploadBulkExcel(tableData);
-      console.log(te)
-      toast({ title: "Upload Excel Berhasil" });
-      // redirect("/dashboard/alokasi");
-    // } catch (error) {
-    //   toast({ title: "Upload Excel Gagal", variant:"destructive" });
-    //   console.error(error);
-    // }
+        toast({
+          title: "Gagal",
+          description: result.error,
+          variant: "destructive",
+        });
+      } else {
+        setLoading(false);
+        router.back();
+        toast({
+          title: "Berhasil",
+          description: "Alokasi Bulanan berhasil ditambahkan",
+        });
+      }
+    } else {
+      setLoading(false);
+      toast({
+        title:
+          selectedFile == null
+            ? "Harap pilih file untuk diunggah."
+            : "Data tidak ditemukan. Harap periksa format file.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -159,18 +174,31 @@ export default function UploadAlokasi({
               accept=".xlsx, .xls"
               className="hidden"
               onChange={handleFileChange}
+              ref={fileInputRef}
             />
           </label>
         </div>
         <div className="mt-4 flex justify-center">
-          <Input
+        <Input
             disabled
             type="text"
             value={selectedFile ? selectedFile.name : "Upload File"}
             className="text-primary"
           />
-          <Button onClick={uploadExcel}>
+          {/* <Button onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}>
             {tableData.length > 0 ? "Upload" : "Impor"} Data
+          </Button> */}
+          <Button
+            onClick={tableData.length > 0 ? uploadExcel : triggerFileInput}
+            disabled={loading} // Disable button when loading
+          >
+            {loading ? (
+              <div className="flex items-center">
+                <Loader className="mr-2 animate-spin"/> Uploading...
+              </div>
+            ) : (
+              tableData.length > 0 ? "Upload" : "Impor"
+            )}
           </Button>
         </div>
       </div>
@@ -201,7 +229,7 @@ export default function UploadAlokasi({
                   <TableCell className="py-3">{row.allocatedQty}</TableCell>
                   <TableCell className="py-3">{row.materialName}</TableCell>
                   <TableCell className="py-3">{row.plannedGiDate}</TableCell>
-                  <TableCell className="py-3">{row.giDate ? row.giDate.toLocaleDateString() : ""}</TableCell>
+                  <TableCell className="py-3">{row.giDate ? row.giDate.toLocaleDateString() : "-"}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

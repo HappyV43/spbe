@@ -1,7 +1,11 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import React, { useState } from "react";
+import { EyeOff, Eye, Loader } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { onlyRegister } from "@/app/actions/auth.actions";
+import { toast } from "@/hooks/use-toast";
+import { SignInValues } from "@/lib/types";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
@@ -10,17 +14,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
-import { Input } from "@/components/ui/input";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
-import { SignInValues } from "@/lib/types";
-import { registerAction } from "@/app/actions/auth.actions";
-import { EyeOff, Eye } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
 
-const SignUpForm = () => {
+const Register = ({ role }: { role?: string }) => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<SignInValues>({
     defaultValues: {
@@ -31,19 +31,29 @@ const SignUpForm = () => {
   });
 
   async function onSubmit(values: SignInValues) {
-    const res = await registerAction(values);
+    setIsLoading(true); 
+    const res = await onlyRegister(values);
     if (res.error) {
-      router.push("/auth/login");
+      setIsLoading(false); 
       toast({
         variant: "destructive",
         title: res.error,
       });
     } else {
-      router.push("/dashboard/alokasi");
+      setIsLoading(false); 
+      router.push("/dashboard/penyaluran-elpiji");
       toast({
         title: "Register has been succesfully",
       });
     }
+  }
+
+  if (role != "ADMIN") {
+    toast({
+      variant: "destructive",
+      title: "Hanya admin yang bisa akses",
+    });
+    redirect("/dashboard/penyaluran-elpiji");
   }
 
   return (
@@ -65,11 +75,12 @@ const SignUpForm = () => {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        // className="max-w-lg"
-                        placeholder="Enter your username..."
-                        {...field}
-                      />
+                      <div className="max-w-lg">
+                        <Input
+                          placeholder="Enter your username..."
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -107,8 +118,11 @@ const SignUpForm = () => {
                   </FormItem>
                 )}
               />
-              <Button type="submit" className="self-start">
-                Sign Up
+              <Button type="submit" disabled={isLoading} className="self-start">
+                {isLoading && (
+                  <Loader className="mr-2 h-4 w-4 px-3 animate-spin" />
+                )}
+                Register
               </Button>
             </form>
           </Form>
@@ -118,4 +132,4 @@ const SignUpForm = () => {
   );
 };
 
-export default SignUpForm;
+export default Register;

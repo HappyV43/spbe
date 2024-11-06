@@ -1,6 +1,6 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import { ContentLayout } from "@/components/ContentLayout";
-import Form from "@/components/FormComponent/Form";
+import Form from "@/components/Screens/FormComponent/Form";
 import { redirect } from "next/navigation";
 import React from "react";
 
