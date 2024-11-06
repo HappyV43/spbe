@@ -1,13 +1,21 @@
 import Link from "next/link";
 import { SheetMenu } from "../Sidebar/SheetMenu";
-import { BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage, Breadcrumb } from "../ui/breadcrumb";
+import {
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbSeparator,
+  BreadcrumbPage,
+  Breadcrumb,
+} from "../ui/breadcrumb";
 import { ToggleMode } from "../ToggleMode";
 import React from "react";
 import { toNormalCase } from "@/utils/page";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { CircleUserRound } from "lucide-react";
 import { Profile } from "./Profile";
-
+import { getCurrentSession } from "@/app/actions/auth.actions";
+import { redirect } from "next/navigation";
 
 interface HeaderProps {
   home: string;
@@ -16,9 +24,15 @@ interface HeaderProps {
   childrenpage?: string;
 }
 
-export default function AppHeader({ home, mainpage, childpage, childrenpage }: HeaderProps) {
-
-
+export default async function AppHeader({
+  home,
+  mainpage,
+  childpage,
+  childrenpage,
+}: HeaderProps) {
+  const { user } = await getCurrentSession();
+  const name = user?.username;
+  if (!name) redirect("/auth/login");
 
   return (
     <header className="sticky top-0 z-10 w-full bg-background/95 shadow backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:shadow-secondary">
@@ -33,7 +47,7 @@ export default function AppHeader({ home, mainpage, childpage, childrenpage }: H
                 {/* <BreadcrumbLink>
                   <Link href={`/${home}/${mainpage}`}>{toNormalCase(home)}</Link>
                 </BreadcrumbLink> */}
-                <BreadcrumbPage className={'text-inherit'}>
+                <BreadcrumbPage className={"text-inherit"}>
                   {toNormalCase(home)}
                 </BreadcrumbPage>
               </BreadcrumbItem>
@@ -43,15 +57,15 @@ export default function AppHeader({ home, mainpage, childpage, childrenpage }: H
                 <>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    {childpage ? 
+                    {childpage ? (
                       <BreadcrumbLink>
                         <Link href={`/${home}/${mainpage}`}>
                           {toNormalCase(mainpage)}
                         </Link>
                       </BreadcrumbLink>
-                      :
+                    ) : (
                       <BreadcrumbPage>{toNormalCase(mainpage)}</BreadcrumbPage>
-                    }
+                    )}
                   </BreadcrumbItem>
                 </>
               )}
@@ -61,15 +75,15 @@ export default function AppHeader({ home, mainpage, childpage, childrenpage }: H
                 <>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    {childrenpage ? 
+                    {childrenpage ? (
                       <BreadcrumbLink>
                         <Link href={`/${home}/${mainpage}/${childpage}`}>
                           {toNormalCase(childpage)}
                         </Link>
                       </BreadcrumbLink>
-                      :
+                    ) : (
                       <BreadcrumbPage>{toNormalCase(childpage)}</BreadcrumbPage>
-                    }
+                    )}
                   </BreadcrumbItem>
                 </>
               )}
@@ -79,7 +93,7 @@ export default function AppHeader({ home, mainpage, childpage, childrenpage }: H
                 <>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                      <BreadcrumbPage>{childrenpage}</BreadcrumbPage>
+                    <BreadcrumbPage>{childrenpage}</BreadcrumbPage>
                   </BreadcrumbItem>
                 </>
               )}
@@ -87,8 +101,8 @@ export default function AppHeader({ home, mainpage, childpage, childrenpage }: H
           </Breadcrumb>
         </div>
         <div className="flex flex-1 items-center justify-end gap-5">
-          <ToggleMode/>
-          <Profile/>
+          <ToggleMode />
+          <Profile name={name} />
         </div>
       </div>
     </header>
