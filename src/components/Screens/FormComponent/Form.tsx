@@ -30,9 +30,14 @@ interface Props {
   data?: LpgDistributionSearch[];
   companyName?: { id: number; companyName: string }[];
   bpe?: string;
+  user: {
+    id: string;
+    username: string;
+    role: string;
+  };
 }
 
-const Form = ({ page, data, companyName, bpe }: Props) => {
+const Form = ({ page, data, companyName, bpe, user }: Props) => {
   const [selectedCompanyId, setSelectedCompanyId] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -58,7 +63,7 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
   const { pending } = useFormStatus();
   const nonReq =
     "cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300";
-  
+
   const handleSubmitDistribution = async (formData: FormData) => {
     setLoading(true);
     const result = await postLpgData(formData);
@@ -79,7 +84,7 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
       redirect("/dashboard/penyaluran-elpiji");
     }
   };
-  
+
   const handleSubmitAgents = async (formData: FormData) => {
     setLoading(true);
     const result = await postAgentData(formData);
@@ -101,7 +106,6 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
       redirect("/master-data/agents");
     }
   };
-  
 
   const handleSubmitCompany = async (formData: FormData) => {
     setLoading(true);
@@ -123,6 +127,14 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
       redirect("/master-data/companies");
     }
   };
+
+  if (user.role != "ADMIN") {
+    toast({
+      variant: "destructive",
+      title: "Hanya admin yang bisa akses",
+    });
+    redirect("/dashboard/penyaluran-elpiji");
+  }
 
   return (
     <>
@@ -181,7 +193,7 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
                   className={nonReq}
                   placeholder="Waktu pengambilan"
                   name="waktuPengambilan"
-                  value={format(new Date(), 'yyyy-MM-dd')}
+                  value={format(new Date(), "yyyy-MM-dd")}
                   readOnly
                 />
               </div>
@@ -203,7 +215,7 @@ const Form = ({ page, data, companyName, bpe }: Props) => {
                     <SelectValue placeholder="Select Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pending" >Pending</SelectItem>
+                    <SelectItem value="Pending">Pending</SelectItem>
                     <SelectItem value="Approved">Approved</SelectItem>
                   </SelectContent>
                 </Select>

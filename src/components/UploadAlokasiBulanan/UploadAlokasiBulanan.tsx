@@ -10,12 +10,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"; 
+} from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { MonthlyAllocation, RawDataMapMonthly } from "@/lib/types";
 import { uploadBulkExcelMonthly } from "@/app/actions/upload-file.action";
 import { Loader } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 
 export default function UploadAlokasiBulanan({
   user,
@@ -23,12 +23,13 @@ export default function UploadAlokasiBulanan({
   user: {
     id: string;
     username: string;
+    role: string;
   };
 }) {
-  const router = useRouter(); 
+  const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [tableData, setTableData] = useState<MonthlyAllocation[]>([]);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,14 +108,14 @@ export default function UploadAlokasiBulanan({
     if (selectedFile && tableData.length > 0) {
       const result = await uploadBulkExcelMonthly(tableData);
       if (result?.error) {
-        setLoading(false); 
+        setLoading(false);
         toast({
           title: "Gagal",
           description: result.error,
           variant: "destructive",
         });
       } else {
-        setLoading(false); 
+        setLoading(false);
         router.back();
         toast({
           title: "Berhasil",
@@ -122,7 +123,7 @@ export default function UploadAlokasiBulanan({
         });
       }
     } else {
-      setLoading(false); 
+      setLoading(false);
       toast({
         title:
           selectedFile == null
@@ -132,6 +133,14 @@ export default function UploadAlokasiBulanan({
       });
     }
   };
+
+  if (user.role != "ADMIN") {
+    toast({
+      variant: "destructive",
+      title: "Hanya admin yang bisa akses",
+    });
+    redirect("/dashboard/penyaluran-elpiji");
+  }
 
   return (
     <div className="flex flex-col items-center justify-center gap-8 px-4 py-12 md:px-6 lg:px-8">
@@ -194,10 +203,12 @@ export default function UploadAlokasiBulanan({
           >
             {loading ? (
               <div className="flex items-center">
-                <Loader className="mr-2 animate-spin"/> Uploading...
+                <Loader className="mr-2 animate-spin" /> Uploading...
               </div>
+            ) : tableData.length > 0 ? (
+              "Upload"
             ) : (
-              tableData.length > 0 ? "Upload" : "Impor"
+              "Impor"
             )}
           </Button>
         </div>
