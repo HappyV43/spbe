@@ -29,6 +29,7 @@ export default function UploadAlokasi({
 }) {
   const router = useRouter();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string[]>([]);
   const [tableData, setTableData] = useState<Allocation[]>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
@@ -132,20 +133,22 @@ export default function UploadAlokasi({
     setLoading(true);
     if (selectedFile && tableData.length > 0) {
       const result = await uploadBulkExcel(tableData);
-      if (result?.error) {
-        setLoading(false);
-
-        toast({
-          title: "Gagal",
-          description: result.error,
-          variant: "destructive",
-        });
-      } else {
+      if (result?.success) {
         setLoading(false);
         router.back();
         toast({
           title: "Berhasil",
-          description: "Alokasi Bulanan berhasil ditambahkan",
+          description: "Alokasi harian berhasil ditambahkan",
+        });
+      } else if (result.missingAgents) {
+        setLoading(false);
+        setErrorMessage(result.missingAgents);
+      } else {
+        setLoading(false);
+        toast({
+          title: "Gagal",
+          description: "Alokasi harian Gagal ditambahkan",
+          variant: "destructive",
         });
       }
     } else {
@@ -159,6 +162,7 @@ export default function UploadAlokasi({
       });
     }
   };
+
   if (user.role != "ADMIN") {
     toast({
       variant: "destructive",
@@ -241,44 +245,58 @@ export default function UploadAlokasi({
         </div>
       </div>
 
-      {tableData.length > 0 && (
-        <div className="mt-8 w-full">
-          <h2 className="text-2xl font-semibold my-3">Pratinjau Excel</h2>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="text-lg">No</TableHead>
-                <TableHead className="text-lg">Ship To</TableHead>
-                <TableHead className="text-lg">Nama Agen</TableHead>
-                <TableHead className="text-lg">Nomer DO</TableHead>
-                <TableHead className="text-lg">Jumlah Tabung</TableHead>
-                <TableHead className="text-lg">Nama Material</TableHead>
-                <TableHead className="text-lg">Planned GI Date</TableHead>
-                <TableHead className="text-lg">GI Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {tableData.map((row, index) => (
-                <TableRow key={index}>
-                  <TableCell className="py-3">{index + 1}</TableCell>
-                  <TableCell className="py-3">{row.shipTo}</TableCell>
-                  <TableCell className="py-3">{row.agentName}</TableCell>
-                  <TableCell className="py-3">{row.deliveryNumber}</TableCell>
-                  <TableCell className="py-3">{row.allocatedQty}</TableCell>
-                  <TableCell className="py-3">{row.materialName}</TableCell>
-                  <TableCell className="py-3">
-                    {row.plannedGiDate
-                      ? row.plannedGiDate.toLocaleDateString()
-                      : "-"}
-                  </TableCell>
-                  <TableCell className="py-3">
-                    {row.giDate ? row.giDate.toLocaleDateString() : "-"}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+      {errorMessage.length > 0 ? (
+        // Jika ada error, tampilkan hanya pesan error
+        <div className="mt-4 text-red-600 font-semibold">
+          <p>Gagal menemukan agen berikut:</p>
+          <ul className="list-disc pl-5">
+            {/* Remove duplicates by converting to a Set, then back to an array */}
+            {Array.from(new Set(errorMessage)).map((agent, index) => (
+              <li key={index}>{agent}</li>
+            ))}
+          </ul>
         </div>
+      ) : (
+        // Jika tidak ada error, tampilkan tabel
+        tableData.length > 0 && (
+          <div className="mt-8 w-full">
+            <h2 className="text-2xl font-semibold my-3">Pratinjau Excel</h2>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-lg">No</TableHead>
+                  <TableHead className="text-lg">Ship To</TableHead>
+                  <TableHead className="text-lg">Nama Agen</TableHead>
+                  <TableHead className="text-lg">Nomer DO</TableHead>
+                  <TableHead className="text-lg">Jumlah Tabung</TableHead>
+                  <TableHead className="text-lg">Nama Material</TableHead>
+                  <TableHead className="text-lg">Planned GI Date</TableHead>
+                  <TableHead className="text-lg">GI Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {tableData.map((row, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="py-3">{index + 1}</TableCell>
+                    <TableCell className="py-3">{row.shipTo}</TableCell>
+                    <TableCell className="py-3">{row.agentName}</TableCell>
+                    <TableCell className="py-3">{row.deliveryNumber}</TableCell>
+                    <TableCell className="py-3">{row.allocatedQty}</TableCell>
+                    <TableCell className="py-3">{row.materialName}</TableCell>
+                    <TableCell className="py-3">
+                      {row.plannedGiDate
+                        ? row.plannedGiDate.toLocaleDateString()
+                        : "-"}
+                    </TableCell>
+                    <TableCell className="py-3">
+                      {row.giDate ? row.giDate.toLocaleDateString() : "-"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+        )
       )}
     </div>
   );
