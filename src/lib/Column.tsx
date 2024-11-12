@@ -140,15 +140,21 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     accessorKey: "plannedGiDate",
     header: "Planned GI Date",
     cell: ({ row }) => {
-      const rawDate = row.original.plannedGiDate;
-      if (rawDate) {
-        const day = rawDate.slice(0, 2);
-        const month = rawDate.slice(2, 4);
-        const year = rawDate.slice(4);
-        const formattedDate = `${day}-${month}-${year}`;
-        return <span>{formattedDate}</span>;
-      }
-      return <span>-</span>;
+      const date = row.original.plannedGiDate
+        ? new Date(row.original.plannedGiDate)
+        : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
     },
   },
   {
@@ -233,15 +239,21 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
     accessorKey: "plannedGiDate",
     header: "Planned GI Date",
     cell: ({ row }) => {
-      const rawDate = row.original.plannedGiDate;
-      if (rawDate) {
-        const day = rawDate.slice(0, 2);
-        const month = rawDate.slice(2, 4);
-        const year = rawDate.slice(4);
-        const formattedDate = `${day}-${month}-${year}`;
-        return <span>{formattedDate}</span>;
-      }
-      return <span>-</span>;
+      const date = row.original.plannedGiDate
+        ? new Date(row.original.plannedGiDate)
+        : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
     },
   },
   {

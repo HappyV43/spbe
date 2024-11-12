@@ -1,11 +1,12 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { Agents, Allocation, MonthlyAllocation, RawData } from "@/lib/types";
+import { MonthlyAllocation } from "@/lib/types";
+import type { Allocations } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export const uploadExcel = async (
-  data: Omit<Allocation, "createdAt" | "updatedAt">
+  data: Omit<Allocations, "createdAt" | "updatedAt">
 ) => {
   try {
     const existingRecord = await prisma.allocations.findFirst({
@@ -61,7 +62,7 @@ export const uploadExcel = async (
   }
 };
 
-export const uploadBulkExcel = async (datas: Allocation[]) => {
+export const uploadBulkExcel = async (datas: Allocations[]) => {
   try {
     for (const excel of datas) {
       await uploadExcel(excel);

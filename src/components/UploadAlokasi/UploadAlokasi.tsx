@@ -16,6 +16,7 @@ import {
   TableRow,
 } from "../ui/table";
 import { Loader } from "lucide-react";
+import { convertStringToDate } from "@/utils/convertPlannedGiDate";
 
 export default function UploadAlokasi({
   user,
@@ -115,7 +116,7 @@ export default function UploadAlokasi({
               ? parseInt(row.QUANTITY)
               : row.QUANTITY,
           materialName: String(row.MATERIAL_NAME),
-          plannedGiDate: String(row.PLANNED_GI_DATE),
+          plannedGiDate: convertStringToDate(row.PLANNED_GI_DATE), // Pastikan tidak ada new Date() di sini
           giDate: row.giDate ? new Date(row.giDate) : null,
           createdBy: user.id,
           updatedBy: user.id,
@@ -265,7 +266,11 @@ export default function UploadAlokasi({
                   <TableCell className="py-3">{row.deliveryNumber}</TableCell>
                   <TableCell className="py-3">{row.allocatedQty}</TableCell>
                   <TableCell className="py-3">{row.materialName}</TableCell>
-                  <TableCell className="py-3">{row.plannedGiDate}</TableCell>
+                  <TableCell className="py-3">
+                    {row.plannedGiDate
+                      ? row.plannedGiDate.toLocaleDateString()
+                      : "-"}
+                  </TableCell>
                   <TableCell className="py-3">
                     {row.giDate ? row.giDate.toLocaleDateString() : "-"}
                   </TableCell>

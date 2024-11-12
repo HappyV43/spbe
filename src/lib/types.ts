@@ -7,7 +7,7 @@ export interface Allocation {
   shipTo: string;
   materialName: string;
   agentName: string;
-  plannedGiDate: string;
+  plannedGiDate: Date;
   period?: string | null;
   allocatedQty: number;
   status?: "Pending" | "Approved";

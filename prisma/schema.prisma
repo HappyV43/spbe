@@ -91,7 +91,7 @@ model Allocations {
   shipTo          String
   materialName    String
   agentName       String
-  plannedGiDate   String
+  plannedGiDate   DateTime
   period          String?
   allocatedQty    Int
   status          String            @default("Pending")
@@ -143,20 +143,4 @@ model LpgDistributions {
   updater         User        @relation("lpgUpdatedByRelation", fields: [updatedBy], references: [id])
 }
 
-model RawData {
-  no            Int       @id
-  plant         Int
-  shipTo        String
-  shipToName    String
-  doNumber      String
-  quantity      Int
-  uom           String
-  doStatus      String
-  material      String
-  materialName  String
-  plannedGiDate String
-  giDate        DateTime?
-  bpe           String?
-  updatedAt     DateTime  @updatedAt
-  createdAt     DateTime  @default(now())
-}
+
