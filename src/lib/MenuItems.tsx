@@ -33,7 +33,7 @@ export function getMenuList(pathname: string): Group[] {
           submenus: [
             {
               href: "/dashboard/alokasi",
-              label: "Alokasi",
+              label: "Alokasi Harian ",
               active: pathname === "/dashboard/alokasi"
             },
             {

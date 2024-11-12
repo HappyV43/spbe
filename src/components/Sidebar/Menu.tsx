@@ -103,7 +103,7 @@ export function Menu({ isOpen }: MenuProps) {
                 <TooltipTrigger asChild>
                   <Button
                     onClick={handleClick}
-                    variant="default"
+                    variant={isOpen === false ? "default" : "destructive"}
                     className="w-full justify-center h-10 mt-5"
                   >
                     <span className={cn(isOpen === false ? "" : "mr-4")}>

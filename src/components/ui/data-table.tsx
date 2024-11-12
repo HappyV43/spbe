@@ -60,6 +60,9 @@ export function DataTable<TData, TValue>({
         columnVisibility,
         rowSelection,
       },
+      initialState: {
+        pagination: { pageSize: 50 },
+      },
   })
 
   return (
@@ -133,7 +136,7 @@ export function DataTable<TData, TValue>({
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 25, 50, 100].map((pageSize) => (
+              {[50, 100, 150, 200].map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>
