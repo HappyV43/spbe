@@ -91,21 +91,6 @@ export type SignInValues = {
   company: any;
 };
 
-export interface RawData {
-  no: number;
-  shipTo: string;
-  agentId: string;
-  shipToName: string;
-  doNumber: string;
-  quantity: number;
-  materialName: string;
-  plannedGiDate: string;
-  giDate?: Date | null;
-  bpe?: string | null;
-  createdBy: string;
-  updatedBy: string;
-}
-
 export interface RawDataMap {
   agentId?: string | null;
   SHIP_TO: string;
