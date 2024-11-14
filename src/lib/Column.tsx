@@ -8,7 +8,7 @@ import {
   LpgDistributions,
   MonthlyAllocation,
 } from "@/lib/types";
-import { Printer, SquarePlus } from "lucide-react";
+import { PackageOpen, Printer, ShoppingBag, SquarePlus } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -17,6 +17,7 @@ import EditFormLpg from "@/components/FeatureComponents/CRUD/EditFormLpg";
 import CetakPenyaluran from "@/components/FeatureComponents/CetakDistribusi/CetakPenyaluran";
 import { formatDate } from "@/utils/page";
 import { getCurrentSession } from "@/app/actions/auth.actions";
+import CetakPlastikWrap from "@/components/FeatureComponents/CetakDistribusi/CetakPlastikWrap";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
@@ -38,6 +39,19 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
             </PDFDownloadLink>
           </Button>
           <EditFormLpg row={row.original} />
+          <Button
+            variant="outline"
+            asChild
+            className="text-center align-center justify-center w-1"
+          >
+            <PDFDownloadLink
+              className="text-center"
+              document={<CetakPlastikWrap data={row.original} />}
+              fileName={`Plastik Wrap ${row.original.deliveryNumber}.pdf`}
+            >
+              <PackageOpen className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+            </PDFDownloadLink>
+          </Button>
         </div>
       );
     },

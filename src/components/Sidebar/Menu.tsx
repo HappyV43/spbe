@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Ellipsis, LogOut } from "lucide-react";
+import { ChartArea, Ellipsis, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
@@ -58,7 +58,7 @@ export function Menu({ isOpen }: MenuProps) {
                             >
                               <Link href={href}>
                                 <span
-                                  className={cn(isOpen === false ? "" : "mr-4")}
+                                  className={cn(isOpen === false ? "" : "mr-2")}
                                 >
                                   <Icon size={18} />
                                 </span>
