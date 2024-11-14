@@ -1,4 +1,4 @@
-import { Database, House, LucideIcon, Settings, User } from "lucide-react";
+import { ChartArea, Database, House, LucideIcon, Settings, User } from "lucide-react";
 import { cookies } from "next/headers";
 
 type Submenu = {
@@ -23,7 +23,19 @@ type Group = {
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: "",
+      groupLabel: "Analytics",
+      menus: [
+        {
+          href: "/summary",
+          label: "Summary",
+          active: pathname === "/summary",
+          icon: ChartArea,
+        }
+      ]
+    }
+    ,
+    {
+      groupLabel: "Dashboard",
       menus: [
         {
           href: "/dashboard",

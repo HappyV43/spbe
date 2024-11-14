@@ -19,7 +19,7 @@ import { redirect } from "next/navigation";
 
 interface HeaderProps {
   home: string;
-  mainpage: string;
+  mainpage?: string;
   childpage?: string;
   childrenpage?: string;
 }

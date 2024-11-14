@@ -177,64 +177,6 @@ const PenyaluranElpiji = <
 
   return (
     <div className="w-full">
-      <div className="px-4 pt-4 text-center">
-        <h1 className="text-lg font-semibold">Chart Jumlah Tabung</h1>
-      </div>
-      <div className=" m-4">
-        <Card className="flex flex-col w-full md:h-[520px] px-2 my-5">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Minggu ini</CardTitle>
-            <CardDescription>
-              Mingguan ({format(new Date(), "dd MMMM yyyy")})
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 pb-0 pl-2">
-            <ChartComponent
-              data={weeklyData}
-              data2={weeklyDataMontly}
-              config={chartConfig}
-              title={"Tabung Elpiji"}
-              timeFrame={"weekdays"}
-            />
-          </CardContent>
-        </Card>
-
-        <Card className="flex flex-col w-full md:h-[520px] px-2 my-5">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Tahun ini</CardTitle>
-            <CardDescription>
-              Tahunan ({format(new Date(), "MMMM yyyy")})
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 pb-0 pl-2">
-            <ChartComponent
-              data={monthlyData}
-              data2={monthlyDataMonthly}
-              config={chartConfig}
-              title={"Tabung Elpiji"}
-              timeFrame={"monthly"}
-            />
-          </CardContent>
-        </Card>
-      </div>
-      <div className="flex gap-4 py-4 mx-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Jumlah Tabung:</h1>
-            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData))}</p>
-          </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Jumlah Kg:</h1>
-            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData)*3)}</p>
-          </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Agen:</h1>
-            <p className="text-3xl font-bold">{calculateTotalAgen(filteredData)}</p>
-          </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Nomor DO:</h1>
-            <p className="text-3xl font-bold">{filteredData.length}</p>
-          </Card>
-        </div>
       <div className=" items-center py-4 mx-4">
         <Card className="px-4 py-5 mb-4">
           <div className="px-4 text-center">
