@@ -39,6 +39,9 @@ export default function Sidebar({}) {
       } else if (pathname === "/register") {
         updateSelectedKey("8");
       } 
+      else if (pathname === "/summary") {
+        updateSelectedKey("9");
+      } 
       // TODO
       // if (userRole === "admin" && pathname === "/register") {
       //   updateSelectedKey("8");

@@ -164,46 +164,6 @@ const PenyaluranElpiji = <
 
   return (
     <div className="w-full">
-      <div className="px-4 pt-4 text-center">
-        <h1 className="text-lg font-semibold">Chart Jumlah Tabung</h1>
-      </div>
-      <div className=" m-4">
-        <Card className="flex flex-col w-full md:h-[520px] px-2 my-5">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Minggu ini</CardTitle>
-            <CardDescription>
-              Mingguan ({format(new Date(), "dd MMMM yyyy")})
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 pb-0 pl-2">
-            <ChartComponent
-              data={weeklyData}
-              data2={weeklyDataMontly}
-              config={chartConfig}
-              title={"Tabung Elpiji"}
-              timeFrame={"weekdays"}
-            />
-          </CardContent>
-        </Card>
-
-        <Card className="flex flex-col w-full md:h-[520px] px-2 my-5">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Tahun ini</CardTitle>
-            <CardDescription>
-              Tahunan ({format(new Date(), "MMMM yyyy")})
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 pb-0 pl-2">
-            <ChartComponent
-              data={monthlyData}
-              data2={monthlyDataMonthly}
-              config={chartConfig}
-              title={"Tabung Elpiji"}
-              timeFrame={"monthly"}
-            />
-          </CardContent>
-        </Card>
-      </div>
       <div className=" items-center py-4 mx-4">
         <Card className="px-4 py-5 mb-4">
           <div className="px-4 text-center">
