@@ -5,6 +5,9 @@ import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Plus, Printer, Search, SearchX } from "lucide-react";
 import {
+  calculateTotalAgen,
+  calculateTotalQty,
+  formatNumberQty,
   getMonthlyTotalQty,
   getTodayTotalQty,
   getWeekTotalQty,
@@ -51,6 +54,11 @@ interface DistributionProps<TData, TValue> {
   user: User;
 }
 
+const today = {
+  from: new Date(),
+  to: new Date(),
+};
+
 const PenyaluranElpiji = <
   TData extends {
     giDate: Date;
@@ -69,7 +77,7 @@ const PenyaluranElpiji = <
   const [notrans, setnotrans] = useState("");
   const [agentName, setAgentName] = useState("");
   const [doNumber, setDoNumber] = useState("");
-  const [dateFilter, setDateFilter] = useState<any>(null);
+  const [dateFilter, setDateFilter] = useState<any>("today"); 
   const [filteredData, setFilteredData] = useState<TData[]>(data);
   const [filtered, setFiltered] = useState<Boolean>(false);
   const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
@@ -117,7 +125,9 @@ const PenyaluranElpiji = <
           : // For Single Dates
             item.giDate >= normalizeDateFrom(dateFilter.from) &&
             item.giDate <= normalizeDateTo(dateFilter.from)
-        : true;
+          : dateFilter === 'today'
+            ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
+          : true;
 
       return (
         matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber
@@ -151,14 +161,17 @@ const PenyaluranElpiji = <
     },
   } satisfies ChartConfig;
 
+  useEffect(() => {
+    setFiltered(true);
+    setDateFilter(today)
+  }, []);
+
   const handleClearSearch = () => {
     setAgentName("");
     setDoNumber("");
     setnotrans("");
     setDateFilter(null);
-
     setFilteredData(data);
-
     setFiltered(false);
   };
 
@@ -204,6 +217,24 @@ const PenyaluranElpiji = <
           </CardContent>
         </Card>
       </div>
+      <div className="flex gap-4 py-4 mx-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Jumlah Tabung:</h1>
+            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData))}</p>
+          </Card>
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Jumlah Kg:</h1>
+            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData)*3)}</p>
+          </Card>
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Agen:</h1>
+            <p className="text-3xl font-bold">{calculateTotalAgen(filteredData)}</p>
+          </Card>
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Nomor DO:</h1>
+            <p className="text-3xl font-bold">{filteredData.length}</p>
+          </Card>
+        </div>
       <div className=" items-center py-4 mx-4">
         <Card className="px-4 py-5 mb-4">
           <div className="px-4 text-center">
@@ -220,7 +251,7 @@ const PenyaluranElpiji = <
                 data={notransOptions}
                 value={notrans}
                 setValue={setnotrans}
-                placeholder="Pilih nomer BPE..."
+                placeholder="Semua nomor BPE"
               />
             </div>
             <div>
@@ -231,7 +262,7 @@ const PenyaluranElpiji = <
                 data={agentNameOptions}
                 value={agentName}
                 setValue={setAgentName}
-                placeholder="Pilih agen..."
+                placeholder="Semua agen"
               />
             </div>
             <div>
@@ -242,7 +273,7 @@ const PenyaluranElpiji = <
                 data={doNumberOptions}
                 value={doNumber}
                 setValue={setDoNumber}
-                placeholder="Pilih delivery number..."
+                placeholder="Semua number DO"
               />
             </div>
             <div>
@@ -252,7 +283,7 @@ const PenyaluranElpiji = <
               <DatePickerWithRange
                 value={dateFilter}
                 onDateChange={setDateFilter}
-                placeholder="Pilih tanggal..."
+                placeholder={filtered ? `${format(new Date(), "dd MMM yyyy")}` : "Semua Tanggal"}
               />
             </div>
           </div>

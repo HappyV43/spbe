@@ -49,7 +49,7 @@ export function LoginForm() {
       router.push("/auth/login");
     } else {
       setIsLoading(false); 
-      router.push("/dashboard/alokasi");
+      router.push("/dashboard/alokasi-harian");
       toast({
         title: "Login has been successfully",
       });

@@ -79,7 +79,7 @@ export const uploadBulkExcel = async (
     }
 
     // Step 3: If no missing agents, proceed with success
-    revalidatePath("/dashboard/alokasi");
+    revalidatePath("/dashboard/alokasi-harian");
     return { success: true };
   } catch (error) {
     console.error("Failed to upload Excel data:", error);
@@ -110,7 +110,7 @@ export const uploadBulkExcelMonthly = async (datas: MonthlyAllocation[]) => {
     for (const excel of datas) {
       await uploadExcelMonthly(excel);
     }
-    revalidatePath("/dashboard/alokasi-bulanan");
+    revalidatePath("/dashboard/alokasi-harian-bulanan");
   } catch (error) {
     return {
       error: "Terjadi masalah saat upload excel",

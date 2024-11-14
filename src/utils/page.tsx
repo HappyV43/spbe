@@ -37,6 +37,22 @@ export const generateColor = (index: number) => {
     return pastelColorPalette[index % pastelColorPalette.length];  
 };
 
+export const formatNumberQty = (num: number): string => {
+    return num.toLocaleString('id-ID'); 
+  };
+
+export const calculateTotalQty = (items: any) => {
+    return items.reduce((sum: any, item: { allocatedQty: any; }) => sum + item.allocatedQty, 0);
+};
+
+export const calculateTotalVolume = (items: any) => {
+    return items.reduce((sum: any, item: { allocatedQty: any; }) => sum + item.allocatedQty, 0);
+};
+
+export const calculateTotalAgen = (data: { agentName: string }[]) => {
+  return new Set(data.map((item) => item.agentName)).size;
+};
+
 export const formatDate = (date:any) => {
     return date
         ? `${date.toLocaleDateString("id-ID", {

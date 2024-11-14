@@ -1,6 +1,6 @@
 import { getAllokasiAll } from "@/app/actions/alokasi.action";
 import { getCurrentSession } from "@/app/actions/auth.actions";
-import Alokasi from "@/components/Screens/Alokasi/Alokasi";
+import AlokasiHarian from "@/components/Screens/Alokasi/AlokasiHarian";
 import { ContentLayout } from "@/components/ContentLayout";
 import { adminAllocationColumns, allocationColumns } from "@/lib/Column";
 import { redirect } from "next/navigation";
@@ -19,9 +19,9 @@ const AlokasiPage = async () => {
   return (
     <ContentLayout
       home={"dashboard"}
-      mainpage={"alokasi"}
+      mainpage={"alokasi-harian"}
       children={
-        <Alokasi
+        <AlokasiHarian
           columns={
             user.role === "ADMIN" ? adminAllocationColumns : allocationColumns
           }

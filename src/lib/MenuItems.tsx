@@ -32,9 +32,9 @@ export function getMenuList(pathname: string): Group[] {
           icon: House,
           submenus: [
             {
-              href: "/dashboard/alokasi",
+              href: "/dashboard/alokasi-harian",
               label: "Alokasi Harian ",
-              active: pathname === "/dashboard/alokasi"
+              active: pathname === "/dashboard/alokasi-harian"
             },
             {
               href: "/dashboard/penyaluran-elpiji",

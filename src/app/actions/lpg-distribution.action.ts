@@ -111,7 +111,7 @@ export const postLpgData = async (formData: FormData) => {
         updatedBy: user.id,
       },
     });
-    revalidatePath("/dashboard/alokasi");
+    revalidatePath("/dashboard/alokasi-harian");
   } catch (error) {
     return {
       error: getErrorMessage(error),

@@ -24,7 +24,7 @@ export default function Sidebar({}) {
   };
 
   useEffect(() => {
-      if (pathname === "/dashboard/alokasi") {
+      if (pathname === "/dashboard/alokasi-harian") {
         setSelectedKeys(['2']);
       } else if (pathname === "/dashboard/penyaluran-elpiji") {
         setSelectedKeys(['3']);
@@ -59,7 +59,7 @@ export default function Sidebar({}) {
           variant="link"
           asChild
         >
-          <Link href="/dashboard/alokasi" className="flex items-center gap-2">
+          <Link href="/dashboard/alokasi-harian" className="flex items-center gap-2">
             <h1
               className={cn(
                 "font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-500",

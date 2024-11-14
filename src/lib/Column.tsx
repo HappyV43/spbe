@@ -134,7 +134,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   },
   {
     accessorKey: "allocatedQty",
-    header: "Jumlah",
+    header: "Jumlah Alokasi",
   },
   {
     accessorKey: "plannedGiDate",
@@ -233,7 +233,7 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   },
   {
     accessorKey: "allocatedQty",
-    header: "Jumlah",
+    header: "Jumlah Alokasi",
   },
   {
     accessorKey: "plannedGiDate",
@@ -321,6 +321,8 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
     accessorKey: "date",
     header: "Tanggal",
+    sortingFn: "datetime",
+    sortDescFirst: false,
     size: 1,
     cell: ({ row }) => {
       return (
