@@ -18,7 +18,7 @@ import { Pencil } from "lucide-react";
 import { redirect } from "next/navigation";
 import React, { useRef, useState } from "react";
 
-const EditFormAgents = ({ row } : any) => {
+const EditFormAgents = ({ row }: any) => {
   const ref = useRef<HTMLFormElement>(null);
   const [agentName, setAgentName] = useState(row.agentName);
   const [phone, setPhone] = useState(row.phone);
@@ -47,14 +47,13 @@ const EditFormAgents = ({ row } : any) => {
 
   return (
     <Dialog>
-      <DialogTrigger
-        className="text-center align-center justify-center">
-          <Button
-            variant="outline"
-            className="text-center align-center justify-center"
-          >
-            <Pencil className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
-          </Button>
+      <DialogTrigger className="text-center align-center justify-center">
+        <Button
+          variant="outline"
+          className="text-center align-center justify-center"
+        >
+          <Pencil className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <form

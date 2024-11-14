@@ -10,13 +10,16 @@ import { useEffect, useState } from "react";
 import { DatePickerWithRange } from "../../FeatureComponents/DateRange";
 import { normalizeDateFrom, normalizeDateTo } from "@/utils/page";
 import { Card } from "../../ui/card";
+import type { User } from "@prisma/client";
 
 interface AlokasiProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  user: User;
 }
 
-const Alokasi = <TData extends {
+const Alokasi = <
+  TData extends {
     giDate: Date;
     deliveryNumber: string;
     allocatedQty: number;
@@ -28,11 +31,12 @@ const Alokasi = <TData extends {
 >({
   columns,
   data,
+  user,
 }: AlokasiProps<TData, TValue>) => {
   const [status, setStatus] = useState("Pending");
   const [agentName, setAgentName] = useState("");
   const [doNumber, setDoNumber] = useState("");
-  const [dateFilter, setDateFilter] = useState<any>(""); 
+  const [dateFilter, setDateFilter] = useState<any>("");
   const [filteredData, setFilteredData] = useState<TData[]>(data);
   const [filtered, setFiltered] = useState<Boolean>(false);
 
@@ -51,43 +55,45 @@ const Alokasi = <TData extends {
   }));
 
   const doNumberOptions = Array.from(
-      new Set(data.map((item) => item.deliveryNumber)) 
+    new Set(data.map((item) => item.deliveryNumber))
   ).map((deliveryNumber) => ({
-      label: deliveryNumber,
-      value: deliveryNumber,
+    label: deliveryNumber,
+    value: deliveryNumber,
   }));
 
   useEffect(() => {
-      const filtered = data.filter((item) => {
-        const matchesStatus = status ? item.status === status : true;
-        const matchesAgentName = agentName ? item.agentName === agentName : true;
-        const matchesDoNumber = doNumber ? item.deliveryNumber === doNumber : true;
+    const filtered = data.filter((item) => {
+      const matchesStatus = status ? item.status === status : true;
+      const matchesAgentName = agentName ? item.agentName === agentName : true;
+      const matchesDoNumber = doNumber
+        ? item.deliveryNumber === doNumber
+        : true;
 
-        const matchesDate = dateFilter?.from ? (
-            dateFilter?.to ? (
-              item.giDate >= normalizeDateFrom(dateFilter.from) &&
-              item.giDate <= normalizeDateTo(dateFilter.to)
-            ) : (
-              item.giDate >= normalizeDateFrom(dateFilter.from) &&
-              item.giDate <= normalizeDateTo(dateFilter.from)
-            )
-        ) : true;
+      const matchesDate = dateFilter?.from
+        ? dateFilter?.to
+          ? item.giDate >= normalizeDateFrom(dateFilter.from) &&
+            item.giDate <= normalizeDateTo(dateFilter.to)
+          : item.giDate >= normalizeDateFrom(dateFilter.from) &&
+            item.giDate <= normalizeDateTo(dateFilter.from)
+        : true;
 
-        return matchesStatus && matchesAgentName && matchesDoNumber && matchesDate;
-      });
+      return (
+        matchesStatus && matchesAgentName && matchesDoNumber && matchesDate
+      );
+    });
 
-      setFilteredData(filtered);
+    setFilteredData(filtered);
   }, [status, agentName, doNumber, dateFilter, data]);
 
   const handleClearSearch = () => {
-      setStatus("");
-      setAgentName("");
-      setDoNumber("");
-      setDateFilter(null);
-  
-      setFilteredData(data);
-  
-      setFiltered(false);
+    setStatus("");
+    setAgentName("");
+    setDoNumber("");
+    setDateFilter(null);
+
+    setFilteredData(data);
+
+    setFiltered(false);
   };
 
   return (
@@ -95,13 +101,17 @@ const Alokasi = <TData extends {
       <div className="items-center py-4 mx-4">
         <Card className="px-4 py-5 mb-4">
           <div className="px-4 text-center">
-              <h1 className="text-lg font-semibold py-2 pb-4">Filter Penyaluran</h1>
+            <h1 className="text-lg font-semibold py-2 pb-4">
+              Filter Penyaluran
+            </h1>
           </div>
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
             <div>
-              <Label htmlFor="status-search" className="text-lg">Status</Label>
+              <Label htmlFor="status-search" className="text-lg">
+                Status
+              </Label>
               <ComboBox
-                data={statusOptions} 
+                data={statusOptions}
                 value={status}
                 setValue={setStatus}
                 placeholder="Pilih status..."
@@ -131,28 +141,35 @@ const Alokasi = <TData extends {
               />
             </div>
 
-              <div>
-                <Label htmlFor="date-search" className="text-lg">Tanggal</Label>
-                <DatePickerWithRange
-                    value={dateFilter}
-                    onDateChange={setDateFilter}
-                    placeholder="Pilih tanggal..."
-                />
-              </div>
+            <div>
+              <Label htmlFor="date-search" className="text-lg">
+                Tanggal
+              </Label>
+              <DatePickerWithRange
+                value={dateFilter}
+                onDateChange={setDateFilter}
+                placeholder="Pilih tanggal..."
+              />
+            </div>
           </div>
 
           <div className="flex justify-between items-center mb-3 space-x-2">
-            <Button variant="default" asChild>
-                <Link href="alokasi/upload"> 
-                    <Upload className="h-4 w-4 mr-2 cursor-pointer"/>
-                    Upload Alokasi
+            {user.role === "ADMIN" && (
+              <Button variant="default" asChild>
+                <Link href="alokasi/upload">
+                  <Upload className="h-4 w-4 mr-2 cursor-pointer" />
+                  Upload Alokasi
                 </Link>
-            </Button>
-            <div className="flex space-x-2">
-              {(status || doNumber || agentName || dateFilter != null) &&(
-                  <Button variant="default" onClick={handleClearSearch}>
-                      <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
-                  </Button>
+              </Button>
+            )}
+
+            {/* Add an additional container for the right-aligned content */}
+            <div className="ml-auto flex space-x-2">
+              {(status || doNumber || agentName || dateFilter != null) && (
+                <Button variant="default" onClick={handleClearSearch}>
+                  <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan
+                  Pencarian
+                </Button>
               )}
             </div>
           </div>

@@ -8,15 +8,15 @@ import {
   LpgDistributions,
   MonthlyAllocation,
 } from "@/lib/types";
-import { Trash, Printer, Pencil, SquarePlus } from "lucide-react";
+import { Printer, SquarePlus } from "lucide-react";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Button } from "@/components/ui/button";
-import ActionButtons from "@/components/FeatureComponents/ActionButtons";
 import Link from "next/link";
 import EditFormAgents from "../components/FeatureComponents/CRUD/EditFormAgents";
 import EditFormLpg from "@/components/FeatureComponents/CRUD/EditFormLpg";
 import CetakPenyaluran from "@/components/FeatureComponents/CetakDistribusi/CetakPenyaluran";
 import { formatDate } from "@/utils/page";
+import { getCurrentSession } from "@/app/actions/auth.actions";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
@@ -50,9 +50,7 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
     accessorKey: "giDate",
     header: "Tanggal",
     cell: ({ row }) => {
-      const date = row.original.giDate
-        ? new Date(row.original.giDate)
-        : null;
+      const date = row.original.giDate ? new Date(row.original.giDate) : null;
       return (
         <div className="flex-[1]">
           {date
@@ -97,7 +95,7 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
     sortingFn: "datetime",
     sortDescFirst: true,
     cell: ({ row }) => {
-      const date = row.original.updatedAt; 
+      const date = row.original.updatedAt;
       return <div>{formatDate(date)}</div>;
     },
   },
@@ -111,7 +109,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
       const status = row.original.status;
       return (
         <span
-          className={status == "Pending" ? ("text-orange-500") : ("text-lime-500")}
+          className={status == "Pending" ? "text-orange-500" : "text-lime-500"}
         >
           {status}
         </span>
@@ -142,24 +140,28 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     accessorKey: "plannedGiDate",
     header: "Planned GI Date",
     cell: ({ row }) => {
-      const rawDate = row.original.plannedGiDate;
-      if (rawDate) {
-        const day = rawDate.slice(0, 2);
-        const month = rawDate.slice(2, 4);
-        const year = rawDate.slice(4);
-        const formattedDate = `${day}-${month}-${year}`;
-        return <span>{formattedDate}</span>;
-      }
-      return <span>-</span>;
+      const date = row.original.plannedGiDate
+        ? new Date(row.original.plannedGiDate)
+        : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
     },
   },
   {
     accessorKey: "giDate",
     header: "GI Date",
     cell: ({ row }) => {
-      const date = row.original.giDate
-        ? new Date(row.original.giDate)
-        : null;
+      const date = row.original.giDate ? new Date(row.original.giDate) : null;
       return (
         <div className="flex-[1]">
           {date
@@ -179,19 +181,114 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     header: "Nomer BPE",
     cell: ({ row }) => {
       const bpe = row.original.bpeNumber;
-      return (
-        <>
-          {bpe ? bpe : "-" }
-        </>
-      )
-    }
+      return <>{bpe ? bpe : "-"}</>;
+    },
   },
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
     size: 1,
     cell: ({ row }) => {
-      const date = row.original.updatedAt; 
+      const date = row.original.updatedAt;
+      return <div>{formatDate(date)}</div>;
+    },
+  },
+  // {
+  //   accessorKey: "createdAt",
+  //   header: "Created At",
+  //   cell: ({ row }) => new Date(row.original.createdAt).toLocaleString(), // Format tanggal
+  // },
+];
+
+export const adminAllocationColumns: ColumnDef<Allocation>[] = [
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.original.status;
+      return (
+        <span
+          className={status == "Pending" ? "text-orange-500" : "text-lime-500"}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "deliveryNumber",
+    header: "Nomer DO",
+  },
+  {
+    accessorKey: "shipTo",
+    header: "Ship To",
+  },
+  {
+    accessorKey: "agentName",
+    header: "Nama Agen",
+  },
+  {
+    accessorKey: "materialName",
+    header: "Nama Material",
+  },
+  {
+    accessorKey: "allocatedQty",
+    header: "Jumlah",
+  },
+  {
+    accessorKey: "plannedGiDate",
+    header: "Planned GI Date",
+    cell: ({ row }) => {
+      const date = row.original.plannedGiDate
+        ? new Date(row.original.plannedGiDate)
+        : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "giDate",
+    header: "GI Date",
+    cell: ({ row }) => {
+      const date = row.original.giDate ? new Date(row.original.giDate) : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "bpeNumber",
+    header: "Nomer BPE",
+    cell: ({ row }) => {
+      const bpe = row.original.bpeNumber;
+      return <>{bpe ? bpe : "-"}</>;
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+    size: 1,
+    cell: ({ row }) => {
+      const date = row.original.updatedAt;
       return <div>{formatDate(date)}</div>;
     },
   },
@@ -228,7 +325,9 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex-[1]">
-          {row.original.date ? new Date(row.original.date).toLocaleDateString("id-ID") : "-"}
+          {row.original.date
+            ? new Date(row.original.date).toLocaleDateString("id-ID")
+            : "-"}
         </div>
       );
     },
@@ -238,9 +337,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     header: "Jumlah",
     size: 3,
     cell: ({ row }) => {
-      return (
-        <div className="flex-[3]">{row.original.totalElpiji}</div>
-      )
+      return <div className="flex-[3]">{row.original.totalElpiji}</div>;
     },
   },
   {
@@ -248,9 +345,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     header: "Total Volume",
     size: 3,
     cell: ({ row }) => {
-      return (
-        <div className="flex-[3]">{row.original.totalElpiji*3}</div>
-      )
+      return <div className="flex-[3]">{row.original.totalElpiji * 3}</div>;
     },
   },
   {
@@ -258,19 +353,60 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     header: "Diperbarui",
     size: 1,
     cell: ({ row }) => {
-      const date = row.original.updatedAt; 
+      const date = row.original.updatedAt;
       return <div>{formatDate(date)}</div>;
     },
-  }
+  },
 ];
 
 export const agentColumns: ColumnDef<Agents>[] = [
   {
+    accessorKey: "agentName",
+    header: "Nama Agen",
+  },
+  {
+    accessorKey: "address",
+    header: "Alamat",
+  },
+  {
+    accessorKey: "city",
+    header: "Kota",
+  },
+  {
+    accessorKey: "phone",
+    header: "No HP",
+  },
+  {
+    accessorKey: "fax",
+    header: "Fax",
+  },
+  {
+    accessorKey: "companyName",
+    header: "Nama Perusahaan",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Dibuat",
+    cell: ({ row }) => {
+      const date = row.original.createdAt;
+      return <div>{formatDate(date)}</div>;
+    },
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+    cell: ({ row }) => {
+      const date = row.original.updatedAt;
+      return <div>{formatDate(date)}</div>;
+    },
+  },
+];
+
+export const adminAgentColumns: ColumnDef<Agents>[] = [
+  {
     accessorKey: "Tindakan",
     cell: ({ row }) => {
-      return (
-        <EditFormAgents row={row.original} />
-      );
+      return <EditFormAgents row={row.original} />;
     },
   },
   {
@@ -301,7 +437,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
     accessorKey: "createdAt",
     header: "Dibuat",
     cell: ({ row }) => {
-      const date = row.original.createdAt; 
+      const date = row.original.createdAt;
       return <div>{formatDate(date)}</div>;
     },
   },
@@ -309,7 +445,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
     accessorKey: "updatedAt",
     header: "Diperbarui",
     cell: ({ row }) => {
-      const date = row.original.updatedAt; 
+      const date = row.original.updatedAt;
       return <div>{formatDate(date)}</div>;
     },
   },
@@ -333,7 +469,7 @@ export const companiesColumns: ColumnDef<Companies>[] = [
     header: "Dibuat",
     size: 1,
     cell: ({ row }) => {
-      const date = row.original.createdAt; 
+      const date = row.original.createdAt;
       return <div>{formatDate(date)}</div>;
     },
   },
@@ -342,7 +478,7 @@ export const companiesColumns: ColumnDef<Companies>[] = [
     header: "Diperbarui",
     size: 1,
     cell: ({ row }) => {
-      const date = row.original.updatedAt; 
+      const date = row.original.updatedAt;
       return <div>{formatDate(date)}</div>;
     },
   },

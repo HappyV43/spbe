@@ -11,8 +11,8 @@ export const metadata = {
 
 const AlokasiBulananPage = async () => {
   const data = await getMonthlyAllocation();
-  const dataUser = await getCurrentSession();
-  if (!dataUser.session && !dataUser.user) {
+  const { session, user } = await getCurrentSession();
+  if (!session && !user) {
     redirect("/auth/login");
   }
   return (
@@ -20,7 +20,11 @@ const AlokasiBulananPage = async () => {
       home={"dashboard"}
       mainpage={"alokasi-bulanan"}
       children={
-        <AlokasiBulanan columns={monthlyAllocationColumns} data={data} />
+        <AlokasiBulanan
+          columns={monthlyAllocationColumns}
+          data={data}
+          user={user}
+        />
       }
     />
   );
