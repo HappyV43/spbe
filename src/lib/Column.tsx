@@ -15,9 +15,10 @@ import Link from "next/link";
 import EditFormAgents from "../components/FeatureComponents/CRUD/EditFormAgents";
 import EditFormLpg from "@/components/FeatureComponents/CRUD/EditFormLpg";
 import CetakPenyaluran from "@/components/FeatureComponents/CetakDistribusi/CetakPenyaluran";
-import { formatDate } from "@/utils/page";
+import { formatDateTime } from "@/utils/page";
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import CetakPlastikWrap from "@/components/FeatureComponents/CetakDistribusi/CetakPlastikWrap";
+import { formatDate } from "date-fns";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
@@ -110,7 +111,7 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
     sortDescFirst: true,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
 ];
@@ -204,7 +205,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
   // {
@@ -303,7 +304,7 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
   {
@@ -336,15 +337,12 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     accessorKey: "date",
     header: "Tanggal",
     sortingFn: "datetime",
-    sortDescFirst: false,
-    size: 1,
+    sortDescFirst: true,
+    enableSorting: true,
     cell: ({ row }) => {
+      const date = row.original.date
       return (
-        <div className="flex-[1]">
-          {row.original.date
-            ? new Date(row.original.date).toLocaleDateString("id-ID")
-            : "-"}
-        </div>
+        <div>{formatDateTime(date)}</div>
       );
     },
   },
@@ -370,7 +368,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
 ];
@@ -405,7 +403,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
     header: "Dibuat",
     cell: ({ row }) => {
       const date = row.original.createdAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
   {
@@ -413,7 +411,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
     header: "Diperbarui",
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
 ];
@@ -454,7 +452,7 @@ export const adminAgentColumns: ColumnDef<Agents>[] = [
     header: "Dibuat",
     cell: ({ row }) => {
       const date = row.original.createdAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
   {
@@ -462,7 +460,7 @@ export const adminAgentColumns: ColumnDef<Agents>[] = [
     header: "Diperbarui",
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
 ];
@@ -486,7 +484,7 @@ export const companiesColumns: ColumnDef<Companies>[] = [
     size: 1,
     cell: ({ row }) => {
       const date = row.original.createdAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
   {
@@ -495,7 +493,7 @@ export const companiesColumns: ColumnDef<Companies>[] = [
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDate(date)}</div>;
+      return <div>{formatDateTime(date)}</div>;
     },
   },
 ];

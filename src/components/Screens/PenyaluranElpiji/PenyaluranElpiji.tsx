@@ -33,6 +33,7 @@ import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
 import type { User } from "@prisma/client";
+import { id } from "date-fns/locale";
 
 interface Records {
   bpeNumber: String;
@@ -178,6 +179,24 @@ const PenyaluranElpiji = <
   return (
     <div className="w-full">
       <div className=" items-center py-4 mx-4">
+        <div className="flex gap-4 py-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Jumlah Tabung:</h1>
+            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData))}</p>
+          </Card>
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Jumlah Kg:</h1>
+            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData)*3)} <span className="text-lg">Kg</span></p>
+          </Card>
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Agen:</h1>
+            <p className="text-3xl font-bold">{calculateTotalAgen(filteredData)}</p>
+          </Card>
+          <Card className="flex-1 px-4 py-5">
+            <h1 className="text-lg font-semibold">Total Nomor DO:</h1>
+            <p className="text-3xl font-bold">{filteredData.length}</p>
+          </Card>
+        </div>
         <Card className="px-4 py-5 mb-4">
           <div className="px-4 text-center">
             <h1 className="text-lg font-semibold py-2 pb-4">
@@ -225,11 +244,7 @@ const PenyaluranElpiji = <
               <DatePickerWithRange
                 value={dateFilter}
                 onDateChange={setDateFilter}
-                placeholder={
-                  filtered
-                    ? `${format(new Date(), "dd MMM yyyy")}`
-                    : "Semua Tanggal"
-                }
+                placeholder={filtered ? `${format(new Date(), "dd MMMM yyyy", {locale: id})}` : "Semua Tanggal"}
               />
             </div>
           </div>
