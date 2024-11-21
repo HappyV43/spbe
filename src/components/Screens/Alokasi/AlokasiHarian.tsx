@@ -12,6 +12,7 @@ import { calculateTotalAgen, calculateTotalQty, formatNumberQty, normalizeDateFr
 import { Card } from "../../ui/card";
 import type { User } from "@prisma/client";
 import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 interface AlokasiProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -122,7 +123,7 @@ const AlokasiHarian = <
           </Card>
           <Card className="flex-1 px-4 py-5">
             <h1 className="text-lg font-semibold">Total Jumlah Kg:</h1>
-            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData)*3)}</p>
+            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData)*3)} <span className="text-lg">Kg</span></p>
           </Card>
           <Card className="flex-1 px-4 py-5">
             <h1 className="text-lg font-semibold">Total Agen:</h1>
@@ -176,7 +177,7 @@ const AlokasiHarian = <
                 <DatePickerWithRange
                     value={dateFilter}
                     onDateChange={setDateFilter}
-                    placeholder={filtered ? `${format(new Date(), "dd MMM yyyy")}` : "Semua Tanggal"}
+                    placeholder={filtered ? `${format(new Date(), "dd MMMM yyyy", {locale:id})}` : "Semua Tanggal"}
                 />
               </div>
           </div>
