@@ -16,6 +16,7 @@ import {
 } from "@/utils/page";
 import MonthPicker from "@/components/FeatureComponents/MonthPicker";
 import { id } from "date-fns/locale";
+import { Weight } from "lucide-react";
 
 interface AllocationData {
   date?: string | Date | null;
@@ -99,23 +100,33 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
         <Card className="px-4 py-5">
           <h1 className="text-lg font-semibold">Total Alokasi Harian:</h1>
           <p className="text-3xl font-bold">{formatNumberQty(totalDailyQty)}</p>
-          <p className="text-3xl font-bold">
-            {formatNumberQty(totalDailyQty * 3)} <span className="text-lg">Kg</span>
-          </p>
+          <div className="flex flex-row justify-end mt-3">
+            <Weight/>
+            <p className="text-3lg font-bold text-gray-600 px-3">
+              {formatNumberQty(totalDailyQty * 3)} Kg
+            </p>
+          </div>
+
         </Card>
         <Card className="px-4 py-5">
-          <h1 className="text-lg font-semibold">Total Alokasi Bulanan</h1>
+          <h1 className="text-lg font-semibold">Total Alokasi Bulanan:</h1>
           <p className="text-3xl font-bold">{formatNumberQty(totalMonthlyQty)}</p>
-          <p className="text-3xl font-bold">
-            {formatNumberQty(totalMonthlyQty * 3)} <span className="text-lg">Kg</span>
-          </p>
+          <div className="flex flex-row justify-end mt-3">
+            <Weight/>
+            <p className="text-3lg font-bold text-gray-600 px-3">
+              {formatNumberQty(totalMonthlyQty * 3)} Kg
+            </p>
+          </div>
         </Card>
         <Card className="px-4 py-5">
-          <h1 className="text-lg font-semibold">Total Penyaluran Elpiji</h1>
+          <h1 className="text-lg font-semibold">Total Penyaluran Elpiji:</h1>
           <p className="text-3xl font-bold">{formatNumberQty(totalMonthlyQty)}</p>
-          <p className="text-3xl font-bold">
-            {formatNumberQty(totalMonthlyQty * 3)} <span className="text-lg">Kg</span>
-          </p>
+          <div className="flex flex-row justify-end mt-3">
+            <Weight/>          
+            <p className="text-3lg font-bold text-gray-600 px-3">
+              {formatNumberQty(totalMonthlyQty * 3)} Kg
+            </p>
+          </div>
         </Card>
       </div>
 
