@@ -24,18 +24,22 @@ export async function getMonthlyAllocation() {
 
 export const getSummary = async () => {
   const data = await prisma.allocations.findMany({
-    where: {
-      status: {
-        in: ["Pending", "Approved"],
-      },
-    },
-    include: {
+    select: {
+      allocatedQty: true,
+      plannedGiDate: true,
       lpgDistribution: {
         select: {
           distributionQty: true,
+          giDate: true,
         },
       },
     },
   });
-  return data;
+  const monthlyAllocations = await prisma.monthlyAllocations.findMany({
+    select: {
+      date: true,
+      totalElpiji: true,
+    },
+  });
+  return { data, monthlyAllocations };
 };

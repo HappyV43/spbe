@@ -1,17 +1,21 @@
 "use client";
 
-import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
+import { getSummary } from "@/app/actions/alokasi.action";
 import { ChartComponent } from "@/components/FeatureComponents/Chart";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ChartConfig } from "@/components/ui/chart";
 import { format, isSameMonth } from "date-fns";
 import React, { useEffect, useState } from "react";
 import {
-  calculateTotalAgen,
   calculateTotalQty,
   formatNumberQty,
   getMonthlyTotalQty,
-  getTodayTotalQty,
   getWeekTotalQty,
 } from "@/utils/page";
 import MonthPicker from "@/components/FeatureComponents/MonthPicker";
@@ -19,16 +23,29 @@ import { id } from "date-fns/locale";
 import { Weight } from "lucide-react";
 
 interface AllocationData {
-  date?: string | Date | null;
+  plannedGiDate?: Date;
   allocatedQty?: number;
+  lpgDistribution: {
+    giDate: Date;
+    distributionQty: number;
+  } | null;
 }
 
 interface SummaryProps {
   data: AllocationData[];
 }
 
-const Summary: React.FC<SummaryProps> = ({ data }) => {
-  const [allocationMonthly, setAllocationMonthly] = useState<AllocationData[]>([]);
+interface monthlyData {
+  date?: Date;
+  totalElpiji?: number;
+}
+
+interface SummaryProps {
+  monthly: monthlyData[];
+}
+
+const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
+  const [allocationMonthly, setAllocationMonthly] = useState<monthlyData[]>([]);
   const [currentMonth, setCurrentMonth] = useState<Date | null>(new Date());
   const [filteredData, setFilteredData] = useState<AllocationData[]>([]);
 
@@ -37,9 +54,9 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
 
   useEffect(() => {
     const fetchMonthlyAllocation = async () => {
-      const result = await getMonthlyAllocation();
+      const result = (await getSummary()).monthlyAllocations;
       const monthlyData = result.map((item: any) => ({
-        date: item.date,
+        date: item.plannedGiDate,
         allocatedQty: item.totalElpiji,
       }));
       setAllocationMonthly(monthlyData);
@@ -50,7 +67,9 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
   useEffect(() => {
     const filtered = currentMonth
       ? data.filter(
-          (item) => item.date && isSameMonth(new Date(item.date), currentMonth)
+          (item) =>
+            item.plannedGiDate &&
+            isSameMonth(new Date(item.plannedGiDate), currentMonth)
         )
       : data;
     setFilteredData(filtered);
@@ -68,9 +87,9 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
   } satisfies ChartConfig;
 
   // Placeholder logic for Pending and Fakultatif calculations
-  const totalPending = totalDailyQty - totalMonthlyQty; 
+  const totalPending = totalDailyQty - totalMonthlyQty;
   // Replace with actual logic
-  const totalFakultatif = Math.max(0, totalMonthlyQty - totalDailyQty); 
+  const totalFakultatif = Math.max(0, totalMonthlyQty - totalDailyQty);
 
   return (
     <div className="py-4 mx-4">
@@ -101,18 +120,19 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
           <h1 className="text-lg font-semibold">Total Alokasi Harian:</h1>
           <p className="text-3xl font-bold">{formatNumberQty(totalDailyQty)}</p>
           <div className="flex flex-row justify-end mt-3">
-            <Weight/>
+            <Weight />
             <p className="text-3lg font-bold text-gray-600 px-3">
               {formatNumberQty(totalDailyQty * 3)} Kg
             </p>
           </div>
-
         </Card>
         <Card className="px-4 py-5">
           <h1 className="text-lg font-semibold">Total Alokasi Bulanan:</h1>
-          <p className="text-3xl font-bold">{formatNumberQty(totalMonthlyQty)}</p>
+          <p className="text-3xl font-bold">
+            {formatNumberQty(totalMonthlyQty)}
+          </p>
           <div className="flex flex-row justify-end mt-3">
-            <Weight/>
+            <Weight />
             <p className="text-3lg font-bold text-gray-600 px-3">
               {formatNumberQty(totalMonthlyQty * 3)} Kg
             </p>
@@ -120,9 +140,11 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
         </Card>
         <Card className="px-4 py-5">
           <h1 className="text-lg font-semibold">Total Penyaluran Elpiji:</h1>
-          <p className="text-3xl font-bold">{formatNumberQty(totalMonthlyQty)}</p>
+          <p className="text-3xl font-bold">
+            {formatNumberQty(totalMonthlyQty)}
+          </p>
           <div className="flex flex-row justify-end mt-3">
-            <Weight/>          
+            <Weight />
             <p className="text-3lg font-bold text-gray-600 px-3">
               {formatNumberQty(totalMonthlyQty * 3)} Kg
             </p>
@@ -137,7 +159,9 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
         </Card>
         <Card className="px-4 py-5">
           <h1 className="text-lg font-semibold">Total Fakultatif:</h1>
-          <p className="text-3xl font-bold">{formatNumberQty(totalFakultatif)}</p>
+          <p className="text-3xl font-bold">
+            {formatNumberQty(totalFakultatif)}
+          </p>
         </Card>
       </div>
 
@@ -178,6 +202,26 @@ const Summary: React.FC<SummaryProps> = ({ data }) => {
           </CardContent>
         </Card>
       </div>
+
+      {/* looping for data={alokasi harian, distribution} monthly={monthly allocation} */}
+      {/* <div>
+        {monthly.map((data) => (
+          <div>
+            {data.date?.toLocaleDateString()}
+            {data.totalElpiji}
+          </div>
+        ))}
+      </div>
+      <div>
+        {data.map((data) => (
+          <div>
+            {data.plannedGiDate?.toLocaleDateString()}
+            {data.allocatedQty}
+            {data.lpgDistribution?.distributionQty}
+            {data.lpgDistribution?.giDate.toLocaleDateString()}
+          </div>
+        ))}
+      </div> */}
     </div>
   );
 };
