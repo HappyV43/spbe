@@ -23,6 +23,7 @@ import { formatDate } from "date-fns";
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     header: "Tindakan",
+    enableSorting: false,
     cell: ({ row }) => {
       return (
         <div className="flex space-x-1">
@@ -60,6 +61,7 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     accessorKey: "bpeNumber",
     header: "Nomor BPE",
+    enableSorting: false,
   },
   {
     accessorKey: "giDate",
@@ -87,10 +89,12 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     accessorKey: "licensePlate",
     header: "Nomor Plat",
+    enableSorting: false,
   },
   {
     accessorKey: "deliveryNumber",
     header: "Nomor DO",
+    enableSorting: false,
   },
   {
     accessorKey: "allocatedQty",
@@ -103,6 +107,7 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     accessorKey: "volume",
     header: "Volume Tabung",
+    enableSorting: false,
   },
   {
     accessorKey: "updatedAt",
@@ -120,6 +125,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "status",
     header: "Status",
+    enableSorting: false,
     cell: ({ row }) => {
       const status = row.original.status;
       return (
@@ -134,10 +140,12 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "deliveryNumber",
     header: "Nomer DO",
+    enableSorting: false,
   },
   {
     accessorKey: "shipTo",
     header: "Ship To",
+    enableSorting: false,
   },
   {
     accessorKey: "agentName",
@@ -146,6 +154,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "materialName",
     header: "Nama Material",
+    enableSorting: false,
   },
   {
     accessorKey: "allocatedQty",
@@ -194,6 +203,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "bpeNumber",
     header: "Nomer BPE",
+    enableSorting: false,
     cell: ({ row }) => {
       const bpe = row.original.bpeNumber;
       return <>{bpe ? bpe : "-"}</>;
@@ -219,6 +229,7 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "status",
     header: "Status",
+    enableSorting: false,
     cell: ({ row }) => {
       const status = row.original.status;
       return (
@@ -233,18 +244,22 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "deliveryNumber",
     header: "Nomer DO",
+    enableSorting: false,
   },
   {
     accessorKey: "shipTo",
     header: "Ship To",
+    enableSorting: false,
   },
   {
     accessorKey: "agentName",
     header: "Nama Agen",
+    enableSorting: false,
   },
   {
     accessorKey: "materialName",
     header: "Nama Material",
+    enableSorting: false,
   },
   {
     accessorKey: "allocatedQty",
@@ -293,6 +308,7 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "bpeNumber",
     header: "Nomer BPE",
+    enableSorting: false,
     cell: ({ row }) => {
       const bpe = row.original.bpeNumber;
       return <>{bpe ? bpe : "-"}</>;
@@ -336,9 +352,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
     accessorKey: "date",
     header: "Tanggal",
-    sortingFn: "datetime",
-    sortDescFirst: true,
-    enableSorting: true,
+    sortDescFirst: false,
     cell: ({ row }) => {
       const date = row.original.date
       return (
@@ -349,6 +363,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
     accessorKey: "totalElpiji",
     header: "Jumlah",
+    enableSorting: false,
     size: 3,
     cell: ({ row }) => {
       return <div className="flex-[3]">{row.original.totalElpiji}</div>;
@@ -357,6 +372,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
     accessorKey: "volume",
     header: "Total Volume",
+    enableSorting: false,
     size: 3,
     cell: ({ row }) => {
       return <div className="flex-[3]">{row.original.totalElpiji * 3}</div>;
@@ -365,6 +381,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: false,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
@@ -381,26 +398,33 @@ export const agentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "address",
     header: "Alamat",
+    enableSorting: false,
+
   },
   {
     accessorKey: "city",
     header: "Kota",
+    enableSorting: false,
   },
   {
     accessorKey: "phone",
     header: "No HP",
+    enableSorting: false,
   },
   {
     accessorKey: "fax",
     header: "Fax",
+    enableSorting: false,
   },
   {
     accessorKey: "companyName",
     header: "Nama Perusahaan",
+    enableSorting: false,
   },
   {
     accessorKey: "createdAt",
     header: "Dibuat",
+    enableSorting: false,
     cell: ({ row }) => {
       const date = row.original.createdAt;
       return <div>{formatDateTime(date)}</div>;
@@ -409,6 +433,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: false,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
@@ -419,6 +444,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
 export const adminAgentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "Tindakan",
+    enableSorting: false,
     cell: ({ row }) => {
       return <EditFormAgents row={row.original} />;
     },
@@ -430,26 +456,32 @@ export const adminAgentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "address",
     header: "Alamat",
+    enableSorting: false,
   },
   {
     accessorKey: "city",
     header: "Kota",
+    enableSorting: false,
   },
   {
     accessorKey: "phone",
     header: "No HP",
+    enableSorting: false,
   },
   {
     accessorKey: "fax",
     header: "Fax",
+    enableSorting: false,
   },
   {
     accessorKey: "companyName",
     header: "Nama Perusahaan",
+    enableSorting: false,
   },
   {
     accessorKey: "createdAt",
     header: "Dibuat",
+    enableSorting: false,
     cell: ({ row }) => {
       const date = row.original.createdAt;
       return <div>{formatDateTime(date)}</div>;
@@ -458,6 +490,7 @@ export const adminAgentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: false,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
@@ -473,14 +506,17 @@ export const companiesColumns: ColumnDef<Companies>[] = [
   {
     accessorKey: "address",
     header: "Alamat",
+    enableSorting: false,
   },
   {
     accessorKey: "telephone",
     header: "No HP",
+    enableSorting: false,
   },
   {
     accessorKey: "createdAt",
     header: "Dibuat",
+    enableSorting: false,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.createdAt;
@@ -490,6 +526,7 @@ export const companiesColumns: ColumnDef<Companies>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: false,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
