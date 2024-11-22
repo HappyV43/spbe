@@ -1,7 +1,7 @@
 import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
 import { getCurrentSession } from "@/app/actions/auth.actions";
-import AlokasiBulanan from "@/components/Screens/Alokasi/AlokasiBulanan";
 import { ContentLayout } from "@/components/ContentLayout";
+import AlokasiBulanan from "@/components/Screens/Alokasi/AlokasiBulanan";
 import { monthlyAllocationColumns } from "@/lib/Column";
 import { redirect } from "next/navigation";
 

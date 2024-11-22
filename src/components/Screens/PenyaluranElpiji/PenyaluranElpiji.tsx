@@ -78,7 +78,7 @@ const PenyaluranElpiji = <
   const [notrans, setnotrans] = useState("");
   const [agentName, setAgentName] = useState("");
   const [doNumber, setDoNumber] = useState("");
-  const [dateFilter, setDateFilter] = useState<any>("today"); 
+  const [dateFilter, setDateFilter] = useState<any>("today");
   const [filteredData, setFilteredData] = useState<TData[]>(data);
   const [filtered, setFiltered] = useState<Boolean>(false);
   const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
@@ -126,9 +126,9 @@ const PenyaluranElpiji = <
           : // For Single Dates
             item.giDate >= normalizeDateFrom(dateFilter.from) &&
             item.giDate <= normalizeDateTo(dateFilter.from)
-          : dateFilter === 'today'
-            ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
-          : true;
+        : dateFilter === "today"
+        ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
+        : true;
 
       return (
         matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber
@@ -164,7 +164,7 @@ const PenyaluranElpiji = <
 
   useEffect(() => {
     setFiltered(true);
-    setDateFilter(today)
+    setDateFilter(today);
   }, []);
 
   const handleClearSearch = () => {
@@ -179,18 +179,25 @@ const PenyaluranElpiji = <
   return (
     <div className="w-full">
       <div className=" items-center py-4 mx-4">
-        <div className="flex gap-4 py-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
+        <div className="py-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
           <Card className="flex-1 px-4 py-5">
             <h1 className="text-lg font-semibold">Total Jumlah Tabung:</h1>
-            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData))}</p>
+            <p className="text-3xl font-bold">
+              {formatNumberQty(calculateTotalQty(filteredData))}
+            </p>
           </Card>
           <Card className="flex-1 px-4 py-5">
             <h1 className="text-lg font-semibold">Total Jumlah Kg:</h1>
-            <p className="text-3xl font-bold">{formatNumberQty(calculateTotalQty(filteredData)*3)} <span className="text-lg">Kg</span></p>
+            <p className="text-3xl font-bold">
+              {formatNumberQty(calculateTotalQty(filteredData) * 3)}{" "}
+              <span className="text-lg">Kg</span>
+            </p>
           </Card>
           <Card className="flex-1 px-4 py-5">
             <h1 className="text-lg font-semibold">Total Agen:</h1>
-            <p className="text-3xl font-bold">{calculateTotalAgen(filteredData)}</p>
+            <p className="text-3xl font-bold">
+              {calculateTotalAgen(filteredData)}
+            </p>
           </Card>
           <Card className="flex-1 px-4 py-5">
             <h1 className="text-lg font-semibold">Total Nomor DO:</h1>
@@ -244,7 +251,11 @@ const PenyaluranElpiji = <
               <DatePickerWithRange
                 value={dateFilter}
                 onDateChange={setDateFilter}
-                placeholder={filtered ? `${format(new Date(), "dd MMMM yyyy", {locale: id})}` : "Semua Tanggal"}
+                placeholder={
+                  filtered
+                    ? `${format(new Date(), "dd MMMM yyyy", { locale: id })}`
+                    : "Semua Tanggal"
+                }
               />
             </div>
           </div>
