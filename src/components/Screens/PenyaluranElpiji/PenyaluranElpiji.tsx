@@ -3,14 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { Plus, Printer, Search, SearchX } from "lucide-react";
+import { CalendarCheck, Database, Handshake, Plus, Printer, Search, SearchX, Weight } from "lucide-react";
 import {
   calculateTotalAgen,
   calculateTotalQty,
   formatNumberQty,
-  getMonthlyTotalQty,
-  getTodayTotalQty,
-  getWeekTotalQty,
   normalizeDateFrom,
   normalizeDateTo,
 } from "@/utils/page";
@@ -83,12 +80,6 @@ const PenyaluranElpiji = <
   const [filtered, setFiltered] = useState<Boolean>(false);
   const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
 
-  const monthlyData = getMonthlyTotalQty(data);
-  const weeklyData = getWeekTotalQty(data);
-
-  const weeklyDataMontly = getWeekTotalQty(allocationMonthly);
-  const monthlyDataMonthly = getMonthlyTotalQty(allocationMonthly);
-
   const notransOptions = Array.from(
     new Set(data.map((item) => item.bpeNumber))
   ).map((bpeNumber) => ({
@@ -138,16 +129,13 @@ const PenyaluranElpiji = <
     setFilteredData(filtered);
   }, [notrans, agentName, doNumber, dateFilter, data]);
 
-  useEffect(() => {
-    getMonthly();
-  }, []);
-
   const getMonthly = async () => {
     const data = await getMonthlyAllocation();
     const monthlyData = data.map((item) => ({
       giDate: item.date,
       allocatedQty: item.totalElpiji,
     }));
+    console.log(monthlyData);
     setAllocationMonthly(monthlyData);
   };
 
@@ -163,6 +151,7 @@ const PenyaluranElpiji = <
   } satisfies ChartConfig;
 
   useEffect(() => {
+    getMonthly();
     setFiltered(true);
     setDateFilter(today);
   }, []);
@@ -179,32 +168,53 @@ const PenyaluranElpiji = <
   return (
     <div className="w-full">
       <div className=" items-center py-4 mx-4">
-        <div className="py-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Jumlah Tabung:</h1>
-            <p className="text-3xl font-bold">
-              {formatNumberQty(calculateTotalQty(filteredData))}
-            </p>
+        <div className="pt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
+          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="bg-black rounded-xl p-2">
+                <CalendarCheck className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL TABUNG</h1>
+                <p className="text-3xl font-extrabold">{formatNumberQty(calculateTotalQty(filteredData, 'distributionQty'))}</p>
+              </div>
+            </div>
           </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Jumlah Kg:</h1>
-            <p className="text-3xl font-bold">
-              {formatNumberQty(calculateTotalQty(filteredData) * 3)}{" "}
-              <span className="text-lg">Kg</span>
-            </p>
+          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="bg-black rounded-xl p-2">
+                <Weight className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL BERAT TABUNG</h1>
+                <p className="text-3xl font-extrabold">{formatNumberQty(calculateTotalQty(filteredData, 'distributionQty') * 3)} <span className="text-xl text-gray-600"> Kg</span></p>
+              </div>
+            </div>
           </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Agen:</h1>
-            <p className="text-3xl font-bold">
-              {calculateTotalAgen(filteredData)}
-            </p>
+          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="bg-black rounded-xl p-2">
+                <Handshake className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL AGEN</h1>
+                <p className="text-3xl font-extrabold">{calculateTotalAgen(filteredData)}</p>
+              </div>
+            </div>
           </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Nomor DO:</h1>
-            <p className="text-3xl font-bold">{filteredData.length}</p>
+          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="bg-black rounded-xl p-2">
+                <Database className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL DISTRIBUSI LPG</h1>
+                <p className="text-3xl font-extrabold">{filteredData.length}</p>
+              </div>
+            </div>
           </Card>
         </div>
-        <Card className="px-4 py-5 mb-4">
+        <Card className="px-6 py-6 my-3 shadow-lg rounded-2xl bg-white border border-gray-200">
           <div className="px-4 text-center">
             <h1 className="text-lg font-semibold py-2 pb-4">
               Filter Penyaluran Elpiji

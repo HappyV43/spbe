@@ -3,7 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../../ui/button";
 import { DataTable } from "../../ui/data-table";
 import Link from "next/link";
-import { SearchX, Upload } from "lucide-react";
+import { CalendarCheck, Database, SearchX, Upload, Weight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import MonthPicker from "@/components/FeatureComponents/MonthPicker";
 import { useEffect, useState } from "react";
@@ -54,51 +54,8 @@ const AlokasiBulanan = <
 
   return (
     <div className="w-full">
-      <div className="py-4 mx-4">
-        {/* Summary Cards */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3 mb-4">
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Jumlah Alokasi:</h1>
-            <p className="text-3xl font-bold">
-              {formatNumberQty(calculateMontlyQty(filteredData))}
-            </p>
-          </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Volume Alokasi:</h1>
-            <p className="text-3xl font-bold">
-              {formatNumberQty(calculateMontlyQty(filteredData) * 3)} <span className="text-lg">Kg</span>
-            </p>
-          </Card>
-          <Card className="flex-1 px-4 py-5">
-            <h1 className="text-lg font-semibold">Total Data:</h1>
-            <p className="text-3xl font-bold">{filteredData.length}</p>
-          </Card>
-        </div>
-
-        {/* Filter Section */}
-        <Card className="px-4 py-5 mb-4">
-          <div className="px-4 text-center">
-            <h1 className="text-lg font-semibold py-2 pb-4">Filter Alokasi</h1>
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
-            {/* Month Picker */}
-            <div className="gap-4 ">
-              <label htmlFor="month-picker" className="text-lg">
-                Bulan
-              </label>
-              <MonthPicker
-                currentMonth={currentMonth!}
-                onMonthChange={(newMonth) => setCurrentMonth(newMonth)}
-                placeholder={
-                  currentMonth
-                    ? format(currentMonth, "MMMM yyyy", { locale: id })
-                    : "Semua Bulan"
-                }
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-between items-center mb-3 space-x-2">
+      <div className="items-center py-4 mx-4">
+        <div className="flex justify-between items-center my-3 space-x-2">
             {user.role === "ADMIN" && (
               <Button variant="default" asChild>
                 <Link href="alokasi-bulanan/upload">
@@ -107,17 +64,61 @@ const AlokasiBulanan = <
                 </Link>
               </Button>
             )}
-            {/* <div className="flex space-x-2">
-              {currentMonth && (
-                <Button variant="default" onClick={handleClearSearch}>
-                  <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
-                  Bersihkan Pencarian
-                </Button>
-              )}
-            </div> */}
-          </div>
-        </Card>
-
+            {/* <div className="flex space-x-2 items-center"> */}
+              <MonthPicker
+                  currentMonth={currentMonth!}
+                  onMonthChange={(newMonth) => setCurrentMonth(newMonth)}
+                  placeholder={
+                    currentMonth
+                      ? format(currentMonth, "MMMM yyyy", { locale: id })
+                      : "Semua Bulan"
+                  }
+                />
+                {/* {currentMonth && (
+                  <Button variant="default" onClick={handleClearSearch}>
+                    <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
+                    Bersihkan Pencarian
+                  </Button>
+                )} */}
+            {/* </div> */}
+        </div>
+        
+        {/* Summary Cards */}
+        <div className="pt-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3 mb-4">
+          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="bg-black rounded-xl p-2">
+                <CalendarCheck className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL TABUNG</h1>
+                <p className="text-3xl font-extrabold">{formatNumberQty(calculateMontlyQty(filteredData))}</p>
+              </div>
+            </div>
+          </Card>
+          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="bg-black rounded-xl p-2">
+                <Weight className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL BERAT TABUNG</h1>
+                <p className="text-3xl font-extrabold">{formatNumberQty(calculateMontlyQty(filteredData)*3)} <span className="text-xl text-gray-600">Kg</span></p>
+              </div>
+            </div>
+          </Card>
+          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="bg-black rounded-xl p-2">
+                <Database className="h-10 w-10 text-white" />
+              </div>
+              <div>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL ALOKASI BULANAN</h1>
+                <p className="text-3xl font-extrabold">{filteredData.length}</p>
+              </div>
+            </div>
+          </Card>
+        </div>
         <DataTable columns={columns} data={filteredData} />
       </div>
     </div>

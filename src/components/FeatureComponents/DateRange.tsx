@@ -32,6 +32,7 @@ export function DatePickerWithRange({
 
     const handleDateChange = (newDate: any) => {
         setDate(newDate);
+        console.log(onDateChange)
         if (onDateChange) {
             onDateChange(newDate); 
         }
