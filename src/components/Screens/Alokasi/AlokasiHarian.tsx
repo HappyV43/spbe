@@ -19,6 +19,7 @@ import { Card } from "../../ui/card";
 import type { User } from "@prisma/client";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
+import SummaryItems from "@/components/FeatureComponents/SummaryItems";
 
 interface AlokasiProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

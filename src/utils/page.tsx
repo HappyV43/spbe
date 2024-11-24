@@ -134,23 +134,20 @@ export const getAnnualTotalQty = (data: any[]) => {
     }));
 };
 
-// export const getTodayTotalQty = (data: any[]) => {
-//     const today = new Date();
+export const getTodayTotalQty = (data: any[]): number => {
+    const today = new Date();
 
-//     // Filter items that match today's date and sum up the total quantity
-//     const totalQty = data
-//         .filter((item) => {
-//             const itemDate = new Date(item.giDate);
-//             // Check if the item's date is the same as today
-//             return isSameDay(itemDate, today);
-//         })
-//         .reduce((total, item) => total + item.allocatedQty, 0); // Sum up the allocated quantities
-
-//     return {
-//         giDate: format(today, "dd-MM-yyyy"),
-//         qty: totalQty,
-//     };
-// };
+    // Calculate the total quantity for today's date
+    const totalQty = data
+        .filter((item) => {
+            const itemDate = new Date(item.date);
+            return isSameDay(itemDate, today); // Only include items from today
+        })
+        .reduce((total, item) => total + (item.qty || 0), 0);
+    
+    // Return the total quantity as a number
+    return totalQty;
+};
 
 export const getWeeklyTotalQty = (data: any[]) => {
     const today = new Date();

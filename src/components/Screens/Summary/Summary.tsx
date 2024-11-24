@@ -15,6 +15,7 @@ import {
   calculateSummaryQty,
   formatNumberQty,
   getAnnualTotalQty,
+  getTodayTotalQty,
   getWeeklyTotalQty,
   normalizeDateFrom,
   normalizeDateTo,
@@ -23,6 +24,7 @@ import { id } from "date-fns/locale";
 import { CalendarCheck, CalendarDays, Clock4, PackagePlus, ScrollText, SearchX } from "lucide-react";
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
 import { Button } from "@/components/ui/button";
+import SummaryItems from "@/components/FeatureComponents/SummaryItems";
 
 interface AllocationData {
   plannedGiDate?: Date;
@@ -54,22 +56,14 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
   const [dailyAllocation, setDailyAllocation] = useState<DataConfig[]>([]);
   const [dailyDistribution, setDailyDistribution] = useState<DataConfig[]>([]);
   
-  // Filtering Data
-  const [filtered, setFiltered] = useState<Boolean>(false);
+  // Filtering Data 
   const [dateFilter, setDateFilter] = useState<any>(null);
   const [filteredDaily, setFilteredDaily] = useState<AllocationData[]>([]);
   const [filteredMonthly, setFilteredMonthly] = useState<DataConfig[]>([]);
   const [filteredDistribution, setFilteredDistribution] = useState<AllocationData[]>([]);
-
-  // Summary Card
   const totalDailyQty = calculateSummaryQty(filteredDaily, "allocatedQty");
   const totalMonthlyQty = calculateSummaryQty(filteredMonthly, "totalElpiji");
-  // console.log(totalMonthlyQty)
   const totalDistributionlyQty = calculateSummaryQty(filteredDistribution, "lpgDistribution.distributionQty");
-
-  // const calcTotal = (data:any, key: string) => {
-  //   return calculateSummaryQty(data, key);
-  // }
 
   const calculateDiff = (a: number, b: number) =>{
     return (Math.abs(a-b))
@@ -77,19 +71,30 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
   const totalPending = Math.abs(totalDailyQty - totalDistributionlyQty);
   const totalFakultatif = Math.abs( totalMonthlyQty - totalDailyQty);
 
+  const filterByDate = (itemDate: Date, day?:string) => {
+    const matchesDate = dateFilter?.from
+      ? dateFilter?.to
+        ? normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
+          normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.to)
+        : normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
+          normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.from)
+      : day
+    ? normalizeDateFrom(new Date()) === normalizeDateTo(new Date())
+    : true;
+    return matchesDate; 
+  };
+
   // Config all data to date and qty only
   useEffect(() => {
     const monthlyData = monthly.map((item: any) => ({
       date: item.date,
       qty: item.totalElpiji,
     }));
-    setMonthlyAllocation(monthlyData);
 
     const dailyData = data.map((item: any) => ({
       date: item.plannedGiDate,
       qty: item.allocatedQty,
     }));
-    setDailyAllocation(dailyData);
     
     const distributionData = data
       .filter((item: any) => item.lpgDistribution !== null) 
@@ -97,47 +102,19 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
         date: item.lpgDistribution.giDate,
         qty: item.lpgDistribution.distributionQty ?? 0, 
       }));
+
+    // const filteredTodayDaily = dailyData.filter((item: { date: any; }) => filterByDate(item.date,"today"));
+    // const filteredTodayMonthly = monthlyData.filter((item: { date: any; }) => filterByDate(item.date, "today"));
+    // const filteredTodayDistribution = distributionData.filter((item: { date: any; }) => filterByDate(item.date, "today"));
+
+    setDailyAllocation(dailyData);
+    setMonthlyAllocation(monthlyData);
     setDailyDistribution(distributionData);
   }, [data, monthly]);
 
-
   useEffect(() => {
-    // if (!data || !monthly || !dateFilter) return;
-  
-    const fromDate = dateFilter?.from ? normalizeDateFrom(dateFilter.from) : null;
-    const toDate = dateFilter?.to ? normalizeDateTo(dateFilter.to) : null;
-
-
-
-        
-    const filterByDate = (itemDate: Date) => {
-      const matchesDate = dateFilter?.from
-        ? dateFilter?.to
-          ? normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
-            normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.to)
-          : normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
-            normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.from)
-        : dateFilter === null
-      ? normalizeDateFrom(new Date()) === normalizeDateTo(new Date())
-      : true;
-
-      // const normalizedDate = normalizeDateFrom(itemDate);
-  
-      // if (dateFilter === "today") {
-      //   return normalizedDate === normalizeDateTo(new Date());
-      // }
-  
-      // if (dateFilter?.from) {
-      //   const fromDate = normalizeDateFrom(dateFilter.from);
-      //   const toDate = dateFilter.to
-      //     ? normalizeDateTo(dateFilter.to)
-      //     : fromDate; // If no `to`, assume `to` is the same as `from`.
-  
-      //   return normalizedDate >= fromDate && normalizedDate <= toDate;
-      // }
-  
-      return matchesDate; // No date filter applied
-    };
+    // const fromDate = dateFilter?.from ? normalizeDateFrom(dateFilter.from) : null;
+    // const toDate = dateFilter?.to ? normalizeDateTo(dateFilter.to) : null;
 
     // Apply filters
     const filteredDailyData = data.filter((item: { plannedGiDate: any; }) => filterByDate(item.plannedGiDate));
@@ -145,11 +122,6 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
     const filteredDistributionData = data
       .filter((item: { lpgDistribution: null; }) => item.lpgDistribution !== null)
       .filter((item: { lpgDistribution: { giDate: any; }; }) => filterByDate(item.lpgDistribution.giDate));
-  
-    // Update filtered states
-    // console.log(filteredDailyData, "DAILY");
-    // console.log(filteredMonthlyData, "MONTHLY");
-    // console.log(filteredDistributionData, "DISTRIBUTION");
   
     setFilteredDaily(filteredDailyData);
     setFilteredMonthly(filteredMonthlyData);
@@ -194,7 +166,8 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
                     "dd MMMM yyyy",
                     { locale: id }
                   )}`
-                : format(new Date(), "dd MMMM yyyy", { locale: id })
+                : "Semua Tanggal"
+                // : format(new Date(), "dd MMMM yyyy", { locale: id })
             }
           />
           <Button variant="default" onClick={handleClearSearch} className="w-full md:w-auto">
@@ -205,137 +178,91 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
 
         {/* TODAY */}
         <Card className="px-6 py-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200">
-          <h1 className="text-2xl font-semibold mb-4">Wawasan Hari ini</h1>
+          <h1 className="text-2xl font-semibold mb-4">Wawasan Hari Ini</h1>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between px-2">
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-2">
-                  <CalendarCheck className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL ALOKASI HARIAN ({filteredDaily.length})</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(totalDailyQty)} / <span className="text-xl text-gray-600">{formatNumberQty(totalDailyQty*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-2">
-                  <CalendarDays className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL ALOKASI BULANAN ({filteredMonthly.length})</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(totalMonthlyQty)} / <span className="text-xl text-gray-600">{formatNumberQty(totalMonthlyQty*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-2">
-                  <ScrollText className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL PENYALURAN LPG ({filteredDistribution.length})</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(totalDistributionlyQty)} / <span className="text-xl text-gray-600">{formatNumberQty(totalDistributionlyQty*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-2">
-                  <Clock4 className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL PENDING</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(totalDistributionlyQty)} / <span className="text-xl text-gray-600">{formatNumberQty(totalDistributionlyQty*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-2">
-                  <PackagePlus className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL FAKULTATIF</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(totalDistributionlyQty)} / <span className="text-xl text-gray-600">{formatNumberQty(totalDistributionlyQty*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
+          <SummaryItems
+              icon={<CalendarCheck className="h-10 w-10 text-white" />}
+              title={`TOTAL ALOKASI HARIAN`}
+              value={`${formatNumberQty(getTodayTotalQty(dailyAllocation))} / `}
+              additionalInfo={`${formatNumberQty(getTodayTotalQty(dailyAllocation) * 3)} Kg`}
+            />
+            
+            <SummaryItems
+              icon={<CalendarDays className="h-10 w-10 text-white" />}
+              title={`TOTAL ALOKASI BULANAN`}
+              value={`${formatNumberQty(getTodayTotalQty(monthlyAllocation))} / `}
+              additionalInfo={`${formatNumberQty(getTodayTotalQty(monthlyAllocation) * 3)} Kg`}
+            />
+            
+            <SummaryItems
+              icon={<ScrollText className="h-10 w-10 text-white" />}
+              title={`TOTAL PENYALURAN LPG`}
+              value={`${formatNumberQty(getTodayTotalQty(dailyDistribution))} / `}
+              additionalInfo={`${formatNumberQty(getTodayTotalQty(dailyDistribution) * 3)} Kg`}
+            />
+            
+            <SummaryItems
+              icon={<Clock4 className="h-10 w-10 text-white" />}
+              title={"TOTAL PENDING"}
+              value={`${formatNumberQty(calculateDiff(getTodayTotalQty(dailyAllocation), getTodayTotalQty(dailyDistribution)))} / `}
+              additionalInfo={`${formatNumberQty(calculateDiff(getTodayTotalQty(dailyAllocation), getTodayTotalQty(dailyDistribution)) * 3)} Kg`}
+            />
+            
+            <SummaryItems
+              icon={<PackagePlus className="h-10 w-10 text-white" />}
+              title={"TOTAL FAKULTATIF"}
+              value={`${formatNumberQty(calculateDiff(getTodayTotalQty(monthlyAllocation), getTodayTotalQty(dailyAllocation)))} / `}
+              additionalInfo={`${formatNumberQty(calculateDiff(getTodayTotalQty(monthlyAllocation), getTodayTotalQty(dailyAllocation)) * 3)} Kg`}
+            />
           </div>
         </Card>
 
-        {/* ALL DATA */}
+        {/* FILTER DATA */}
         <Card className="px-6 py-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200 mb-5">
           <h1 className="text-2xl font-semibold mb-4">Ringkasan</h1>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between px-2">
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-4">
-                  <CalendarCheck className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL ALOKASI HARIAN ({dailyAllocation.length})</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(calculateSummaryQty(data, "allocatedQty"))} / <span className="text-xl text-gray-600">{formatNumberQty(calculateSummaryQty(data, "allocatedQty")*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-4">
-                  <CalendarDays className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL ALOKASI BULANAN ({monthlyAllocation.length})</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(calculateSummaryQty(monthly, "totalElpiji"))} / <span className="text-xl text-gray-600">{formatNumberQty(calculateSummaryQty(monthly, "totalElpiji")*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-4">
-                  <ScrollText className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL PENYALURAN LPG ({dailyDistribution.length})</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(calculateSummaryQty(data, "lpgDistribution.distributionQty"))} / <span className="text-xl text-gray-600">{formatNumberQty(calculateSummaryQty(data, "lpgDistribution.distributionQty")*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-4">
-                  <Clock4 className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL PENDING</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(calculateDiff(calculateSummaryQty(data, "allocatedQty"), calculateSummaryQty(data,"lpgDistribution.distributionQty")))} / <span className="text-xl text-gray-600">{formatNumberQty(calculateDiff(calculateSummaryQty(data, "allocatedQty"), calculateSummaryQty(data,"lpgDistribution.distributionQty"))*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-4">
-                <div className="bg-black rounded-xl p-4">
-                  <PackagePlus className="h-10 w-10 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL FAKULTATIF</h1>
-                  <p className="text-3xl font-extrabold">{formatNumberQty(calculateDiff(calculateSummaryQty(monthly, "totalElpiji"), calculateSummaryQty(data,"allocatedQty")))} / <span className="text-xl text-gray-600">{formatNumberQty(calculateDiff(calculateSummaryQty(monthly, "totalElpiji"), calculateSummaryQty(data,"allocatedQty"))*3)} Kg</span></p>
-                </div>
-              </div>
-            </div>
+          <SummaryItems
+              icon={<CalendarCheck className="h-10 w-10 text-white" />}
+              title={`TOTAL ALOKASI HARI INI (${filteredDaily.length})`}
+              value={`${formatNumberQty(totalDailyQty)} / `}
+              additionalInfo={`${formatNumberQty(totalDailyQty * 3)} Kg`}
+              cs={"p-4"}
+            />
+            
+            <SummaryItems
+              icon={<CalendarDays className="h-10 w-10 text-white" />}
+              title={`TOTAL ALOKASI BULANAN (${filteredMonthly.length})`}
+              value={`${formatNumberQty(totalMonthlyQty)} / `}
+              additionalInfo={`${formatNumberQty(totalMonthlyQty * 3)} Kg`}
+              cs={"p-4"}
+            />
+            
+            <SummaryItems
+              icon={<ScrollText className="h-10 w-10 text-white" />}
+              title={`TOTAL PENYALURAN LPG (${filteredDistribution.length})`}
+              value={`${formatNumberQty(totalDistributionlyQty)} / `}
+              additionalInfo={`${formatNumberQty(totalDistributionlyQty * 3)} Kg`}
+              cs={"p-4"}
+            />
+            
+            <SummaryItems
+              icon={<Clock4 className="h-10 w-10 text-white" />}
+              title={"TOTAL PENDING"}
+              value={`${formatNumberQty(totalPending)} / `}
+              additionalInfo={`${formatNumberQty(totalPending * 3)} Kg`}
+              cs={"p-4"}
+            />
+            
+            <SummaryItems
+              icon={<PackagePlus className="h-10 w-10 text-white" />}
+              title={"TOTAL FAKULTATIF"}
+              value={`${formatNumberQty(totalFakultatif)} / `}
+              additionalInfo={`${formatNumberQty(totalFakultatif * 3)} Kg`}
+              cs={"p-4"}
+            />
           </div>
         </Card>
       </div>
-
 
       <div className="mb-16"></div>
         <div className="my-5">

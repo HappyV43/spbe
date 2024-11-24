@@ -46,7 +46,7 @@ const SignUpForm = () => {
         title: res.error,
       });
     } else {
-      router.push("/dashboard/alokasi-harian");
+      router.push("/summary");
       toast({
         title: "Register has been succesfully",
       });
