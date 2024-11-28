@@ -5,7 +5,14 @@ import { DataTable } from "../../ui/data-table";
 import Link from "next/link";
 import { Label } from "../../ui/label";
 import ComboBox from "../../FeatureComponents/ComboBox";
-import { CalendarCheck, Database, Handshake, SearchX, Upload, Weight } from "lucide-react";
+import {
+  CalendarCheck,
+  Database,
+  Handshake,
+  SearchX,
+  Upload,
+  Weight,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { DatePickerWithRange } from "../../FeatureComponents/DateRange";
 import {
@@ -132,8 +139,14 @@ const AlokasiHarian = <
                 <CalendarCheck className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL TABUNG</h1>
-                <p className="text-3xl font-extrabold">{formatNumberQty(calculateTotalQty(filteredData, 'allocatedQty'))}</p>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL TABUNG
+                </h1>
+                <p className="text-3xl font-extrabold">
+                  {formatNumberQty(
+                    calculateTotalQty(filteredData, "allocatedQty")
+                  )}
+                </p>
               </div>
             </div>
           </Card>
@@ -143,8 +156,15 @@ const AlokasiHarian = <
                 <Weight className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL BERAT TABUNG</h1>
-                <p className="text-3xl font-extrabold">{formatNumberQty(calculateTotalQty(filteredData, 'allocatedQty') * 3)}<span className="text-xl text-gray-600"> Kg</span></p>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL BERAT TABUNG
+                </h1>
+                <p className="text-3xl font-extrabold">
+                  {formatNumberQty(
+                    calculateTotalQty(filteredData, "allocatedQty") * 3
+                  )}
+                  <span className="text-xl text-gray-600"> Kg</span>
+                </p>
               </div>
             </div>
           </Card>
@@ -154,8 +174,12 @@ const AlokasiHarian = <
                 <Handshake className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL AGEN</h1>
-                <p className="text-3xl font-extrabold">{calculateTotalAgen(filteredData)}</p>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL AGEN
+                </h1>
+                <p className="text-3xl font-extrabold">
+                  {calculateTotalAgen(filteredData)}
+                </p>
               </div>
             </div>
           </Card>
@@ -165,7 +189,9 @@ const AlokasiHarian = <
                 <Database className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL ALOKASI HARIAN</h1>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL ALOKASI HARIAN
+                </h1>
                 <p className="text-3xl font-extrabold">{filteredData.length}</p>
               </div>
             </div>
@@ -230,7 +256,7 @@ const AlokasiHarian = <
           <div className="flex justify-between items-center mb-3 space-x-2">
             {user.role === "ADMIN" && (
               <Button variant="default" asChild>
-                <Link href="alokasi/upload">
+                <Link href="alokasi-harian/upload">
                   <Upload className="h-4 w-4 mr-2 cursor-pointer" />
                   Upload Alokasi
                 </Link>
