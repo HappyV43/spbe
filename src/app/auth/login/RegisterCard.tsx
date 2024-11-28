@@ -58,7 +58,7 @@ const SignUpForm = () => {
       <CardHeader className="pb-4">
         <CardTitle className="text-2xl font-semibold flex justify-between">
           Welcome back!
-          <ToggleMode />
+          {/* <ToggleMode /> */}
         </CardTitle>
         <CardDescription className="text-gray-500">
           Sign Up your account to continue.

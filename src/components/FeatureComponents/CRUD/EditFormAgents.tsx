@@ -52,7 +52,7 @@ const EditFormAgents = ({ row }: any) => {
           variant="outline"
           className="text-center align-center justify-center"
         >
-          <Pencil className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+          <Pencil className="h-4 w-4 text-center align-center cursor-pointer" style={{color:"orange"}} aria-label="Edit"/>
         </Button>
       </DialogTrigger>
       <DialogContent>

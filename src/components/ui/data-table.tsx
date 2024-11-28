@@ -111,7 +111,10 @@ export function DataTable<TData, TValue>({
                   className="hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="p-4 text-center">
+                    <TableCell key={cell.id} className="p-4 text-center"
+                    style={{
+                      color: cell.getValue() === "Pending" ? "red" : cell.getValue() === "Approved" ? "green" : "black",
+                    }}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
