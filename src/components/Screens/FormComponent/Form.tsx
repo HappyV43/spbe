@@ -278,12 +278,17 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
                 <Input
                   placeholder="Jumlah tabung bocor"
                   name="jumlahTabungBocor"
+                  type="number"
                 />
               </div>
 
               <div className="flex flex-col my-2">
                 <Label className="font-bold text-xs my-2">Isi Kurang</Label>
-                <Input placeholder="Isi kurang" name="isiKurang" />
+                <Input
+                  placeholder="Isi kurang"
+                  name="isiKurang"
+                  type="number"
+                />
               </div>
             </div>
 

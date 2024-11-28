@@ -15,10 +15,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Pencil } from "lucide-react";
-import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import React, { useRef, useState } from "react";
 
-const EditFormLpg = ({ row } :any) => {
+const EditFormLpg = ({ row }: any) => {
   const ref = useRef<HTMLFormElement>(null);
   const [id, setId] = useState(row.id);
   const [platKendaraan, setPlatKendaraan] = useState(row.licensePlate);
@@ -41,7 +41,6 @@ const EditFormLpg = ({ row } :any) => {
         title: "Berhasil",
         description: "Penyaluran Lpg berhasil diupdate",
       });
-      redirect("/master-data/agents");
     }
   };
 
@@ -52,7 +51,7 @@ const EditFormLpg = ({ row } :any) => {
           variant="outline"
           className="text-center align-center justify-center w-1"
         >
-            <Pencil className="h-4 w-4 text-center align-center text-green-500 cursor-pointer"/>
+          <Pencil className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -122,7 +121,9 @@ const EditFormLpg = ({ row } :any) => {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Simpan Perubahan</Button>
+              <DialogClose asChild>
+                <Button type="submit">Simpan Perubahan</Button>
+              </DialogClose>
               <DialogClose asChild>
                 <Button>Kembali</Button>
               </DialogClose>
