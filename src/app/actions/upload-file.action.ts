@@ -2,11 +2,11 @@
 
 import prisma from "@/lib/db";
 import { MonthlyAllocation } from "@/lib/types";
-import type { Allocations } from "@prisma/client";
+import { Allocation } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 
 export const uploadBulkExcel = async (
-  datas: Omit<Allocations, "createdAt" | "updatedAt">[]
+  datas: Omit<Allocation, "createdAt" | "updatedAt">[]
 ) => {
   const missingAgents: string[] = []; // Array to store missing agent names
 
@@ -51,7 +51,6 @@ export const uploadBulkExcel = async (
     if (invalidData.length > 0) {
       return {
         error: "Terdapat data yang kosong",
-        invalidData, // Kirim data yang salah agar ditangani frontend
       };
     }
 

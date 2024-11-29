@@ -63,6 +63,8 @@ export default function UploadAlokasi({
       }
 
       setSelectedFile(file);
+      setTableData([]);
+      setErrorMessage([]);
       previewExcel(file);
     }
   };
@@ -108,22 +110,39 @@ export default function UploadAlokasi({
         const json = utils.sheet_to_json(workSheet);
         const uploadedData = json as RawDataMap[];
 
-        const transformedData = uploadedData.map((row) => ({
-          shipTo: String(row.SHIP_TO),
-          agentName: String(row.SHIP_TO_NAME),
-          deliveryNumber: String(row.DO_NUMBER),
-          allocatedQty:
-            typeof row.QUANTITY === "string"
-              ? parseInt(row.QUANTITY)
-              : row.QUANTITY,
-          materialName: String(row.MATERIAL_NAME),
-          plannedGiDate: row.PLANNED_GI_DATE
-            ? convertStringToDate(row.PLANNED_GI_DATE)
-            : null,
-          giDate: row.giDate ? new Date(row.giDate) : null,
-          createdBy: user.id,
-          updatedBy: user.id,
-        }));
+        const transformedData = uploadedData.map((row) => {
+          if (
+            !row.SHIP_TO ||
+            !row.SHIP_TO_NAME ||
+            !row.DO_NUMBER ||
+            !row.QUANTITY ||
+            !row.MATERIAL_NAME ||
+            !row.PLANNED_GI_DATE
+          ) {
+            toast({
+              title: "Data tidak valid, ada nilai yang kosong/undefiend.",
+              variant: "destructive",
+            });
+          }
+
+          // Transformasi data jika valid
+          return {
+            shipTo: String(row.SHIP_TO),
+            agentName: String(row.SHIP_TO_NAME),
+            deliveryNumber: String(row.DO_NUMBER),
+            allocatedQty:
+              typeof row.QUANTITY === "string"
+                ? parseInt(row.QUANTITY)
+                : row.QUANTITY,
+            materialName: String(row.MATERIAL_NAME),
+            plannedGiDate: row.PLANNED_GI_DATE
+              ? convertStringToDate(row.PLANNED_GI_DATE)
+              : null,
+            giDate: row.giDate ? new Date(row.giDate) : null,
+            createdBy: user.id,
+            updatedBy: user.id,
+          };
+        });
 
         setTableData(transformedData);
       }
@@ -149,11 +168,9 @@ export default function UploadAlokasi({
           description: result.error, // Display specific error message
           variant: "destructive",
         });
-        setTimeout(() => location.reload(), 1000);
       } else if (result?.missingAgents) {
         setLoading(false);
         setErrorMessage(result.missingAgents);
-        setTimeout(() => location.reload(), 1000);
       } else {
         setLoading(false);
         toast({
@@ -290,18 +307,20 @@ export default function UploadAlokasi({
                 {tableData.map((row, index) => (
                   <TableRow key={index}>
                     <TableCell className="py-3">{index + 1}</TableCell>
-                    <TableCell className="py-3">{row.shipTo}</TableCell>
-                    <TableCell className="py-3">{row.agentName}</TableCell>
-                    <TableCell className="py-3">{row.deliveryNumber}</TableCell>
-                    <TableCell className="py-3">{row.allocatedQty}</TableCell>
-                    <TableCell className="py-3">{row.materialName}</TableCell>
+                    <TableCell className="py-3">{row?.shipTo}</TableCell>
+                    <TableCell className="py-3">{row?.agentName}</TableCell>
                     <TableCell className="py-3">
-                      {row.plannedGiDate
-                        ? row.plannedGiDate.toLocaleDateString()
+                      {row?.deliveryNumber}
+                    </TableCell>
+                    <TableCell className="py-3">{row?.allocatedQty}</TableCell>
+                    <TableCell className="py-3">{row?.materialName}</TableCell>
+                    <TableCell className="py-3">
+                      {row?.plannedGiDate
+                        ? row?.plannedGiDate.toLocaleDateString()
                         : "-"}
                     </TableCell>
                     <TableCell className="py-3">
-                      {row.giDate ? row.giDate.toLocaleDateString() : "-"}
+                      {row?.giDate ? row?.giDate.toLocaleDateString() : "-"}
                     </TableCell>
                   </TableRow>
                 ))}
