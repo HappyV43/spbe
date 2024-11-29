@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChartArea, Ellipsis, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
@@ -25,15 +25,16 @@ export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
   const handleClick = async () => {
-    try {
-      await logOut();
+    const result = await logOut();
+    if (result?.error) {
       toast({
-        title: "Logout telah berhasil",
-      });
-    } catch (error) {
-      toast({
-        title: "Logout Gagal",
+        title: "Gagal",
+        description: result.error,
         variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Logout berhasil",
       });
     }
   };

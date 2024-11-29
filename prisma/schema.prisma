@@ -91,7 +91,7 @@ model Allocations {
   shipTo          String
   materialName    String
   agentName       String
-  plannedGiDate   DateTime
+  plannedGiDate   DateTime?
   period          String?
   allocatedQty    Int
   status          String            @default("Pending")

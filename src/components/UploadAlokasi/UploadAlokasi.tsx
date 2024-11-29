@@ -117,7 +117,9 @@ export default function UploadAlokasi({
               ? parseInt(row.QUANTITY)
               : row.QUANTITY,
           materialName: String(row.MATERIAL_NAME),
-          plannedGiDate: convertStringToDate(row.PLANNED_GI_DATE), // Pastikan tidak ada new Date() di sini
+          plannedGiDate: row.PLANNED_GI_DATE
+            ? convertStringToDate(row.PLANNED_GI_DATE)
+            : null,
           giDate: row.giDate ? new Date(row.giDate) : null,
           createdBy: user.id,
           updatedBy: user.id,
@@ -140,9 +142,10 @@ export default function UploadAlokasi({
           title: "Berhasil",
           description: "Alokasi harian berhasil ditambahkan",
         });
-      } else if (result.missingAgents) {
+      } else if (result?.missingAgents) {
         setLoading(false);
         setErrorMessage(result.missingAgents);
+        setTimeout(() => window.location.reload(), 1000);
       } else {
         setLoading(false);
         toast({
@@ -150,6 +153,7 @@ export default function UploadAlokasi({
           description: "Alokasi harian Gagal ditambahkan",
           variant: "destructive",
         });
+        window.location.reload();
       }
     } else {
       setLoading(false);

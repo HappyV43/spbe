@@ -215,7 +215,6 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
                     <SelectValue placeholder="Select Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Pending">Pending</SelectItem>
                     <SelectItem value="Approved">Approved</SelectItem>
                   </SelectContent>
                 </Select>

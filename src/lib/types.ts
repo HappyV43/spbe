@@ -98,7 +98,7 @@ export interface RawDataMap {
   DO_NUMBER: string;
   QUANTITY: number;
   MATERIAL_NAME: string;
-  PLANNED_GI_DATE: string;
+  PLANNED_GI_DATE: string | null;
   giDate?: Date | null;
   bpe?: string | null;
   createdBy: string;

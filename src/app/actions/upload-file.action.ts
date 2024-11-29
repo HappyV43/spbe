@@ -49,6 +49,17 @@ export const uploadBulkExcel = async (
         where: { deliveryNumber: excel.deliveryNumber },
       });
 
+      if (
+        !excel.shipTo ||
+        !excel.materialName ||
+        !excel.agentName ||
+        !excel.plannedGiDate
+      ) {
+        return {
+          error: "Terdapat data yang kosong di excel ini",
+        };
+      }
+
       const allocationData = {
         shipTo: excel.shipTo,
         materialName: excel.materialName,
