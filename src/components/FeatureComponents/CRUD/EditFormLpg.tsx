@@ -27,6 +27,15 @@ const EditFormLpg = ({ row }: any) => {
   const [isiKurang, setIsiKurang] = useState(row.isiKurang);
 
   const handleEditAgent = async (formData: FormData) => {
+    if (!platKendaraan || !namaSopir) {
+      toast({
+        title: "Gagal",
+        description: "Ada field yang kosong",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const result = await UpdateLpgData(formData);
 
     if (result?.error) {
@@ -41,6 +50,7 @@ const EditFormLpg = ({ row }: any) => {
         title: "Berhasil",
         description: "Penyaluran Lpg berhasil diupdate",
       });
+      redirect("/dashboard/penyaluran-elpiji");
     }
   };
 
@@ -51,7 +61,7 @@ const EditFormLpg = ({ row }: any) => {
           variant="outline"
           className="text-center align-center justify-center w-1"
         >
-          <Pencil className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+          <Pencil className="h-4 w-4 text-center align-center cursor-pointer" style={{color:"orange"}} aria-label="Edit"/>
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -90,23 +100,27 @@ const EditFormLpg = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">TabungBocor</Label>
+                <Label className="text-center">Tabung Bocor</Label>
                 <Input
                   id="jumlahTabungBocor"
                   name="jumlahTabungBocor"
                   value={jumlahTabungBocor}
                   onChange={(e) => setJumlahTabungBocor(e.target.value)}
                   className="col-span-3"
+                  defaultValue="" min="0" 
+                  type="number"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Isi-Kurang</Label>
+                <Label className="text-center">Isi Kurang</Label>
                 <Input
                   id="isiKurang"
                   name="isiKurang"
                   value={isiKurang}
                   onChange={(e) => setIsiKurang(e.target.value)}
                   className="col-span-3"
+                  defaultValue="" min="0" 
+                  type="number"
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">

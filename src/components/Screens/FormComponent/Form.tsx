@@ -160,7 +160,7 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
                 />
               </div>
               <div className="flex flex-col my-2">
-                <Label className="font-bold text-xs my-2">Nomor DO</Label>
+                <Label className="font-bold text-xs my-2">Nomor DO  <span className="text-red-500 text-[16px]">*</span></Label>
                 <div className="flex">
                   <Input
                     placeholder="Nomor DO"
@@ -170,6 +170,7 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
                     }}
                     defaultValue={searchParams.get("query")?.toString()}
                     name="nomorDo"
+                    required
                   />
                 </div>
               </div>
@@ -199,13 +200,15 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
               </div>
 
               <div className="flex flex-col my-2">
-                <Label className="font-bold text-xs my-2">Plat Kendaraan</Label>
-                <Input placeholder="Plat kendaraan" name="platKendaraan" />
+              <Label className="font-bold text-xs my-2">
+                Plat Kendaraan <span className="text-red-500 text-[16px]">*</span>
+              </Label>
+                <Input placeholder="Plat kendaraan" name="platKendaraan" required/>
               </div>
 
               <div className="flex flex-col my-2">
-                <Label className="font-bold text-xs my-2">Nama Sopir</Label>
-                <Input placeholder="Nama sopir" name="namaSopir" />
+                <Label className="font-bold text-xs my-2">Nama Sopir <span className="text-red-500 text-[16px]">*</span></Label>
+                <Input placeholder="Nama sopir" name="namaSopir" required />
               </div>
 
               <div className="flex flex-col my-2">
@@ -278,14 +281,16 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
                   placeholder="Jumlah tabung bocor"
                   name="jumlahTabungBocor"
                   type="number"
+                  defaultValue="0" min="0" 
                 />
               </div>
 
               <div className="flex flex-col my-2">
                 <Label className="font-bold text-xs my-2">Isi Kurang</Label>
-                <Input
-                  placeholder="Isi kurang"
+                <Input 
+                  placeholder="Isi kurang" 
                   name="isiKurang"
+                  defaultValue="0" min="0" 
                   type="number"
                 />
               </div>

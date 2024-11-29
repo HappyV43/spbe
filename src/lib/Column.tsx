@@ -31,13 +31,19 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
             variant="outline"
             asChild
             className="text-center align-center justify-center w-1"
+            aria-hidden="false"
           >
             <PDFDownloadLink
               className="text-center"
               document={<CetakPenyaluran data={row.original} />}
               fileName={`Penyaluran Elpiji ${row.original.deliveryNumber}.pdf`}
+              aria-label={`Download Penyaluran Elpiji PDF for delivery number ${row.original.deliveryNumber}`}
             >
-              <Printer className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+              <Printer
+                className="h-4 w-4 text-center align-center cursor-pointer"
+                style={{ color: "blue" }}
+                aria-hidden="true" 
+              />
             </PDFDownloadLink>
           </Button>
           <EditFormLpg row={row.original} />
@@ -50,8 +56,12 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
               className="text-center"
               document={<CetakPlastikWrap data={row.original} />}
               fileName={`Plastik Wrap ${row.original.deliveryNumber}.pdf`}
+              aria-label={`Download Plastik Wrap PDF for delivery number ${row.original.deliveryNumber}`}
             >
-              <PackageOpen className="h-4 w-4 text-center align-center text-green-500 cursor-pointer" />
+              <PackageOpen
+                className="h-4 w-4 text-center align-center text-green-500 cursor-pointer"
+                aria-hidden="true" 
+              />
             </PDFDownloadLink>
           </Button>
         </div>
@@ -327,12 +337,16 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
     header: "Tindakan",
     enableHiding: false,
     cell: ({ row }) => {
+      const bpeNumber = row.original.bpeNumber;
+      const status = row.original.status;
+      const giDate = row.original.giDate;
+
       return (
-        <Button variant="outline" disabled={row.original.status === "Approved"}>
+        <Button variant="outline" disabled={status === "Approved" && bpeNumber !== null && giDate !== null}>
           <Link
             href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
             className={
-              row.original.status === "Approved" ? "cursor-not-allowed" : ""
+              status === "Approved" && bpeNumber !== null && giDate !== null ? "cursor-not-allowed" : ""
             }
           >
             <SquarePlus className="h-4 w-4" />
