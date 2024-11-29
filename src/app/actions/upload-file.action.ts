@@ -37,6 +37,24 @@ export const uploadBulkExcel = async (
       };
     }
 
+    const invalidData = datas.filter(
+      (excel) =>
+        !excel.shipTo ||
+        !excel.materialName ||
+        !excel.agentName ||
+        !excel.plannedGiDate ||
+        !excel.deliveryNumber ||
+        !excel.allocatedQty ||
+        !excel.updatedBy
+    );
+
+    if (invalidData.length > 0) {
+      return {
+        error: "Terdapat data yang kosong",
+        invalidData, // Kirim data yang salah agar ditangani frontend
+      };
+    }
+
     // Step 2: Process the data if all agents are valid
     for (const excel of datas) {
       // Retrieve agent ID
@@ -48,17 +66,6 @@ export const uploadBulkExcel = async (
       const existingRecord = await prisma.allocations.findFirst({
         where: { deliveryNumber: excel.deliveryNumber },
       });
-
-      if (
-        !excel.shipTo ||
-        !excel.materialName ||
-        !excel.agentName ||
-        !excel.plannedGiDate
-      ) {
-        return {
-          error: "Terdapat data yang kosong di excel ini",
-        };
-      }
 
       const allocationData = {
         shipTo: excel.shipTo,
@@ -93,8 +100,9 @@ export const uploadBulkExcel = async (
     revalidatePath("/dashboard/alokasi-harian");
     return { success: true };
   } catch (error) {
-    console.error("Failed to upload Excel data:", error);
-    throw new Error("Terjadi masalah saat upload excel");
+    return {
+      error: "terjadi kesalahan",
+    };
   }
 };
 

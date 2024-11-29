@@ -137,23 +137,31 @@ export default function UploadAlokasi({
       const result = await uploadBulkExcel(tableData);
       if (result?.success) {
         setLoading(false);
-        router.back();
         toast({
           title: "Berhasil",
           description: "Alokasi harian berhasil ditambahkan",
         });
+        router.push("/dashboard/alokasi-harian/");
+      } else if (result?.error) {
+        setLoading(false);
+        toast({
+          title: "Gagal",
+          description: result.error, // Display specific error message
+          variant: "destructive",
+        });
+        setTimeout(() => location.reload(), 1000);
       } else if (result?.missingAgents) {
         setLoading(false);
         setErrorMessage(result.missingAgents);
-        setTimeout(() => window.location.reload(), 1000);
+        setTimeout(() => location.reload(), 1000);
       } else {
         setLoading(false);
         toast({
           title: "Gagal",
-          description: "Alokasi harian Gagal ditambahkan",
+          description: "Alokasi harian gagal ditambahkan",
           variant: "destructive",
         });
-        window.location.reload();
+        location.reload();
       }
     } else {
       setLoading(false);
