@@ -82,7 +82,7 @@ export const postLpgData = async (formData: FormData) => {
     },
   });
 
-  if (checkLpgData) {
+  if (checkLpgData.length > 0) {
     return {
       error: "Data penyaluran lpg ini sudah diisi",
     };
