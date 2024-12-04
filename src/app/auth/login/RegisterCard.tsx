@@ -43,12 +43,14 @@ const SignUpForm = () => {
       router.push("/auth/login");
       toast({
         variant: "destructive",
-        title: res.error,
+        title: "Gagal",
+        description: res.error,
       });
     } else {
       router.push("/summary");
       toast({
-        title: "Register has been succesfully",
+        title: "Berhasill",
+        description: "Register Berhasil"
       });
     }
   }

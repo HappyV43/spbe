@@ -136,9 +136,7 @@ export default function UploadAlokasi({
                 ? parseInt(row.QUANTITY)
                 : row.QUANTITY,
             materialName: String(row.MATERIAL_NAME),
-            plannedGiDate: row.PLANNED_GI_DATE
-              ? convertStringToDate(row.PLANNED_GI_DATE)
-              : null,
+            plannedGiDate: convertStringToDate(row.PLANNED_GI_DATE),
             giDate: row.giDate ? new Date(row.giDate) : null,
             createdBy: user.id,
             updatedBy: user.id,

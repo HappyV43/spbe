@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import { format, isSameMonth } from "date-fns";
 import { formatNumberQty, calculateTotalQty, calculateMontlyQty } from "@/utils/page";
 import { id } from "date-fns/locale";
+import { MonthlyAllocation } from "@/lib/types";
 
 interface AlokasiBulananProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -22,7 +23,7 @@ interface AlokasiBulananProps<TData, TValue> {
 }
 
 const AlokasiBulanan = <
-  TData extends { date?: Date },
+  TData extends MonthlyAllocation,
   TValue
 >({
   columns,

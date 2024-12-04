@@ -31,6 +31,7 @@ import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
 import type { User } from "@prisma/client";
 import { id } from "date-fns/locale";
+import { LpgDistributions } from "@/lib/types";
 
 interface Records {
   bpeNumber: String;
@@ -58,14 +59,7 @@ const today = {
 };
 
 const PenyaluranElpiji = <
-  TData extends {
-    giDate: Date;
-    deliveryNumber: string;
-    allocatedQty: number;
-    agentName: string;
-    bpeNumber: string;
-    updatedAt: Date;
-  },
+  TData extends LpgDistributions,
   TValue
 >({
   columns,

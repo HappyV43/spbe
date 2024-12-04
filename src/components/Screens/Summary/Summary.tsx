@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import SummaryItems from "@/components/FeatureComponents/SummaryItems";
 
 interface AllocationData {
-  plannedGiDate?: Date;
+  plannedGiDate: Date | null;
   allocatedQty?: number;
   lpgDistribution: {
     giDate: Date;
@@ -37,20 +37,15 @@ interface AllocationData {
 
 interface SummaryProps {
   monthly: DataConfig[];
-  data: any;
+  data: AllocationData[];
 }
 
 interface DataConfig {
   date: Date;
-  qty: number;
+  qty?: number;
 }
 
-// const today = {
-//   from: new Date(),
-//   to: new Date(),
-// };
-
-const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
+const Summary = ({ data, monthly }: SummaryProps) => {
   // Summary Chart
   const [monthlyAllocation, setMonthlyAllocation] = useState<DataConfig[]>([]);
   const [dailyAllocation, setDailyAllocation] = useState<DataConfig[]>([]);
@@ -61,6 +56,7 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
   const [filteredDaily, setFilteredDaily] = useState<AllocationData[]>([]);
   const [filteredMonthly, setFilteredMonthly] = useState<DataConfig[]>([]);
   const [filteredDistribution, setFilteredDistribution] = useState<AllocationData[]>([]);
+  
   const totalDailyQty = calculateSummaryQty(filteredDaily, "allocatedQty");
   const totalMonthlyQty = calculateSummaryQty(filteredMonthly, "totalElpiji");
   const totalDistributionlyQty = calculateSummaryQty(filteredDistribution, "lpgDistribution.distributionQty");
@@ -86,6 +82,8 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
 
   // Config all data to date and qty only
   useEffect(() => {
+    console.log(data)
+    console.log(monthly)
     const monthlyData = monthly.map((item: any) => ({
       date: item.date,
       qty: item.totalElpiji,
@@ -118,11 +116,23 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
 
     // Apply filters
     const filteredDailyData = data.filter((item: { plannedGiDate: any; }) => filterByDate(item.plannedGiDate));
-    const filteredMonthlyData = monthly.filter((item) => filterByDate(item.date));
+    // const filteredMonthlyData = monthly.filter((item) => filterByDate(item.date));
+    // const filteredDistributionData = data
+    //   .filter((item: { lpgDistribution: null; }) => item.lpgDistribution !== null)
+    //   .filter((item: { lpgDistribution: { giDate: any; }; }) => filterByDate(item.lpgDistribution.giDate));
+    
+    const filteredMonthlyData = monthly.filter((item) =>
+      filterByDate(item.date)
+    );
+
     const filteredDistributionData = data
-      .filter((item: { lpgDistribution: null; }) => item.lpgDistribution !== null)
-      .filter((item: { lpgDistribution: { giDate: any; }; }) => filterByDate(item.lpgDistribution.giDate));
-  
+      .filter((item) => item.lpgDistribution !== null)
+      .filter((item) =>
+        item.lpgDistribution?.giDate
+          ? filterByDate(item.lpgDistribution.giDate)
+          : false
+      );
+
     setFilteredDaily(filteredDailyData);
     setFilteredMonthly(filteredMonthlyData);
     setFilteredDistribution(filteredDistributionData);
