@@ -309,37 +309,40 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
         <div>
           <form className="grid mx-6" action={handleSubmitAgents}>
             <div className="flex flex-col my-2 mt-6">
-              <Label className="font-bold text-xs rounded-md my-2">Nama</Label>
-              <Input placeholder="Nama" name="agentName" />
-            </div>
-
-            <div className="flex flex-col my-2">
-              <Label className="font-bold text-xs rounded-md my-2">
-                Alamat
+              <Label className="font-bold text-xs rounded-md my-2">Nama <span className="text-red-500 text-[16px]"> *</span>
               </Label>
-              <Input placeholder="Alamat" name="address" />
-            </div>
-
-            <div className="flex flex-col my-2">
-              <Label className="font-bold text-xs rounded-md my-2">Kota</Label>
-              <Input placeholder="Kota" name="city" />
+              <Input placeholder="Nama" name="agentName" required/>
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
-                Nomor Telepon
+                Alamat <span className="text-red-500 text-[16px]"> *</span>
               </Label>
-              <Input placeholder="Nomor telepon" name="phone" />
+              <Input placeholder="Alamat" name="address" required/>
             </div>
 
             <div className="flex flex-col my-2">
-              <Label className="font-bold text-xs rounded-md my-2">Fax</Label>
-              <Input placeholder="Fax" name="fax" />
+              <Label className="font-bold text-xs rounded-md my-2">Kota <span className="text-red-500 text-[16px]"> *</span>
+              </Label>
+              <Input placeholder="Kota" name="city" required/>
             </div>
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-xs rounded-md my-2">
-                Perusahaan Asal
+                Nomor Telepon <span className="text-red-500 text-[16px]"> *</span>
+              </Label>
+              <Input placeholder="Nomor telepon" name="phone" type="number" required/>
+            </div>
+
+            <div className="flex flex-col my-2">
+              <Label className="font-bold text-xs rounded-md my-2">Fax 
+              </Label>
+              <Input placeholder="Fax" name="fax" type="number"/>
+            </div>
+
+            <div className="flex flex-col my-2">
+              <Label className="font-bold text-xs rounded-md my-2">
+                Perusahaan Asal <span className="text-red-500 text-[16px]"> *</span>
               </Label>
               <Select name="companyName" onValueChange={handleCompanySelect}>
                 <SelectTrigger className="outline-none">
@@ -380,7 +383,7 @@ const Form = ({ page, data, companyName, bpe, user }: Props) => {
 
             <div className="flex flex-col my-2">
               <Label className="font-bold text-s my-2">Nomor Telepon</Label>
-              <Input placeholder="Nomor telepon" name="telephone" />
+              <Input placeholder="Nomor telepon" name="telephone" type="number"/>
             </div>
 
             <div className="flex justify-end m-11">
