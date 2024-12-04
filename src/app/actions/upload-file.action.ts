@@ -55,45 +55,47 @@ export const uploadBulkExcel = async (
     }
 
     // Step 2: Process the data if all agents are valid
-    for (const excel of datas) {
-      // Retrieve agent ID
-      const agentId = findAgentName.find(
-        (agent) => agent.agentName === excel.agentName
-      )?.id;
+    await Promise.all(
+      datas.map(async (excel) => {
+        // Retrieve agent ID
+        const agentId = findAgentName.find(
+          (agent) => agent.agentName === excel.agentName
+        )?.id;
 
-      // Cek apakah data alokasi dengan deliveryNumber sudah ada
-      const existingRecord = await prisma.allocations.findFirst({
-        where: { deliveryNumber: excel.deliveryNumber },
-      });
-
-      const allocationData = {
-        shipTo: excel.shipTo,
-        materialName: excel.materialName,
-        agentId: agentId,
-        agentName: excel.agentName,
-        plannedGiDate: excel.plannedGiDate,
-        allocatedQty: excel.allocatedQty,
-        updatedBy: excel.updatedBy,
-      };
-
-      if (existingRecord) {
-        // Update existing allocation data
-        await prisma.allocations.update({
-          where: { id: existingRecord.id },
-          data: allocationData,
+        // Check if allocation with deliveryNumber exists
+        const existingRecord = await prisma.allocations.findFirst({
+          where: { deliveryNumber: excel.deliveryNumber },
         });
-      } else {
-        // Create new allocation data
-        await prisma.allocations.create({
-          data: {
-            ...allocationData,
-            giDate: excel.giDate ? new Date(excel.giDate) : null,
-            deliveryNumber: excel.deliveryNumber,
-            createdBy: excel.createdBy,
-          },
-        });
-      }
-    }
+
+        const allocationData = {
+          shipTo: excel.shipTo,
+          materialName: excel.materialName,
+          agentId: agentId,
+          agentName: excel.agentName,
+          plannedGiDate: excel.plannedGiDate,
+          allocatedQty: excel.allocatedQty,
+          updatedBy: excel.updatedBy,
+        };
+
+        if (existingRecord) {
+          // Update existing allocation data
+          await prisma.allocations.update({
+            where: { id: existingRecord.id },
+            data: allocationData,
+          });
+        } else {
+          // Create new allocation data
+          await prisma.allocations.create({
+            data: {
+              ...allocationData,
+              giDate: excel.giDate ? new Date(excel.giDate) : null,
+              deliveryNumber: excel.deliveryNumber,
+              createdBy: excel.createdBy,
+            },
+          });
+        }
+      })
+    );
 
     // Step 3: If no missing agents, proceed with success
     revalidatePath("/dashboard/alokasi-harian");
@@ -118,16 +120,23 @@ export const uploadExcelMonthly = async (data: MonthlyAllocation) => {
     });
     return { success: true, data: excelMonthly };
   } catch (error) {
-    console.error(error);
-    throw new Error("Bulk upload failed");
+    return {
+      error: "Terjadi masalah saat upload excel",
+    };
   }
 };
 
 export const uploadBulkExcelMonthly = async (datas: MonthlyAllocation[]) => {
   try {
     for (const excel of datas) {
-      await uploadExcelMonthly(excel);
+      if (!excel.date || !excel.totalElpiji || !excel.volume) {
+        return {
+          error:
+            "Terdapat data yang kosong. Pastikan semua data memiliki nilai.",
+        };
+      }
     }
+    await Promise.all(datas.map((excel) => uploadExcelMonthly(excel)));
     revalidatePath("/dashboard/alokasi-harian-bulanan");
   } catch (error) {
     return {

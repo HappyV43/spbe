@@ -13,7 +13,7 @@ export const getAgentsAll = cache(async () => {
   if (!companiesData) {
     redirect("/master-data/companies/form");
   }
-  return await prisma.agents.findMany({
+  return prisma.agents.findMany({
     distinct: ["agentName"],
   });
 });

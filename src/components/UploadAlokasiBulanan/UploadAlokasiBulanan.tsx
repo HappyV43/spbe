@@ -2,7 +2,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import * as XLSX from "xlsx";
+import { read, utils } from "xlsx";
 import {
   Table,
   TableBody,
@@ -80,22 +80,53 @@ export default function UploadAlokasiBulanan({
     reader.onload = (e) => {
       const data = e.target?.result;
       if (data) {
-        const workbook = XLSX.read(data, { type: "binary" });
+        const workbook = read(data, { type: "binary" });
         const sheetName = workbook.SheetNames[0];
         const workSheet = workbook.Sheets[sheetName];
-        const json = XLSX.utils.sheet_to_json(workSheet);
+
+        const requiredColumns = [
+          "Total_Elpiji",
+          "Tanggal",
+          "Volume_Total_Elpiji",
+        ];
+        const sheetHeaders: any = utils.sheet_to_json(workSheet, {
+          header: 1,
+        })[0];
+        const missingColumns = requiredColumns.filter(
+          (col) => !sheetHeaders.includes(col)
+        );
+
+        if (missingColumns.length > 0) {
+          toast({
+            title: `Kolom yang hilang: ${missingColumns.join(
+              ", "
+            )}. Harap periksa format file Anda.`,
+            variant: "destructive",
+          });
+          return;
+        }
+        const json = utils.sheet_to_json(workSheet);
         const uploadedData = json as RawDataMapMonthly[];
 
-        const transformedData = uploadedData.map((row) => ({
-          date:
-            typeof row.Tanggal === "number"
-              ? excelDateToJSDate(row.Tanggal)
-              : row.Tanggal,
-          totalElpiji: row.Total_Elpiji,
-          volume: row.Volume_Total_Elpiji,
-          createdBy: user.id,
-          updatedBy: user.id,
-        }));
+        const transformedData = uploadedData.map((row) => {
+          if (!row.Total_Elpiji || !row.Tanggal || !row.Volume_Total_Elpiji) {
+            toast({
+              title: "Gagal",
+              description: "Data tidak valid, ada nilai yang kosong/undefiend.",
+              variant: "destructive",
+            });
+          }
+          return {
+            date:
+              typeof row.Tanggal === "number"
+                ? excelDateToJSDate(row.Tanggal)
+                : row.Tanggal,
+            totalElpiji: row.Total_Elpiji,
+            volume: row.Volume_Total_Elpiji,
+            createdBy: user.id,
+            updatedBy: user.id,
+          };
+        });
 
         setTableData(transformedData);
       }
@@ -116,11 +147,11 @@ export default function UploadAlokasiBulanan({
         });
       } else {
         setLoading(false);
-        router.back();
         toast({
           title: "Berhasil",
           description: "Alokasi Bulanan berhasil ditambahkan",
         });
+        router.push("/dashboard/alokasi-bulanan/");
       }
     } else {
       setLoading(false);

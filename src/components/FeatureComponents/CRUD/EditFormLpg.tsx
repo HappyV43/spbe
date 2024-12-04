@@ -15,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Pencil } from "lucide-react";
-import { revalidatePath } from "next/cache";
 import React, { useRef, useState } from "react";
+import {redirect} from "next/navigation";
 
 const EditFormLpg = ({ row }: any) => {
   const ref = useRef<HTMLFormElement>(null);

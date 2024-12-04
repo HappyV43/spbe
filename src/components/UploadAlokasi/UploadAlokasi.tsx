@@ -120,7 +120,8 @@ export default function UploadAlokasi({
             !row.PLANNED_GI_DATE
           ) {
             toast({
-              title: "Data tidak valid, ada nilai yang kosong/undefiend.",
+              title: "Gagal",
+              description: "Data tidak valid, ada nilai yang kosong/undefiend.",
               variant: "destructive",
             });
           }
