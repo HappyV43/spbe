@@ -22,9 +22,9 @@ const Companies = <TData, TValue>({
         {user.role === "ADMIN" && (
           <div className="justify-start mb-1">
             <Button variant="default" className="ml-auto justify-start" asChild>
-              <Link href="agents/form">
+              <Link href="companies/form">
                 <Plus className="h-4 w-4 mr-2 cursor-pointer" />
-                New Agen
+                New Company
               </Link>
             </Button>
           </div>
