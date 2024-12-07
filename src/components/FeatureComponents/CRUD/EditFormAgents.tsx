@@ -42,8 +42,11 @@ const EditFormAgents = ({ row }: any) => {
         description: "Agent berhasil diupdate",
       });
       redirect("/master-data/agents");
-    }
+    }    
   };
+
+  const noSpinner = "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+
 
   return (
     <Dialog>
@@ -71,23 +74,31 @@ const EditFormAgents = ({ row }: any) => {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Nama Agen</Label>
+                <Label className="text-center">Nama Agen <span className="text-red-500 text-[16px]"> *</span></Label>
                 <Input
                   id="agentName"
                   name="agentName"
                   value={agentName}
                   onChange={(e) => setAgentName(e.target.value)}
                   className="col-span-3"
+                  required={true}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Nomor HP</Label>
+                <Label className="text-center">Nomor Telepon <span className="text-red-500 text-[16px]"> *</span></Label>
                 <Input
                   id="phone"
                   name="phone"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="col-span-3"
+                  type="number"
+                  className={`${noSpinner} col-span-3`}
+                  required={true}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value.length <= 12) {
+                      setPhone(value);
+                    }
+                  }}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -101,23 +112,25 @@ const EditFormAgents = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Alamat</Label>
+                <Label className="text-center">Alamat <span className="text-red-500 text-[16px]"> *</span></Label>
                 <Input
                   id="address"
                   name="address"
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   className="col-span-3"
+                  required={true}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Kota</Label>
+                <Label className="text-center">Kota <span className="text-red-500 text-[16px]"> *</span></Label>
                 <Input
                   id="city"
                   name="city"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="col-span-3"
+                  required={true}
                 />
                 <Input
                   id="city"
@@ -126,6 +139,7 @@ const EditFormAgents = ({ row }: any) => {
                   onChange={(e) => setCity(e.target.value)}
                   className="col-span-3 hidden"
                   readOnly
+                  required={true}
                 />
               </div>
             </div>

@@ -119,7 +119,7 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
             </View>
 
             {/* Details Section */}
-            <Text style={styles.title}>Bukti Penyerahan Elpiji 3 Kg</Text>
+            <Text style={styles.title}>Bukti Pemasangan Plastik Wrap</Text>
             <View style={styles.detailsRow}>
                 <View style={styles.detailsColumn}>
                     <Text style={styles.detailsLabel}>Jenis Barang</Text>
