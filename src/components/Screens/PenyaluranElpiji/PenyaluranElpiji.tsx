@@ -129,7 +129,6 @@ const PenyaluranElpiji = <
       giDate: item.date,
       allocatedQty: item.totalElpiji,
     }));
-    console.log(monthlyData);
     setAllocationMonthly(monthlyData);
   };
 
@@ -264,42 +263,45 @@ const PenyaluranElpiji = <
             </div>
           </div>
 
-          <div className="flex justify-between items-center mb-3 space-x-2">
-            {user.role === "ADMIN" && (
-              <div className="space-x-2">
-                <Button variant="default" asChild>
-                  <Link href="penyaluran-elpiji/form">
-                    <Plus className="h-4 w-4 mr-2 cursor-pointer" />
-                    New Penyaluran Elpiji
-                  </Link>
-                </Button>
-                <Button variant="default" asChild>
-                  <PDFDownloadLink
-                    className="text-center"
-                    document={
-                      <RekapPenyaluran
-                        data={filteredData != null ? filteredData : data}
-                        data2={allocationMonthly}
-                      />
-                    }
-                    fileName={`Penyaluran Elpiji.pdf`}
-                  >
-                    <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-                    <span>Cetak Rekap</span>
-                  </PDFDownloadLink>
-                </Button>
-              </div>
-            )}
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2">
+  {user.role === "ADMIN" && (
+    <div className="flex space-x-2">
+      <Button variant="default" asChild>
+        <Link href="penyaluran-elpiji/form">
+          <Plus className="h-4 w-4 mr-2 cursor-pointer" />
+          New Penyaluran Elpiji
+        </Link>
+      </Button>
+      <Button variant="default" asChild>
+        <PDFDownloadLink
+          className="text-center"
+          document={
+            <RekapPenyaluran
+              data={filteredData != null ? filteredData : data}
+              data2={allocationMonthly}
+            />
+          }
+          fileName={`Penyaluran Elpiji.pdf`}
+        >
+          <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+          <span>Cetak Rekap</span>
+        </PDFDownloadLink>
+      </Button>
+    </div>
+  )}
 
-            <div className="flex space-x-2">
-              {(notrans || doNumber || agentName || dateFilter != null) && (
-                <Button variant="default" onClick={handleClearSearch}>
-                  <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan
-                  Pencarian
-                </Button>
-              )}
-            </div>
-          </div>
+  <div className="flex sm:flex-none sm:w-auto w-full">
+    {(notrans || doNumber || agentName || dateFilter != null) && (
+      <Button
+        variant="default"
+        className="w-full sm:w-auto"
+        onClick={handleClearSearch}
+      >
+        <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
+      </Button>
+    )}
+  </div>
+</div>
         </Card>
         <DataTable columns={columns} data={filteredData} />
       </div>
