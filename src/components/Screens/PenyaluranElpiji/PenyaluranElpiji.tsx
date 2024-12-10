@@ -8,11 +8,12 @@ import {
   calculateTotalAgen,
   calculateTotalQty,
   formatNumberQty,
+  getTodayTotalQty,
   normalizeDateFrom,
   normalizeDateTo,
 } from "@/utils/page";
 import { format } from "date-fns";
-import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
+import { getAllokasiAll, getMonthlyAllocation, getSummary } from "@/app/actions/alokasi.action";
 import { ChartConfig } from "@/components/ui/chart";
 import { ChartComponent } from "@/components/FeatureComponents/Chart";
 import RekapPenyaluran from "@/components/FeatureComponents/CetakDistribusi/RekapPenyaluran";
@@ -67,11 +68,13 @@ const PenyaluranElpiji = <
   user,
 }: DistributionProps<TData, TValue>) => {
   const [notrans, setnotrans] = useState("");
+  const [isAgentFiltered, setIsAgentFiltered] = useState(false);
   const [agentName, setAgentName] = useState("");
   const [doNumber, setDoNumber] = useState("");
   const [dateFilter, setDateFilter] = useState<any>("today");
   const [filteredData, setFilteredData] = useState<TData[]>(data);
   const [filtered, setFiltered] = useState<Boolean>(false);
+  const [allocationDaily, setAllocationDaily] = useState<any[]>([]);
   const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
 
   const notransOptions = Array.from(
@@ -123,6 +126,10 @@ const PenyaluranElpiji = <
     setFilteredData(filtered);
   }, [notrans, agentName, doNumber, dateFilter, data]);
 
+  useEffect(() => {
+    setIsAgentFiltered(!!agentName);
+  }, [agentName]);
+
   const getMonthly = async () => {
     const data = await getMonthlyAllocation();
     const monthlyData = data.map((item) => ({
@@ -131,6 +138,15 @@ const PenyaluranElpiji = <
     }));
     setAllocationMonthly(monthlyData);
   };
+
+  const getAllocattion = async () =>{
+    const { data }  = await getSummary();
+    const dailyData = data.map((item: any) => ({
+      giDate: item.plannedGiDate,
+      qty: item.allocatedQty,
+    }));
+    setAllocationDaily(dailyData)
+  }
 
   const chartConfig = {
     monthlyQty: {
@@ -145,6 +161,7 @@ const PenyaluranElpiji = <
 
   useEffect(() => {
     getMonthly();
+    getAllocattion()
     setFiltered(true);
     setDateFilter(today);
   }, []);
@@ -264,44 +281,46 @@ const PenyaluranElpiji = <
           </div>
 
           <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2">
-  {user.role === "ADMIN" && (
-    <div className="flex space-x-2">
-      <Button variant="default" asChild>
-        <Link href="penyaluran-elpiji/form">
-          <Plus className="h-4 w-4 mr-2 cursor-pointer" />
-          New Penyaluran Elpiji
-        </Link>
-      </Button>
-      <Button variant="default" asChild>
-        <PDFDownloadLink
-          className="text-center"
-          document={
-            <RekapPenyaluran
-              data={filteredData != null ? filteredData : data}
-              data2={allocationMonthly}
-            />
-          }
-          fileName={`Penyaluran Elpiji.pdf`}
-        >
-          <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-          <span>Cetak Rekap</span>
-        </PDFDownloadLink>
-      </Button>
-    </div>
-  )}
+            {user.role === "ADMIN" && (
+              <div className="flex space-x-2">
+                <Button variant="default" asChild>
+                  <Link href="penyaluran-elpiji/form">
+                    <Plus className="h-4 w-4 mr-2 cursor-pointer" />
+                    New Penyaluran Elpiji
+                  </Link>
+                </Button>
+                <Button variant="default" asChild>
+                  <PDFDownloadLink
+                    className="text-center"
+                    document={
+                      <RekapPenyaluran
+                        data={filteredData != null ? filteredData : data}
+                        data2={allocationMonthly}
+                        data3={allocationDaily}
+                        isAgentFiltered={isAgentFiltered}
+                      />
+                    }
+                    fileName={`Penyaluran Elpiji.pdf`}
+                  >
+                    <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+                    <span>Cetak Rekap</span>
+                  </PDFDownloadLink>
+                </Button>
+              </div>
+            )}
 
-  <div className="flex sm:flex-none sm:w-auto w-full">
-    {(notrans || doNumber || agentName || dateFilter != null) && (
-      <Button
-        variant="default"
-        className="w-full sm:w-auto"
-        onClick={handleClearSearch}
-      >
-        <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
-      </Button>
-    )}
-  </div>
-</div>
+            <div className="flex sm:flex-none sm:w-auto w-full">
+              {(notrans || doNumber || agentName || dateFilter != null) && (
+                <Button
+                  variant="default"
+                  className="w-full sm:w-auto"
+                  onClick={handleClearSearch}
+                >
+                  <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
+                </Button>
+              )}
+            </div>
+          </div>
         </Card>
         <DataTable columns={columns} data={filteredData} />
       </div>
