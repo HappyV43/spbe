@@ -178,7 +178,11 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
 
         {/* TODAY */}
         <Card className="px-6 py-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200">
-          <h1 className="text-2xl font-semibold mb-4">Wawasan Hari Ini</h1>
+          <h1 className="text-2xl font-semibold mb-1 ">Wawasan Hari Ini
+            <span className="text-sm m-3 font-semibold text-gray-500 mb-1">
+              ({format(new Date(), "dd MMMM yyyy")})
+            </span>
+          </h1>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between px-2">
           <SummaryItems
               icon={<CalendarCheck className="h-10 w-10 text-white" />}
@@ -193,7 +197,7 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
               value={`${formatNumberQty(getTodayTotalQty(monthlyAllocation))} / `}
               additionalInfo={`${formatNumberQty(getTodayTotalQty(monthlyAllocation) * 3)} Kg`}
             />
-            
+              
             <SummaryItems
               icon={<ScrollText className="h-10 w-10 text-white" />}
               title={`TOTAL PENYALURAN LPG`}
@@ -219,7 +223,23 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
 
         {/* FILTER DATA */}
         <Card className="px-6 py-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200 mb-5">
-          <h1 className="text-2xl font-semibold mb-4">Ringkasan</h1>
+          <h1 className="text-2xl font-semibold mb-4">Ringkasan
+          <span className="text-sm m-3 font-semibold text-gray-500 mb-1">
+            {
+              dateFilter?.from && dateFilter?.to
+                ? `${format(dateFilter.from, "(dd MMMM yyyy)", { locale: id })} - ${format(
+                    dateFilter.to,
+                    "(dd MMMM yyyy)",
+                    { locale: id }
+                  )}`
+                : dateFilter?.from
+                ?`${format(dateFilter.from, "(dd MMMM yyyy)", { locale: id })}`
+                :"(Semua Tanggal)"
+                // : format(new Date(), "dd MMMM yyyy", { locale: id })
+            }
+            </span>
+          </h1>
+          <p></p>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between px-2">
           <SummaryItems
               icon={<CalendarCheck className="h-10 w-10 text-white" />}
