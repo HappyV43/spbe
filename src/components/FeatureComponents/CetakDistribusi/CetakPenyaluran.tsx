@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
 import { format } from "date-fns";
-import { toNormalCase } from '@/utils/page';
+import { formatNumberQty, toNormalCase } from '@/utils/page';
 
 interface CetakPenyaluranProps {
     data: any;
@@ -161,9 +161,9 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
                 </View>
                 <View style={styles.tableRow}>
                     <Text style={[styles.tableCell, { flex: 2, textAlign: 'left' }]}>{data.deliveryNumber}</Text>
-                    <Text style={[styles.tableCell, { flex: 1, textAlign: 'center' }]}>{data.allocatedQty}</Text>
+                    <Text style={[styles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatNumberQty(data.allocatedQty)}</Text>
                     <Text style={[styles.tableCell, { flex: 1 }]}>0</Text>
-                    <Text style={[styles.tableCell, { flex: 1 }]}>{data.allocatedQty *3}</Text>
+                    <Text style={[styles.tableCell, { flex: 1 }]}>{formatNumberQty(data.allocatedQty *3)}</Text>
                 </View>
                 {/* Additional Table Rows */}
                 <View style={styles.tableRow}>
@@ -181,9 +181,9 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
                 {/* Total Row */}
                 <View style={styles.tableRow}>
                     <Text style={[styles.tableCell, { flex: 2, textAlign: 'center' }]}>Jumlah</Text>
-                    <Text style={[styles.tableCell, { flex: 1, textAlign: 'center' }]}>{data.allocatedQty }</Text>
+                    <Text style={[styles.tableCell, { flex: 1, textAlign: 'center' }]}>{formatNumberQty(data.allocatedQty)}</Text>
                     <Text style={[styles.tableCell, { flex: 1 }]}>0</Text>
-                    <Text style={[styles.tableCell, { flex: 1 }]}>{data.allocatedQty *3}</Text>
+                    <Text style={[styles.tableCell, { flex: 1 }]}>{formatNumberQty(data.allocatedQty * 3)}</Text>
                 </View>
             </View>
 
@@ -200,14 +200,17 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Administrasi</Text>
                     <Text style={styles.signatureLine} />
+                    {/* <Text style={{ textAlign: 'center' }}>{toNormalCase(data.admin)}</Text> */}
                 </View>
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Gate Keeper</Text>
                     <Text style={styles.signatureLine} />
+                    {/* <Text style={{ textAlign: 'center' }}>{toNormalCase(data.gate)}</Text> */}
                 </View>
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Spv. Filling</Text>
                     <Text style={styles.signatureLine} />
+                    {/* <Text style={{ textAlign: 'center' }}>{toNormalCase(data.spv)}</Text> */}
                 </View>
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Penerima</Text>
