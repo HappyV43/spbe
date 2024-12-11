@@ -92,7 +92,6 @@ model Allocations {
   materialName    String
   agentName       String
   plannedGiDate   DateTime?
-  period          String?
   allocatedQty    Int
   status          String            @default("Pending")
   createdAt       DateTime          @default(now())
@@ -142,5 +141,3 @@ model LpgDistributions {
   creator         User        @relation("lpgCreatedByRelation", fields: [createdBy], references: [id])
   updater         User        @relation("lpgUpdatedByRelation", fields: [updatedBy], references: [id])
 }
-
-

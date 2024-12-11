@@ -26,7 +26,7 @@ import { Card } from "../../ui/card";
 import type { User } from "@prisma/client";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
-import SummaryItems from "@/components/FeatureComponents/SummaryItems";
+import { Allocation } from "@/lib/types";
 
 interface AlokasiProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -40,15 +40,7 @@ const today = {
 };
 
 const AlokasiHarian = <
-  TData extends {
-    plannedGiDate: Date;
-    giDate: Date;
-    deliveryNumber: string;
-    allocatedQty: number;
-    agentName: string;
-    status: string;
-    updatedAt: Date;
-  },
+  TData extends Allocation,
   TValue
 >({
   columns,

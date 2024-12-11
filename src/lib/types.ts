@@ -1,13 +1,13 @@
 export interface Allocation {
   id?: number;
-  giDate?: Date | null;
+  giDate: Date | null;
   bpeNumber?: string | null;
   deliveryNumber: string;
   agentId?: string | null;
   shipTo: string;
   materialName: string;
   agentName: string;
-  plannedGiDate: Date | null;
+  plannedGiDate: Date;
   period?: string | null;
   allocatedQty: number;
   status?: "Pending" | "Approved";
@@ -98,7 +98,7 @@ export interface RawDataMap {
   DO_NUMBER: string;
   QUANTITY: number;
   MATERIAL_NAME: string;
-  PLANNED_GI_DATE: string | null;
+  PLANNED_GI_DATE: string;
   giDate?: Date | null;
   bpe?: string | null;
   createdBy: string;

@@ -12,6 +12,7 @@ import { ChartConfig } from "@/components/ui/chart";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
 import {
+  calculateDiff,
   calculateSummaryQty,
   formatNumberQty,
   getAnnualTotalQty,
@@ -27,7 +28,7 @@ import { Button } from "@/components/ui/button";
 import SummaryItems from "@/components/FeatureComponents/SummaryItems";
 
 interface AllocationData {
-  plannedGiDate?: Date;
+  plannedGiDate: Date | null;
   allocatedQty?: number;
   lpgDistribution: {
     giDate: Date;
@@ -37,20 +38,15 @@ interface AllocationData {
 
 interface SummaryProps {
   monthly: DataConfig[];
-  data: any;
+  data: AllocationData[];
 }
 
 interface DataConfig {
   date: Date;
-  qty: number;
+  qty?: number;
 }
 
-// const today = {
-//   from: new Date(),
-//   to: new Date(),
-// };
-
-const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
+const Summary = ({ data, monthly }: SummaryProps) => {
   // Summary Chart
   const [monthlyAllocation, setMonthlyAllocation] = useState<DataConfig[]>([]);
   const [dailyAllocation, setDailyAllocation] = useState<DataConfig[]>([]);
@@ -61,15 +57,10 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
   const [filteredDaily, setFilteredDaily] = useState<AllocationData[]>([]);
   const [filteredMonthly, setFilteredMonthly] = useState<DataConfig[]>([]);
   const [filteredDistribution, setFilteredDistribution] = useState<AllocationData[]>([]);
+  
   const totalDailyQty = calculateSummaryQty(filteredDaily, "allocatedQty");
   const totalMonthlyQty = calculateSummaryQty(filteredMonthly, "totalElpiji");
   const totalDistributionlyQty = calculateSummaryQty(filteredDistribution, "lpgDistribution.distributionQty");
-
-  const calculateDiff = (a: number, b: number) =>{
-    return (Math.abs(a-b))
-  }
-  const totalPending = Math.abs(totalDailyQty - totalDistributionlyQty);
-  const totalFakultatif = Math.abs( totalMonthlyQty - totalDailyQty);
 
   const filterByDate = (itemDate: Date, day?:string) => {
     const matchesDate = dateFilter?.from
@@ -118,11 +109,23 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
 
     // Apply filters
     const filteredDailyData = data.filter((item: { plannedGiDate: any; }) => filterByDate(item.plannedGiDate));
-    const filteredMonthlyData = monthly.filter((item) => filterByDate(item.date));
+    // const filteredMonthlyData = monthly.filter((item) => filterByDate(item.date));
+    // const filteredDistributionData = data
+    //   .filter((item: { lpgDistribution: null; }) => item.lpgDistribution !== null)
+    //   .filter((item: { lpgDistribution: { giDate: any; }; }) => filterByDate(item.lpgDistribution.giDate));
+    
+    const filteredMonthlyData = monthly.filter((item) =>
+      filterByDate(item.date)
+    );
+
     const filteredDistributionData = data
-      .filter((item: { lpgDistribution: null; }) => item.lpgDistribution !== null)
-      .filter((item: { lpgDistribution: { giDate: any; }; }) => filterByDate(item.lpgDistribution.giDate));
-  
+      .filter((item) => item.lpgDistribution !== null)
+      .filter((item) =>
+        item.lpgDistribution?.giDate
+          ? filterByDate(item.lpgDistribution.giDate)
+          : false
+      );
+
     setFilteredDaily(filteredDailyData);
     setFilteredMonthly(filteredMonthlyData);
     setFilteredDistribution(filteredDistributionData);
@@ -207,7 +210,7 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
             
             <SummaryItems
               icon={<Clock4 className="h-10 w-10 text-white" />}
-              title={"TOTAL PENDING"}
+              title={"TOTAL PENDING HARIAN"}
               value={`${formatNumberQty(calculateDiff(getTodayTotalQty(dailyAllocation), getTodayTotalQty(dailyDistribution)))} / `}
               additionalInfo={`${formatNumberQty(calculateDiff(getTodayTotalQty(dailyAllocation), getTodayTotalQty(dailyDistribution)) * 3)} Kg`}
             />
@@ -215,8 +218,8 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
             <SummaryItems
               icon={<PackagePlus className="h-10 w-10 text-white" />}
               title={"TOTAL FAKULTATIF"}
-              value={`${formatNumberQty(calculateDiff(getTodayTotalQty(monthlyAllocation), getTodayTotalQty(dailyAllocation)))} / `}
-              additionalInfo={`${formatNumberQty(calculateDiff(getTodayTotalQty(monthlyAllocation), getTodayTotalQty(dailyAllocation)) * 3)} Kg`}
+              value={`${formatNumberQty(calculateDiff(getTodayTotalQty(dailyAllocation), getTodayTotalQty(monthlyAllocation)))} / `}
+              additionalInfo={`${formatNumberQty(calculateDiff(getTodayTotalQty(dailyAllocation), getTodayTotalQty(monthlyAllocation)) * 3)} Kg`}
             />
           </div>
         </Card>
@@ -243,7 +246,7 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between px-2">
           <SummaryItems
               icon={<CalendarCheck className="h-10 w-10 text-white" />}
-              title={`TOTAL ALOKASI HARI INI (${filteredDaily.length})`}
+              title={`TOTAL ALOKASI HARI INI (${formatNumberQty(filteredDaily.length)})`}
               value={`${formatNumberQty(totalDailyQty)} / `}
               additionalInfo={`${formatNumberQty(totalDailyQty * 3)} Kg`}
               cs={"p-4"}
@@ -251,7 +254,7 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
             
             <SummaryItems
               icon={<CalendarDays className="h-10 w-10 text-white" />}
-              title={`TOTAL ALOKASI BULANAN (${filteredMonthly.length})`}
+              title={`TOTAL ALOKASI BULANAN (${formatNumberQty(filteredMonthly.length)})`}
               value={`${formatNumberQty(totalMonthlyQty)} / `}
               additionalInfo={`${formatNumberQty(totalMonthlyQty * 3)} Kg`}
               cs={"p-4"}
@@ -259,7 +262,7 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
             
             <SummaryItems
               icon={<ScrollText className="h-10 w-10 text-white" />}
-              title={`TOTAL PENYALURAN LPG (${filteredDistribution.length})`}
+              title={`TOTAL PENYALURAN LPG (${formatNumberQty(filteredDistribution.length)})`}
               value={`${formatNumberQty(totalDistributionlyQty)} / `}
               additionalInfo={`${formatNumberQty(totalDistributionlyQty * 3)} Kg`}
               cs={"p-4"}
@@ -267,17 +270,17 @@ const Summary: React.FC<SummaryProps> = ({ data, monthly }) => {
             
             <SummaryItems
               icon={<Clock4 className="h-10 w-10 text-white" />}
-              title={"TOTAL PENDING"}
-              value={`${formatNumberQty(totalPending)} / `}
-              additionalInfo={`${formatNumberQty(totalPending * 3)} Kg`}
+              title={"TOTAL PENDING HARIAN"}
+              value={`${formatNumberQty(calculateDiff(totalDailyQty, totalDistributionlyQty))} / `}
+              additionalInfo={`${formatNumberQty(calculateDiff(totalDailyQty, totalDistributionlyQty) * 3)} Kg`}
               cs={"p-4"}
             />
             
             <SummaryItems
               icon={<PackagePlus className="h-10 w-10 text-white" />}
               title={"TOTAL FAKULTATIF"}
-              value={`${formatNumberQty(totalFakultatif)} / `}
-              additionalInfo={`${formatNumberQty(totalFakultatif * 3)} Kg`}
+              value={`${formatNumberQty(calculateDiff(totalDailyQty, totalMonthlyQty))} / `}
+              additionalInfo={`${formatNumberQty(calculateDiff(totalDailyQty, totalMonthlyQty) * 3)} Kg`}
               cs={"p-4"}
             />
           </div>
