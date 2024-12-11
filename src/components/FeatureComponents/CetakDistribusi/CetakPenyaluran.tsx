@@ -200,17 +200,17 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Administrasi</Text>
                     <Text style={styles.signatureLine} />
-                    {/* <Text style={{ textAlign: 'center' }}>{toNormalCase(data.admin)}</Text> */}
+                    <Text style={{ textAlign: 'center' }}>{toNormalCase(data.administrasi || "")}</Text>
                 </View>
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Gate Keeper</Text>
                     <Text style={styles.signatureLine} />
-                    {/* <Text style={{ textAlign: 'center' }}>{toNormalCase(data.gate)}</Text> */}
+                    <Text style={{ textAlign: 'center' }}>{toNormalCase(data.gateKeeper || "")}</Text>
                 </View>
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Spv. Filling</Text>
                     <Text style={styles.signatureLine} />
-                    {/* <Text style={{ textAlign: 'center' }}>{toNormalCase(data.spv)}</Text> */}
+                    <Text style={{ textAlign: 'center' }}>{toNormalCase(data.superVisor || "")}</Text>
                 </View>
                 <View style={styles.signature}>
                     <Text style={{ textAlign: 'center' }}>Penerima</Text>
