@@ -61,6 +61,9 @@ export const postLpgData = async (formData: FormData) => {
     ? Number(formData.get("isiKurang"))
     : null;
   const shipTo = formData.get("shipTo")?.toString() || "";
+  const superVisor = formData.get("superVisor")?.toString() || "";
+  const administrasi = formData.get("administrasi")?.toString() || "";
+  const gateKeeper = formData.get("gateKeeper")?.toString() || "";
 
   if (
     !nomorTransaksi ||
@@ -74,6 +77,19 @@ export const postLpgData = async (formData: FormData) => {
     return {
       error: "Semua field harus diisi",
     };
+
+  const checkLpgData = await prisma.lpgDistributions.findMany({
+    where: {
+      giDate: waktuPengambilan,
+      bpeNumber: nomorTransaksi,
+    },
+  });
+
+  if (checkLpgData.length > 0) {
+    return {
+      error: "Data penyaluran lpg ini sudah diisi",
+    };
+  }
 
   try {
     const { user } = await getCurrentSession();
@@ -97,6 +113,9 @@ export const postLpgData = async (formData: FormData) => {
         shipTo: shipTo,
         isiKurang: isiKurang || null,
         bocor: jumlahTabungBocor || null,
+        superVisor: superVisor || null,
+        administrasi: administrasi || null,
+        gateKeeper: gateKeeper || null,
         createdBy: user.id,
         updatedBy: user.id,
       },
@@ -111,7 +130,7 @@ export const postLpgData = async (formData: FormData) => {
         updatedBy: user.id,
       },
     });
-    revalidatePath("/dashboard/alokasi");
+    revalidatePath("/dashboard/alokasi-harian");
   } catch (error) {
     return {
       error: getErrorMessage(error),
@@ -142,6 +161,9 @@ export const UpdateLpgData = async (formData: FormData) => {
     formData.get("jumlahTabungBocor") as string
   );
   const isiKurang = parseInt(formData.get("isiKurang") as string);
+  const superVisor = formData.get("superVisor")?.toString() || "";
+  const administrasi = formData.get("administrasi")?.toString() || "";
+  const gateKeeper = formData.get("gateKeeper")?.toString() || "";
   if (!id) {
     return {
       error: "ID is missing.",
@@ -158,6 +180,9 @@ export const UpdateLpgData = async (formData: FormData) => {
         licensePlate: platKendaraan,
         driverName: namaSopir,
         bocor: jumlahTabungBocor,
+        superVisor: superVisor,
+        administrasi: administrasi,
+        gateKeeper: gateKeeper,
         isiKurang: isiKurang,
       },
     });
