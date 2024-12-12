@@ -6,12 +6,9 @@ import {
   View,
   StyleSheet,
   Image,
-  Svg,
-  Path,
 } from "@react-pdf/renderer";
 import { format } from "date-fns";
 import { formatNumberQty, toNormalCase } from "@/utils/page";
-import { SVGProps } from "react";
 
 interface CetakPenyaluranProps {
   data: any;
@@ -37,6 +34,7 @@ const styles = StyleSheet.create({
   },
   root: {
     display: "flex",
+    flexDirection: "row",
     justifyContent: "space-between",
   },
   title: {
@@ -116,8 +114,8 @@ const styles = StyleSheet.create({
     textAlign: "left",
   },
   imageSize: {
-    width: 100,
-    height: 100,
+    width: 50,
+    height: 50,
   },
 });
 
@@ -139,7 +137,9 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
             Telp/Fax: 024-76633360 / 024-76633361
           </Text>
         </View>
-        <SvgComponent />
+        <View style={styles.imageSize}>
+          <Image src="/assets/image.png" />
+        </View>
       </View>
 
       {/* Details Section */}
