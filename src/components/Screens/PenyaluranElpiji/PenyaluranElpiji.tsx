@@ -3,28 +3,22 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { CalendarCheck, Database, Handshake, Plus, Printer, Search, SearchX, Weight } from "lucide-react";
+import { CalendarCheck, Database, Handshake, Plus, Printer, SearchX, Weight } from "lucide-react";
 import {
   calculateTotalAgen,
   calculateTotalQty,
   formatNumberQty,
-  getTodayTotalQty,
   normalizeDateFrom,
   normalizeDateTo,
 } from "@/utils/page";
 import { format } from "date-fns";
-import { getAllokasiAll, getMonthlyAllocation, getSummary } from "@/app/actions/alokasi.action";
+import { getMonthlyAllocation, getSummary } from "@/app/actions/alokasi.action";
 import { ChartConfig } from "@/components/ui/chart";
-import { ChartComponent } from "@/components/FeatureComponents/Chart";
 import RekapPenyaluran from "@/components/FeatureComponents/CetakDistribusi/RekapPenyaluran";
 import ComboBox from "@/components/FeatureComponents/ComboBox";
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
 import {
   Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
 } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { PDFDownloadLink } from "@react-pdf/renderer";
@@ -33,19 +27,6 @@ import { Button } from "@/components/ui/button";
 import type { User } from "@prisma/client";
 import { id } from "date-fns/locale";
 import { LpgDistributions } from "@/lib/types";
-
-interface Records {
-  bpeNumber: String;
-  giDate: Date;
-  agentName: String;
-  licensePlate: String;
-  allocatedQty: number;
-  driverName: String;
-  distributionQty: number;
-  volume: number;
-  deliveryNumbr: string;
-  status: string;
-}
 
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -147,17 +128,6 @@ const PenyaluranElpiji = <
     }));
     setAllocationDaily(dailyData)
   }
-
-  const chartConfig = {
-    monthlyQty: {
-      label: "Bulanan",
-      color: "hsl(var(--chart-1))",
-    },
-    dailyQty: {
-      label: "Harian",
-      color: "hsl(var(--chart-2))",
-    },
-  } satisfies ChartConfig;
 
   useEffect(() => {
     getMonthly();
@@ -310,7 +280,6 @@ const PenyaluranElpiji = <
             )}
 
             <div className="flex sm:flex-none sm:w-auto w-full">
-              {(notrans || doNumber || agentName || dateFilter != null) && (
                 <Button
                   variant="default"
                   className="w-full sm:w-auto"
@@ -318,7 +287,6 @@ const PenyaluranElpiji = <
                 >
                   <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
                 </Button>
-              )}
             </div>
           </div>
         </Card>

@@ -64,7 +64,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="platKendaraan"
                         name="platKendaraan"
                         value={platKendaraan}
-                        className="col-span-3"
+                        className="col-span-3 cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         readOnly
                     />
                 </div>
@@ -74,7 +74,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="namaSopir"
                         name="namaSopir"
                         value={namaSopir}
-                        className="col-span-3"
+                        className="col-span-3 cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         readOnly
                     />
                 </div>
@@ -84,7 +84,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="gateKeeper"
                         name="gateKeeper"
                         value={namaGateKeeper}
-                        className="col-span-3"
+                        className="col-span-3 cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         readOnly
                     />
                 </div>
@@ -94,7 +94,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="superVisor"
                         name="superVisor"
                         value={namaSupervisor}
-                        className="col-span-3"
+                        className="col-span-3 cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         readOnly
                     />
                 </div>
@@ -104,7 +104,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="administrasi"
                         name="administrasi"
                         value={namaAdministrasi}
-                        className="col-span-3"
+                        className="col-span-3 cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         readOnly
                     />
                 </div>
@@ -114,7 +114,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="jumlahTabungBocor"
                         name="jumlahTabungBocor"
                         value={jumlahTabungBocor}
-                        className="col-span-3"
+                        className="col-span-3 cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         type="number"
                         readOnly
                     />
@@ -125,7 +125,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="isiKurang"
                         name="isiKurang"
                         value={isiKurang}
-                        className="col-span-3"
+                        className="col-span-3 cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         type="number"
                         readOnly
                     />
@@ -135,7 +135,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                         id="id"
                         name="id"
                         value={id}
-                        className="col-span-3 hidden"
+                        className="col-span-3 hidden cursor-not-allowed outline outline-2 outline-gray-200 bg-gray-200 dark:outline-gray-600 dark:bg-gray-700 text-slate-600 dark:text-slate-300"
                         readOnly
                     />
                 </div>
