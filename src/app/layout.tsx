@@ -26,13 +26,21 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="light">
+      <head>
+        <link
+          rel="icon"
+          href="/icon?<generated>"
+          type="image/<generated>"
+          sizes="<generated>"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
-          <DefaultLayout>{children}</DefaultLayout>
-          <Toaster />
+        <DefaultLayout>{children}</DefaultLayout>
+        <Toaster />
         {/* </ThemeProvider> */}
       </body>
     </html>
