@@ -31,10 +31,10 @@ const styles = StyleSheet.create({
   root: {
     display: "flex",
     flexDirection: "row",
-    alignItems: "flex-start", 
+    alignItems: "flex-start",
   },
   header: {
-    flex: 1, 
+    flex: 1,
     marginRight: 16,
   },
   imageContainer: {
@@ -45,7 +45,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
   },
-
   title: {
     fontSize: 14,
     fontFamily: "Times-Bold",
@@ -138,13 +137,17 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
             Kawasan Industri Candi Blok XI No. 8, JL Candi Raya Timur, Ngaliyan,
             Semarang
           </Text>
-          <Text style={styles.subHeader}>Telp/Fax: 024-76633360 / 024-76633361</Text>
+          <Text style={styles.subHeader}>
+            Telp/Fax: 024-76633360 / 024-76633361
+          </Text>
         </View>
         <View style={styles.imageContainer}>
-          <Image style={styles.imageSize} src="/assets/image.png" />
+          <Image
+            style={styles.imageSize}
+            src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
+          />
         </View>
       </View>
-
 
       {/* Details Section */}
       <Text style={styles.title}>Bukti Penyerahan Elpiji 3 Kg</Text>
