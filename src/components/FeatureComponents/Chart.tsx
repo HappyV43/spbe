@@ -20,7 +20,7 @@ interface ChartProps<TData> {
   data2: Array<{ date: string; qty: number }>; 
   data3: Array<{ date: string; qty: number }>; 
   title?: string;
-  timeFrame: "weekdays" | "monthly"; 
+  timeFrame: "weekly" | "monthly"; 
 }
 
 export function ChartComponent<TData extends DataItem>({
@@ -64,7 +64,11 @@ export function ChartComponent<TData extends DataItem>({
       }
     });
 
-    return Array.from(map.values());
+    return Array.from(map.values()).sort((a, b) => {
+      const dateA = new Date(a.date.split("-").reverse().join("-")); 
+      const dateB = new Date(b.date.split("-").reverse().join("-"));
+      return dateA.getTime() - dateB.getTime();
+    });
   }, [data, data2, data3]);
 
   const isAllDataEmpty = !data.length && !data2.length && !data3.length;
