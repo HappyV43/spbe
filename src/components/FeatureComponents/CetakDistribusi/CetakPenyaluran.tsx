@@ -23,41 +23,45 @@ const formatTime = (timestamp: number): string => {
 
 const styles = StyleSheet.create({
   page: {
-    padding: 30,
-    fontSize: 10,
-    lineHeight: 1.5,
-    fontFamily: "Times-Roman",
+    padding: 30, // Padding sedikit lebih kecil agar pas di continuous form
+    fontSize: 10.5, // Ukuran font lebih kecil untuk dapat memuat lebih banyak konten
+    lineHeight: 1.3,
+    fontFamily: "Helvetica",
+    flexDirection: "column",
   },
   root: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "space-between", 
     alignItems: "flex-start",
   },
   header: {
     flex: 1,
-    marginRight: 16,
+    marginRight: 8, 
   },
   imageContainer: {
     display: "flex",
     justifyContent: "flex-start",
   },
   imageSize: {
-    width: 120,
-    height: 120,
+    width: 85, // Menyesuaikan ukuran logo agar tidak terlalu besar
+    height: 85,
   },
   title: {
-    fontSize: 14,
-    fontFamily: "Times-Bold",
-    fontWeight: "extrabold",
-    marginBottom: 10,
+    fontSize: 11, // Ukuran judul sedikit lebih kecil
+    fontFamily: "Helvetica-Bold",
+    fontWeight: "bold",
+    marginBottom: 3,
   },
   subHeader: {
-    fontSize: 10,
+    fontSize: 10.5, // Menyesuaikan ukuran font untuk subheader
+    lineHeight: 1.2,
+    marginBottom: 3,
   },
   detailsRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 3,
+    marginVertical: 1, // Margin vertikal lebih kecil untuk menyesuaikan space
   },
   detailsColumn: {
     flexDirection: "row",
@@ -66,66 +70,70 @@ const styles = StyleSheet.create({
   },
   detailsLabel: {
     fontWeight: "bold",
-    width: "25%",
+    width: "35%", // Lebar label sedikit diperkecil
   },
   detailsValue: {
     width: "60%",
     textAlign: "left",
   },
   table: {
-    marginTop: 10,
+    marginTop: 5,
     width: "100%",
-    borderWidth: 1,
+    borderWidth: 1, 
     borderColor: "#000",
   },
   tableRow: {
     flexDirection: "row",
   },
   tableCellHeader: {
-    padding: 5,
+    padding: 2,
     fontWeight: "bold",
-    borderRightWidth: 1,
+    borderRightWidth: 1, // Border lebih tipis
     borderBottomWidth: 1,
     borderColor: "#000",
     textAlign: "center",
-    fontFamily: "Times-Bold",
+    paddingHorizontal: 3,
+    fontFamily: "Helvetica-Bold",
+    fontSize: 10.5, // Ukuran font tabel lebih kecil
   },
   tableCell: {
-    padding: 5,
+    padding: 2,
+    paddingHorizontal: 3,
     borderRightWidth: 1,
     borderBottomWidth: 1,
     borderColor: "#000",
     textAlign: "right",
+    fontSize: 10.5, 
   },
   signatureRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 20,
-    marginBottom: 20,
+    marginTop: 5, 
     textAlign: "center",
   },
   signature: {
     textAlign: "center",
-    marginHorizontal: 20,
+    marginHorizontal: 8,
     flex: 1,
+    fontSize: 10.5,
   },
   signatureLine: {
-    marginTop: 75,
+    marginTop: 35, // Kurangi tinggi garis tanda tangan
     alignSelf: "center",
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: "#000",
-    width: "90%",
+    width: "75%", // Lebar garis lebih kecil
   },
   footerText: {
-    fontSize: 9,
-    marginTop: 12,
+    fontSize: 8, // Ukuran font footer lebih kecil
+    marginTop: 6, // Margin footer lebih kecil
     textAlign: "left",
   },
 });
 
 const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
   <Document>
-    <Page size="A4" style={styles.page}>
+    <Page size="A5" orientation="landscape" style={styles.page}>
       {/* Header Section */}
       <View style={styles.root}>
         <View style={styles.header}>
@@ -154,7 +162,7 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
       <View style={styles.detailsRow}>
         <View style={styles.detailsColumn}>
           <Text style={styles.detailsLabel}>Jenis Barang</Text>
-          <Text style={styles.detailsValue}>: Elpiji 3 Kg</Text>
+          <Text style={styles.detailsValue}>: ELPIJI 3 Kg</Text>
         </View>
         <View style={styles.detailsColumn}>
           <Text style={styles.detailsLabel}>Nomor</Text>
@@ -247,12 +255,11 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
       </View>
 
       {/* Note Section */}
-      <View style={{ marginTop: 10 }}>
+      <View style={{ marginTop: 3, fontSize: 10}}>
         <Text>
-          Telah diserahkan dan diterima dalam keadaan baik, jumlah tabung dan
-          isi benar
+          Telah diserahkan dan diterima dalam keadaan baik, jumlah tabung dan isi benar
         </Text>
-        <Text style={{ textAlign: "right", marginTop: 10 }}>
+        <Text style={{ textAlign: "right", marginTop: 4 }}>
           Semarang, {format(new Date(), "dd MMMM yyyy")}
         </Text>
       </View>
