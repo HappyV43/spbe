@@ -113,10 +113,11 @@ const styles = StyleSheet.create({
     signatureLine: {
         marginTop: 35, // Kurangi tinggi garis tanda tangan
         alignSelf: "center",
-        borderBottomWidth: 0.5,
+        borderBottomWidth: 1.5,
         borderBottomColor: "#000",
         width: "75%", // Lebar garis lebih kecil
-    },
+        marginBottom: 5,
+      },
     footerText: {
         fontSize: 8, // Ukuran font footer lebih kecil
         marginTop: 6, // Margin footer lebih kecil

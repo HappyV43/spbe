@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   table: {
     marginTop: 5,
     width: "100%",
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: "#000",
   },
   tableRow: {
@@ -131,9 +131,10 @@ const styles = StyleSheet.create({
   signatureLine: {
     marginTop: 35, // Kurangi tinggi garis tanda tangan
     alignSelf: "center",
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1.5,
     borderBottomColor: "#000",
     width: "75%", // Lebar garis lebih kecil
+    marginBottom: 5,
   },
   footerText: {
     fontSize: 8, // Ukuran font footer lebih kecil
