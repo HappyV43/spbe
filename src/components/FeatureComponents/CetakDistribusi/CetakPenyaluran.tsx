@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#000",
     textAlign: "right",
-    fontSize: 10.5, 
+    fontSize: 10.5,
   },
   signatureRow: {
     flexDirection: "row",
