@@ -23,7 +23,8 @@ const formatTime = (timestamp: number): string => {
 
 const styles = StyleSheet.create({
   page: {
-    padding: 30, // Padding sedikit lebih kecil agar pas di continuous form
+    paddingHorizontal: 30, // Padding sedikit lebih kecil agar pas di continuous form
+    paddingTop: 20,
     fontSize: 10.5, // Ukuran font lebih kecil untuk dapat memuat lebih banyak konten
     lineHeight: 1.3,
     fontFamily: "Helvetica",
@@ -32,20 +33,30 @@ const styles = StyleSheet.create({
   root: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between", 
-    alignItems: "flex-start",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 0,
+    marginBottom: 0,
+    position: "relative",
+    width: "100%",
+    height: "auto",
   },
   header: {
     flex: 1,
-    marginRight: 8, 
+    marginRight: 8,
   },
   imageContainer: {
     display: "flex",
     justifyContent: "flex-start",
   },
   imageSize: {
-    width: 85, // Menyesuaikan ukuran logo agar tidak terlalu besar
-    height: 85,
+    position: "absolute",
+    left: 415,
+    width: 130,
+    height: 130,
+    margin: 0,
+    padding: 0,
+    objectFit: "cover",
   },
   title: {
     fontSize: 11, // Ukuran judul sedikit lebih kecil
@@ -79,7 +90,7 @@ const styles = StyleSheet.create({
   table: {
     marginTop: 5,
     width: "100%",
-    borderWidth: 1, 
+    borderWidth: 1,
     borderColor: "#000",
   },
   tableRow: {
@@ -103,12 +114,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "#000",
     textAlign: "right",
-    fontSize: 10.5, 
+    fontSize: 10.5,
   },
   signatureRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 5, 
+    marginTop: 5,
     textAlign: "center",
   },
   signature: {
@@ -120,13 +131,14 @@ const styles = StyleSheet.create({
   signatureLine: {
     marginTop: 35, // Kurangi tinggi garis tanda tangan
     alignSelf: "center",
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1.5,
     borderBottomColor: "#000",
     width: "75%", // Lebar garis lebih kecil
+    marginBottom: 5,
   },
   footerText: {
     fontSize: 8, // Ukuran font footer lebih kecil
-    marginTop: 6, // Margin footer lebih kecil
+    marginTop: 10, // Margin footer lebih kecil
     textAlign: "left",
   },
 });
@@ -149,12 +161,10 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
             Telp/Fax: 024-76633360 / 024-76633361
           </Text>
         </View>
-        <View style={styles.imageContainer}>
-          <Image
-            style={styles.imageSize}
-            src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-          />
-        </View>
+        <Image
+          style={styles.imageSize}
+          src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Free%20Image%20Resizer%20(1)-YQCDyEAV27TnvcdTfyQQQ0u7JcTZ2y.png"
+        />
       </View>
 
       {/* Details Section */}
@@ -255,9 +265,10 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
       </View>
 
       {/* Note Section */}
-      <View style={{ marginTop: 3, fontSize: 10}}>
+      <View style={{ marginTop: 3, fontSize: 10 }}>
         <Text>
-          Telah diserahkan dan diterima dalam keadaan baik, jumlah tabung dan isi benar
+          Telah diserahkan dan diterima dalam keadaan baik, jumlah tabung dan
+          isi benar
         </Text>
         <Text style={{ textAlign: "right", marginTop: 4 }}>
           Semarang, {format(new Date(), "dd MMMM yyyy")}
