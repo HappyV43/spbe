@@ -74,7 +74,7 @@ export function ChartComponent<TData extends DataItem>({
   const isAllDataEmpty = !data.length && !data2.length && !data3.length;
 
   if (isAllDataEmpty) {
-    return <div className="text-center text-gray-500 py-4">No data available</div>;
+    return <div className="text-center text-gray-500 py-4">Tidak ada Data</div>;
   }
 
   // const combinedData = React.useMemo(() => {
