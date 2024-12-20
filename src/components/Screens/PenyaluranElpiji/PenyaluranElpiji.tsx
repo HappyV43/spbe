@@ -291,14 +291,21 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
                   className="w-full sm:w-auto flex items-center justify-center"
                   asChild
                 >
-                  <PDFViewer style={{ width: "100%", height: "100vh" }}>
-                    <RekapPenyaluran
-                      data={filteredData != null ? filteredData : data}
-                      data2={allocationMonthly}
-                      data3={allocationDaily}
-                      isAgentFiltered={isAgentFiltered}
-                    />
-                  </PDFViewer>
+                  <PDFDownloadLink
+                    className="text-center"
+                    document={
+                      <RekapPenyaluran
+                        data={filteredData != null ? filteredData : data}
+                        data2={allocationMonthly}
+                        data3={allocationDaily}
+                        isAgentFiltered={isAgentFiltered}
+                      />
+                    }
+                    fileName={`Penyaluran Elpiji.pdf`}
+                  >
+                    <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+                    <span className="truncate">Cetak Rekap</span>
+                  </PDFDownloadLink>
                 </Button>
               </div>
             )}
