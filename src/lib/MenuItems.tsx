@@ -59,9 +59,9 @@ export function getMenuList(pathname: string): Group[] {
               active: pathname === "/dashboard/alokasi-bulanan",
             },
             // {
-            //   href: "/dashboard/cetak-penyaluran",
-            //   label: "Cetak Penyaluran",
-            //   active: pathname === "/dashboard/cetak-penyaluran"
+            //   href: "/dashboard/rekap-penyaluran",
+            //   label: "Rekap Penyaluran",
+            //   active: pathname === "/dashboard/rekap-penyaluran"
             // }
           ],
         },

@@ -1,9 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { CalendarCheck, Database, Handshake, Plus, Printer, SearchX, Weight } from "lucide-react";
+import {
+  CalendarCheck,
+  Database,
+  Handshake,
+  Loader2,
+  Plus,
+  Printer,
+  SearchX,
+  Weight,
+} from "lucide-react";
 import {
   calculateTotalAgen,
   calculateTotalQty,
@@ -17,16 +26,15 @@ import { ChartConfig } from "@/components/ui/chart";
 import RekapPenyaluran from "@/components/FeatureComponents/CetakDistribusi/RekapPenyaluran";
 import ComboBox from "@/components/FeatureComponents/ComboBox";
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
-import {
-  Card,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
 import type { User } from "@prisma/client";
 import { id } from "date-fns/locale";
 import { LpgDistributions } from "@/lib/types";
+import DownloadRekap from "./DownloadRekap";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -40,10 +48,49 @@ const today = {
   to: new Date(),
 };
 
-const PenyaluranElpiji = <
-  TData extends LpgDistributions,
-  TValue
->({
+// const PDFLoadingComponent = () => (
+//   <Button variant="default" className="w-full sm:w-auto flex items-center justify-center" disabled>
+//     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+//     <span>Loading PDF...</span>
+//   </Button>
+// );
+
+// const AsyncPDFDownload = ({ data, allocationMonthly, allocationDaily, isAgentFiltered }: any) => {
+//   const [isClient, setIsClient] = useState(false);
+
+//   useEffect(() => {
+//     setIsClient(true);
+//   }, []);
+
+//   if (!isClient) return <PDFLoadingComponent />;
+
+//   return (
+//     <PDFDownloadLink
+//       className="text-center"
+//       document={
+//         <RekapPenyaluran
+//           data={data}
+//           data2={allocationMonthly}
+//           data3={allocationDaily}
+//           isAgentFiltered={isAgentFiltered}
+//         />
+//       }
+//       fileName={`Rekap Penyaluran Elpiji.pdf`}
+//     >
+//       {({ loading }) =>
+//         loading ? (
+//           <PDFLoadingComponent />
+//         ) : (
+//           <Button variant="default" className="w-full sm:w-auto flex items-center justify-center">
+//             <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+//             <span className="truncate">Cetak Rekap</span>
+//           </Button>
+//         )
+//       }
+//     </PDFDownloadLink>
+//   );
+// };
+const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
   columns,
   data,
   user,
@@ -58,26 +105,32 @@ const PenyaluranElpiji = <
   const [allocationDaily, setAllocationDaily] = useState<any[]>([]);
   const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
 
-  const notransOptions = Array.from(
-    new Set(data.map((item) => item.bpeNumber))
-  ).map((bpeNumber) => ({
-    label: bpeNumber,
-    value: bpeNumber,
-  }));
-
-  const agentNameOptions = Array.from(
-    new Set(data.map((item) => item.agentName))
-  ).map((agentName) => ({
-    label: agentName,
-    value: agentName,
-  }));
-
-  const doNumberOptions = Array.from(
-    new Set(data.map((item) => item.deliveryNumber))
-  ).map((deliveryNumber) => ({
-    label: deliveryNumber,
-    value: deliveryNumber,
-  }));
+  const notransOptions = useMemo(() => {
+    return Array.from(new Set(data.map((item) => item.bpeNumber))).map(
+      (bpeNumber) => ({
+        label: bpeNumber,
+        value: bpeNumber,
+      })
+    );
+  }, [data]);
+  
+  const agentNameOptions = useMemo(() => {
+    return Array.from(new Set(data.map((item) => item.agentName))).map(
+      (agentName) => ({
+        label: agentName,
+        value: agentName,
+      })
+    );
+  }, [data]);
+  
+  const doNumberOptions = useMemo(() => {
+    return Array.from(new Set(data.map((item) => item.deliveryNumber))).map(
+      (deliveryNumber) => ({
+        label: deliveryNumber,
+        value: deliveryNumber,
+      })
+    );
+  }, [data]);
 
   useEffect(() => {
     const filtered = data.filter((item) => {
@@ -120,18 +173,18 @@ const PenyaluranElpiji = <
     setAllocationMonthly(monthlyData);
   };
 
-  const getAllocattion = async () =>{
-    const { data }  = await getSummary();
+  const getAllocattion = async () => {
+    const { data } = await getSummary();
     const dailyData = data.map((item: any) => ({
       giDate: item.plannedGiDate,
       qty: item.allocatedQty,
     }));
-    setAllocationDaily(dailyData)
-  }
+    setAllocationDaily(dailyData);
+  };
 
   useEffect(() => {
     getMonthly();
-    getAllocattion()
+    getAllocattion();
     setFiltered(true);
     setDateFilter(today);
   }, []);
@@ -144,7 +197,7 @@ const PenyaluranElpiji = <
     setFilteredData(data);
     setFiltered(false);
   };
-
+  console.log("test")
   return (
     <div className="w-full">
       <div className=" items-center py-4 mx-4">
@@ -155,8 +208,14 @@ const PenyaluranElpiji = <
                 <CalendarCheck className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL TABUNG</h1>
-                <p className="text-3xl font-extrabold">{formatNumberQty(calculateTotalQty(filteredData, 'distributionQty'))}</p>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL TABUNG
+                </h1>
+                <p className="text-3xl font-extrabold">
+                  {formatNumberQty(
+                    calculateTotalQty(filteredData, "distributionQty")
+                  )}
+                </p>
               </div>
             </div>
           </Card>
@@ -166,8 +225,15 @@ const PenyaluranElpiji = <
                 <Weight className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL BERAT TABUNG</h1>
-                <p className="text-3xl font-extrabold">{formatNumberQty(calculateTotalQty(filteredData, 'distributionQty') * 3)} <span className="text-xl text-gray-600"> Kg</span></p>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL BERAT TABUNG
+                </h1>
+                <p className="text-3xl font-extrabold">
+                  {formatNumberQty(
+                    calculateTotalQty(filteredData, "distributionQty") * 3
+                  )}{" "}
+                  <span className="text-xl text-gray-600"> Kg</span>
+                </p>
               </div>
             </div>
           </Card>
@@ -177,8 +243,12 @@ const PenyaluranElpiji = <
                 <Handshake className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL AGEN</h1>
-                <p className="text-3xl font-extrabold">{calculateTotalAgen(filteredData)}</p>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL AGEN
+                </h1>
+                <p className="text-3xl font-extrabold">
+                  {calculateTotalAgen(filteredData)}
+                </p>
               </div>
             </div>
           </Card>
@@ -188,7 +258,9 @@ const PenyaluranElpiji = <
                 <Database className="h-10 w-10 text-white" />
               </div>
               <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL DISTRIBUSI LPG</h1>
+                <h1 className="text-sm font-semibold text-gray-400 mb-1">
+                  TOTAL DISTRIBUSI LPG
+                </h1>
                 <p className="text-3xl font-extrabold">{filteredData.length}</p>
               </div>
             </div>
@@ -252,41 +324,52 @@ const PenyaluranElpiji = <
 
           <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2">
             {user.role === "ADMIN" && (
-              <div className="flex space-x-2">
-                <Button variant="default" asChild>
+              <div className="flex flex-col sm:flex-row sm:space-x-2 w-full sm:w-auto space-y-2 sm:space-y-0">
+                <Button
+                  variant="default"
+                  className="w-full sm:w-auto flex items-center justify-center"
+                  asChild
+                >
                   <Link href="penyaluran-elpiji/form">
                     <Plus className="h-4 w-4 mr-2 cursor-pointer" />
-                    New Penyaluran Elpiji
+                    <span className="truncate">New Penyaluran Elpiji</span>
                   </Link>
                 </Button>
-                <Button variant="default" asChild>
+
+                {/* <Button
+                  variant="default"
+                  className="w-full sm:w-auto flex items-center justify-center"
+                  asChild
+                >
                   <PDFDownloadLink
                     className="text-center"
                     document={
                       <RekapPenyaluran
-                        data={filteredData != null ? filteredData : data}
+                        data={filteredData}
                         data2={allocationMonthly}
                         data3={allocationDaily}
                         isAgentFiltered={isAgentFiltered}
                       />
                     }
-                    fileName={`Penyaluran Elpiji.pdf`}
+                    fileName={`Rekap Penyaluran Elpiji.pdf`}
                   >
                     <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-                    <span>Cetak Rekap</span>
+                    <span className="truncate">Cetak Rekap</span>
                   </PDFDownloadLink>
-                </Button>
+                </Button> */}
               </div>
             )}
 
-            <div className="flex sm:flex-none sm:w-auto w-full">
-                <Button
-                  variant="default"
-                  className="w-full sm:w-auto"
-                  onClick={handleClearSearch}
-                >
-                  <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan Pencarian
-                </Button>
+            {/* Bersihkan Pencarian Button */}
+            <div className="w-full sm:w-auto">
+              <Button
+                variant="default"
+                className="w-full sm:w-auto flex items-center justify-center"
+                onClick={handleClearSearch}
+              >
+                <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
+                <span className="truncate">Bersihkan Pencarian</span>
+              </Button>
             </div>
           </div>
         </Card>

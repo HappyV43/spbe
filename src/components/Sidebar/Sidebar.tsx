@@ -26,21 +26,23 @@ export default function Sidebar({}) {
 
   useEffect(() => {
     if (pathname === "/dashboard/alokasi-harian") {
-      setSelectedKeys(["2"]);
+      updateSelectedKey("2");
     } else if (pathname === "/dashboard/penyaluran-elpiji") {
-      setSelectedKeys(["3"]);
+      updateSelectedKey("3");
     } else if (pathname === "/dashboard/alokasi-bulanan") {
-      setSelectedKeys(["4"]);
+      updateSelectedKey("4");
     } else if (pathname === "/dashboard/cetak-penyaluran") {
-      setSelectedKeys(["5"]);
+      updateSelectedKey("5");
     } else if (pathname === "/master-data/agents") {
-      setSelectedKeys(["6"]);
+      updateSelectedKey("6");
     } else if (pathname === "/master-data/companies") {
-      setSelectedKeys(["7"]);
+      updateSelectedKey("7");
     } else if (pathname === "/register") {
       updateSelectedKey("8");
     } else if (pathname === "/summary") {
       updateSelectedKey("9");
+    // } else if (pathname === "/dashboard/Rekap") {
+    //   updateSelectedKey("10");
     }
     // TODO
     // if (userRole === "admin" && pathname === "/register") {

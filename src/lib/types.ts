@@ -114,3 +114,14 @@ export interface RawDataMapMonthly {
   updatedAt?: Date;
   createdAt?: Date;
 }
+
+export interface FormSubmit {
+  data?: LpgDistributionSearch[];
+  companyName?: { id: number; companyName: string }[];
+  bpe?: string;
+  user: {
+    id: string;
+    username: string;
+    role: string;
+  };
+}

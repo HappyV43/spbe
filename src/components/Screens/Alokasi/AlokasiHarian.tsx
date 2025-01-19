@@ -28,6 +28,7 @@ import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Allocation } from "@/lib/types";
 
+
 interface AlokasiProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -47,33 +48,30 @@ const AlokasiHarian = <
   data,
   user,
 }: AlokasiProps<TData, TValue>) => {
-  const [status, setStatus] = useState("");
+  const optionStatus = ["Pending", "Approved"];
+  const [status, setStatus] = useState("Pending");
   const [agentName, setAgentName] = useState("");
   const [doNumber, setDoNumber] = useState("");
   const [dateFilter, setDateFilter] = useState<any>("today");
   const [filteredData, setFilteredData] = useState<TData[]>(data);
   const [filtered, setFiltered] = useState<Boolean>(false);
-
-  const statusOptions = Array.from(
-    new Set(data.map((item) => item.status))
-  ).map((status) => ({
-    label: status,
-    value: status,
+  
+  const statusOptions = optionStatus.map((item) => ({
+    label: item,
+    value: item,
   }));
 
-  const agentNameOptions = Array.from(
-    new Set(data.map((item) => item.agentName))
-  ).map((agentName) => ({
-    label: agentName,
-    value: agentName,
-  }));
+  const agentNameOptions = Array.from(new Set(data.map((item) => item.agentName)))
+    .map((agentName) => ({
+      label: agentName,
+      value: agentName,
+    }));
 
-  const doNumberOptions = Array.from(
-    new Set(data.map((item) => item.deliveryNumber))
-  ).map((deliveryNumber) => ({
-    label: deliveryNumber,
-    value: deliveryNumber,
-  }));
+  const doNumberOptions = Array.from(new Set(data.map((item) => item.deliveryNumber)))
+    .map((deliveryNumber) => ({
+      label: deliveryNumber,
+      value: deliveryNumber,
+    }));
 
   useEffect(() => {
     const filtered = data.filter((item) => {
@@ -245,19 +243,30 @@ const AlokasiHarian = <
             </div>
           </div>
 
-          <div className="flex justify-between items-center mb-3 space-x-2">
+          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2">
             {user.role === "ADMIN" && (
-              <Button variant="default" asChild>
-                <Link href="alokasi-harian/upload">
-                  <Upload className="h-4 w-4 mr-2 cursor-pointer" />
-                  Upload Alokasi
-                </Link>
-              </Button>
+              <div className="w-full sm:w-auto">
+                <Button
+                  variant="default"
+                  className="w-full sm:w-auto flex items-center justify-center"
+                  asChild
+                >
+                  <Link href="alokasi-harian/upload">
+                    <Upload className="h-4 w-4 mr-2 cursor-pointer" />
+                    <span className="truncate">Upload Alokasi</span>
+                  </Link>
+                </Button>
+              </div>
             )}
-            <div className="flex space-x-2">
-              <Button variant="default" onClick={handleClearSearch}>
-                <SearchX className="h-4 w-4 mr-2 cursor-pointer" /> Bersihkan
-                Pencarian
+
+            <div className="w-full sm:w-auto">
+              <Button
+                variant="default"
+                className="w-full sm:w-auto flex items-center justify-center"
+                onClick={handleClearSearch}
+              >
+                <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
+                <span className="truncate">Bersihkan Pencarian</span>
               </Button>
             </div>
           </div>
