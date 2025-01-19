@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card";
 import { ChartConfig } from "@/components/ui/chart";
 import { endOfWeek, format, startOfWeek } from "date-fns";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   calcSummary,
   calculateDiff,
@@ -48,6 +48,8 @@ interface DataConfig {
 }
 
 const Summary = ({ data, monthly }: SummaryProps) => {
+  const chartRef = useRef(null);
+
   // Summary Chart
   const [monthlyAllocation, setMonthlyAllocation] = useState<DataConfig[]>([]);
   const [dailyAllocation, setDailyAllocation] = useState<DataConfig[]>([]);

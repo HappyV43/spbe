@@ -1,6 +1,6 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import { ContentLayout } from "@/components/ContentLayout";
-import Form from "@/components/Screens/FormComponent/Form";
+import CompanyForm from "@/components/Screens/FormComponent/CompanyForm";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -18,7 +18,7 @@ const FormCompanyPage = async () => {
       home={"master-data"}
       mainpage={"companies"}
       childpage={"form"}
-      children={<Form page={"companies"} user={user} />}
+      children={<CompanyForm user={user} />}
     />
   );
 };

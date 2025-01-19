@@ -4,7 +4,7 @@ import {
   searchDeliveryNumber,
 } from "@/app/actions/lpg-distribution.action";
 import { ContentLayout } from "@/components/ContentLayout";
-import Form from "@/components/Screens/FormComponent/Form";
+import DistributionForm from "@/components/Screens/FormComponent/DistributionForm";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -33,7 +33,7 @@ const FormLpgPage = async ({
       mainpage={"penyaluran-elpiji"}
       childpage={"form"}
       children={
-        <Form page={"distribution"} data={data} bpe={bpe} user={user} />
+        <DistributionForm data={data} bpe={bpe} user={user} />
       }
     />
   );

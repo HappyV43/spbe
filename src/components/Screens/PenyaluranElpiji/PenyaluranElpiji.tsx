@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   CalendarCheck,
   Database,
   Handshake,
+  Loader2,
   Plus,
   Printer,
   SearchX,
@@ -27,12 +28,13 @@ import ComboBox from "@/components/FeatureComponents/ComboBox";
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
 import { Card } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
 import type { User } from "@prisma/client";
 import { id } from "date-fns/locale";
 import { LpgDistributions } from "@/lib/types";
+import DownloadRekap from "./DownloadRekap";
+import { PDFDownloadLink } from "@react-pdf/renderer";
 
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -46,6 +48,48 @@ const today = {
   to: new Date(),
 };
 
+// const PDFLoadingComponent = () => (
+//   <Button variant="default" className="w-full sm:w-auto flex items-center justify-center" disabled>
+//     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+//     <span>Loading PDF...</span>
+//   </Button>
+// );
+
+// const AsyncPDFDownload = ({ data, allocationMonthly, allocationDaily, isAgentFiltered }: any) => {
+//   const [isClient, setIsClient] = useState(false);
+
+//   useEffect(() => {
+//     setIsClient(true);
+//   }, []);
+
+//   if (!isClient) return <PDFLoadingComponent />;
+
+//   return (
+//     <PDFDownloadLink
+//       className="text-center"
+//       document={
+//         <RekapPenyaluran
+//           data={data}
+//           data2={allocationMonthly}
+//           data3={allocationDaily}
+//           isAgentFiltered={isAgentFiltered}
+//         />
+//       }
+//       fileName={`Rekap Penyaluran Elpiji.pdf`}
+//     >
+//       {({ loading }) =>
+//         loading ? (
+//           <PDFLoadingComponent />
+//         ) : (
+//           <Button variant="default" className="w-full sm:w-auto flex items-center justify-center">
+//             <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+//             <span className="truncate">Cetak Rekap</span>
+//           </Button>
+//         )
+//       }
+//     </PDFDownloadLink>
+//   );
+// };
 const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
   columns,
   data,
@@ -61,26 +105,32 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
   const [allocationDaily, setAllocationDaily] = useState<any[]>([]);
   const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
 
-  const notransOptions = Array.from(
-    new Set(data.map((item) => item.bpeNumber))
-  ).map((bpeNumber) => ({
-    label: bpeNumber,
-    value: bpeNumber,
-  }));
-
-  const agentNameOptions = Array.from(
-    new Set(data.map((item) => item.agentName))
-  ).map((agentName) => ({
-    label: agentName,
-    value: agentName,
-  }));
-
-  const doNumberOptions = Array.from(
-    new Set(data.map((item) => item.deliveryNumber))
-  ).map((deliveryNumber) => ({
-    label: deliveryNumber,
-    value: deliveryNumber,
-  }));
+  const notransOptions = useMemo(() => {
+    return Array.from(new Set(data.map((item) => item.bpeNumber))).map(
+      (bpeNumber) => ({
+        label: bpeNumber,
+        value: bpeNumber,
+      })
+    );
+  }, [data]);
+  
+  const agentNameOptions = useMemo(() => {
+    return Array.from(new Set(data.map((item) => item.agentName))).map(
+      (agentName) => ({
+        label: agentName,
+        value: agentName,
+      })
+    );
+  }, [data]);
+  
+  const doNumberOptions = useMemo(() => {
+    return Array.from(new Set(data.map((item) => item.deliveryNumber))).map(
+      (deliveryNumber) => ({
+        label: deliveryNumber,
+        value: deliveryNumber,
+      })
+    );
+  }, [data]);
 
   useEffect(() => {
     const filtered = data.filter((item) => {
@@ -147,7 +197,7 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
     setFilteredData(data);
     setFiltered(false);
   };
-
+  console.log("test")
   return (
     <div className="w-full">
       <div className=" items-center py-4 mx-4">
@@ -286,7 +336,7 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
                   </Link>
                 </Button>
 
-                <Button
+                {/* <Button
                   variant="default"
                   className="w-full sm:w-auto flex items-center justify-center"
                   asChild
@@ -295,7 +345,7 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
                     className="text-center"
                     document={
                       <RekapPenyaluran
-                        data={filteredData != null ? filteredData : data}
+                        data={filteredData}
                         data2={allocationMonthly}
                         data3={allocationDaily}
                         isAgentFiltered={isAgentFiltered}
@@ -306,7 +356,7 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
                     <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
                     <span className="truncate">Cetak Rekap</span>
                   </PDFDownloadLink>
-                </Button>
+                </Button> */}
               </div>
             )}
 
