@@ -18,6 +18,7 @@ interface DatePickerProps extends React.HTMLAttributes<HTMLDivElement> {
   onDateChange?: (date: Date | null | string ) => void;
   placeholder?: string;
   value?: Date | null;
+  className?: string;
 }
 
 export function DatePick({
@@ -26,6 +27,7 @@ export function DatePick({
   onDateChange,
   value,
 }: DatePickerProps) {
+  const [open, setOpen] = useState(false); 
   const [date, setDate] = useState<any>(value ?? null);
 
   useEffect(() => {
@@ -42,13 +44,16 @@ const handleDateChange = (newDate: any) => {
 };
 
   return (
-      <Popover>
+      <Popover 
+        modal={open}
+        onOpenChange={(isOpen) => {
+          setOpen(isOpen);
+        }}
+      >
         <PopoverTrigger asChild>
           <Button
             variant={"outline"}
-            className={cn(
-              "w-full sm:w-[300] justify-start text-left font-normal"
-            )}
+            className={cn("justify-start text-left font-normal", className)}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? (
@@ -58,13 +63,17 @@ const handleDateChange = (newDate: any) => {
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="absolute z-50 mt-2 w-auto p-0" align="start">
           <Calendar
             mode="single"
             selected={date}
             onSelect={handleDateChange}
             defaultMonth={date || undefined}
+            disabled={(date) =>
+              date > new Date() || date < new Date("2000-01-01")
+            }
             initialFocus
+            locale={id}
           />
         </PopoverContent>
       </Popover>

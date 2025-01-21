@@ -257,7 +257,7 @@ const DistributionForm = ({ data, bpe, user }: FormSubmit) => {
                     {loading ? (
                         <Button type="submit" className="px-9" disabled>
                             <Loader2 className="animate-spin" />
-                            Please wait
+                            Loading...
                         </Button>
                         ) : (
                         <Button type="submit" className="px-9">

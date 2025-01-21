@@ -197,7 +197,6 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
     setFilteredData(data);
     setFiltered(false);
   };
-  console.log("test")
   return (
     <div className="w-full">
       <div className=" items-center py-4 mx-4">
