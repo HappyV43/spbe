@@ -3,6 +3,8 @@ import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, LabelList, Line 
 import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { generateColor } from "@/utils/page";
@@ -161,6 +163,7 @@ export function ChartComponent<TData extends DataItem>({
               }}
             />
             {/* <LabelList dataKey="dailyQty" position="top" /> */}
+            <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
       </div>

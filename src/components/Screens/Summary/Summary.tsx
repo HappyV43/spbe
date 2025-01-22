@@ -23,10 +23,13 @@ import {
   normalizeDateTo,
 } from "@/utils/page";
 import { id } from "date-fns/locale";
-import { CalendarCheck, CalendarDays, CalendarX2, Clock4, PackagePlus, ScrollText, SearchX } from "lucide-react";
+import { CalendarCheck, CalendarDays, CalendarX2, Clock4, Download, PackagePlus, ScrollText, SearchX } from "lucide-react";
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
 import { Button } from "@/components/ui/button";
 import SummaryItems from "@/components/FeatureComponents/SummaryItems";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+
 
 interface AllocationData {
   plannedGiDate: Date | null;
@@ -138,6 +141,86 @@ const Summary = ({ data, monthly }: SummaryProps) => {
     setDateFilter(null);
   };
 
+  // const downloadPDF = async () => {
+  //   try {
+  //     const doc = new jsPDF("portrait", "mm", "a4");
+  //     const pageHeight = doc.internal.pageSize.height; // Tinggi halaman A4 dalam mm
+  //     const margin = 10; // Margin halaman
+  //     let currentHeight = margin; // Posisi vertikal awal
+  
+  //     // Ambil elemen pertama (Chart Minggu Ini)
+  //     const firstChart = document.querySelector("#chart-weekly");
+  //     if (firstChart) {
+  //       const canvas = await html2canvas(firstChart as HTMLElement);
+  //       const imgData = canvas.toDataURL("image/png");
+  //       const imgHeight = (canvas.height * 210) / canvas.width; // Sesuaikan lebar ke 210mm (A4 width)
+  
+  //       // Tambahkan ke PDF
+  //       if (currentHeight + imgHeight > pageHeight - margin) {
+  //         doc.addPage(); // Tambahkan halaman baru jika konten melampaui batas
+  //         currentHeight = margin;
+  //       }
+  //       doc.addImage(imgData, "PNG", margin, currentHeight, 190, imgHeight);
+  //       currentHeight += imgHeight + 10; // Tambahkan margin antar elemen
+  //     }
+  
+  //     // Ambil elemen kedua (Chart Tahun Ini)
+  //     const secondChart = document.querySelector("#chart-annual");
+  //     if (secondChart) {
+  //       const canvas = await html2canvas(secondChart as HTMLElement);
+  //       const imgData = canvas.toDataURL("image/png");
+  //       const imgHeight = (canvas.height * 210) / canvas.width;
+  
+  //       // Tambahkan ke PDF
+  //       if (currentHeight + imgHeight > pageHeight - margin) {
+  //         doc.addPage();
+  //         currentHeight = margin;
+  //       }
+  //       doc.addImage(imgData, "PNG", margin, currentHeight, 190, imgHeight);
+  //     }
+  
+  //     // Simpan PDF
+  //     doc.save("summary-charts.pdf");
+  //   } catch (error) {
+  //     console.error("Terjadi kesalahan saat mengunduh PDF:", error);
+  //   }
+  // };  
+
+  const weeklyChartRef = useRef(null);
+  const yearlyChartRef = useRef(null);
+  
+  const downloadWeeklyChart = async () => {
+    try {
+      const chart = weeklyChartRef.current;
+      if (chart) {
+        const canvas = await html2canvas(chart);
+        const imgData = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = "weekly_chart.png";
+        link.click();
+      }
+    } catch (error) {
+      console.error("Terjadi kesalahan saat mengunduh chart mingguan:", error);
+    }
+  };
+  
+  const downloadYearlyChart = async () => {
+    try {
+      const chart = yearlyChartRef.current;
+      if (chart) {
+        const canvas = await html2canvas(chart);
+        const imgData = canvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = "yearly_chart.png";
+        link.click();
+      }
+    } catch (error) {
+      console.error("Terjadi kesalahan saat mengunduh chart tahunan:", error);
+    }
+  };
+  
   const chartConfig = {
     monthlyQty: {
       label: "Bulanan",
@@ -187,6 +270,14 @@ const Summary = ({ data, monthly }: SummaryProps) => {
               <SearchX className="h-5 w-5 mr-2 cursor-pointer" />
               <span className="truncate">Bersihkan Pencarian</span>
             </Button>
+
+            {/* <Button 
+              onClick={downloadPDF} 
+              className="w-full sm:w-auto flex items-center justify-center"
+            >
+              <Download className="h-5 w-5 mr-2 cursor-pointer" />
+              <span className="truncate">Download Summary in PDF</span>
+            </Button> */}
           </div>
       </div>
 
@@ -315,30 +406,51 @@ const Summary = ({ data, monthly }: SummaryProps) => {
 
       <div className="mb-16"></div>
         <div className="my-5">
-          <div className="pl-2 mt-5">
-            <h1 className="text-2xl font-semibold mb-4 mx-3">Chart Jumlah Tabung</h1>
+        <div className="pl-2 mt-5">
+        <div className="flex items-center justify-between mx-1 mb-4">
+          <h1 className="text-2xl font-semibold">Chart Jumlah Tabung</h1>
+          <div className="flex space-x-2">
+            <Button 
+              onClick={downloadWeeklyChart} 
+              className="w-auto flex items-center justify-center"
+            >
+              <Download className="h-5 w-5 mr-2 cursor-pointer" />
+              <span className="truncate">Mingguan</span>
+            </Button>
+            <Button 
+              onClick={downloadYearlyChart} 
+              className="w-auto flex items-center justify-center"
+            >
+              <Download className="h-5 w-5 mr-2 cursor-pointer" />
+              <span className="truncate">Tahunan</span>
+            </Button>
           </div>
-          <Card className="flex flex-col w-full h-[520px] pb-3 shadow-lg rounded-2xl bg-white ">
-            <CardHeader className="pb-0">
-              <CardTitle>Minggu ini</CardTitle>
-              <CardDescription>
-                {format(startOfWeek(new Date(), { weekStartsOn: 0 }), "dd MMMM yyyy", { locale: id })} - 
-                {format(endOfWeek(new Date(), { weekStartsOn: 0 }), "dd MMMM yyyy", { locale: id })}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex-1 pb-0 pl-2">
-              <ChartComponent
-                data={getWeeklyTotalQty(dailyAllocation)}
-                data2={getWeeklyTotalQty(monthlyAllocation)}
-                data3={getWeeklyTotalQty(dailyDistribution)}
-                config={chartConfig}
-                title="Tabung Elpiji"
-                timeFrame="weekly"
-              />
-            </CardContent>
-          </Card>
+        </div>
+      </div>
+          <div ref={weeklyChartRef} id="chart-weekly">
+            <Card className="flex flex-col w-full h-[550px] pb-3 shadow-lg rounded-2xl bg-white ">
+              <CardHeader className="pb-0">
+                <CardTitle>Minggu ini</CardTitle>
+                <CardDescription>
+                  {format(startOfWeek(new Date(), { weekStartsOn: 0 }), "dd MMMM yyyy", { locale: id })} - 
+                  {format(endOfWeek(new Date(), { weekStartsOn: 0 }), "dd MMMM yyyy", { locale: id })}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1 pb-0 pl-2">
+                <ChartComponent
+                  data={getWeeklyTotalQty(dailyAllocation)}
+                  data2={getWeeklyTotalQty(monthlyAllocation)}
+                  data3={getWeeklyTotalQty(dailyDistribution)}
+                  config={chartConfig}
+                  title="Tabung Elpiji"
+                  timeFrame="weekly"
+                />
+              </CardContent>
+            </Card>
+          </div>
           <div className="mb-6"></div>
-          <Card className="flex flex-col w-full h-[520px] pb-3 shadow-lg rounded-2xl bg-white ">
+          <div ref={yearlyChartRef} id="chart-annual">
+          <Card className="flex flex-col w-full h-[550px] pb-3 shadow-lg rounded-2xl bg-white ">
             <CardHeader className="pb-0">
               <CardTitle>Tahun ini</CardTitle>
               <CardDescription>
@@ -356,6 +468,7 @@ const Summary = ({ data, monthly }: SummaryProps) => {
               />
             </CardContent>
           </Card>
+          </div>
       </div>
     </div>
   );
