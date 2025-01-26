@@ -174,10 +174,6 @@ export function ChartComponent<TData extends DataItem>({
               }}
             />
             <ChartLegend content={<ChartLegendContent />} />
-            {/* <Bar dataKey="Harian" fill={generateColor(0)} radius={4} />
-            <Bar dataKey="Bulanan" fill={generateColor(10)} radius={4} />
-            <Bar dataKey="Penyaluran LPG" fill={generateColor(20)} radius={4} /> */}
-            {/* <LabelList dataKey="dailyQty" position="top" /> */}
           </AreaChart>
         </ChartContainer>
       </div>
