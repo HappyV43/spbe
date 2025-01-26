@@ -32,14 +32,14 @@ import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
 import type { User } from "@prisma/client";
 import { id } from "date-fns/locale";
-import { LpgDistributions } from "@/lib/types";
+import { AllocationData, LpgDistributions, MonthlyAllocation, SummaryProps } from "@/lib/types";
 import DownloadRekap from "./DownloadRekap";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+import InfoCard from "@/components/InfoCard";
+import { getAllLpg } from "@/app/actions/lpg-distribution.action";
 
 interface DistributionProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  data2?: TData[];
   user: User;
 }
 
@@ -48,92 +48,57 @@ const today = {
   to: new Date(),
 };
 
-// const PDFLoadingComponent = () => (
-//   <Button variant="default" className="w-full sm:w-auto flex items-center justify-center" disabled>
-//     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-//     <span>Loading PDF...</span>
-//   </Button>
-// );
-
-// const AsyncPDFDownload = ({ data, allocationMonthly, allocationDaily, isAgentFiltered }: any) => {
-//   const [isClient, setIsClient] = useState(false);
-
-//   useEffect(() => {
-//     setIsClient(true);
-//   }, []);
-
-//   if (!isClient) return <PDFLoadingComponent />;
-
-//   return (
-//     <PDFDownloadLink
-//       className="text-center"
-//       document={
-//         <RekapPenyaluran
-//           data={data}
-//           data2={allocationMonthly}
-//           data3={allocationDaily}
-//           isAgentFiltered={isAgentFiltered}
-//         />
-//       }
-//       fileName={`Rekap Penyaluran Elpiji.pdf`}
-//     >
-//       {({ loading }) =>
-//         loading ? (
-//           <PDFLoadingComponent />
-//         ) : (
-//           <Button variant="default" className="w-full sm:w-auto flex items-center justify-center">
-//             <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-//             <span className="truncate">Cetak Rekap</span>
-//           </Button>
-//         )
-//       }
-//     </PDFDownloadLink>
-//   );
-// };
+var isFiltered = false;
 const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
   columns,
-  data,
   user,
 }: DistributionProps<TData, TValue>) => {
+  const [rawData, setRawData] = useState<TData[]>([]);
   const [notrans, setnotrans] = useState("");
-  const [isAgentFiltered, setIsAgentFiltered] = useState(false);
+
+  // BUAT REKAP
+  // const [isAgentFiltered, setIsAgentFiltered] = useState(false);
+
   const [agentName, setAgentName] = useState("");
   const [doNumber, setDoNumber] = useState("");
-  const [dateFilter, setDateFilter] = useState<any>("today");
-  const [filteredData, setFilteredData] = useState<TData[]>(data);
-  const [filtered, setFiltered] = useState<Boolean>(false);
-  const [allocationDaily, setAllocationDaily] = useState<any[]>([]);
-  const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
+  const [dateFilter, setDateFilter] = useState<{ from: Date | null; to: Date | null } | null>({from: new Date() , to: null});
 
-  const notransOptions = useMemo(() => {
-    return Array.from(new Set(data.map((item) => item.bpeNumber))).map(
+  const [filteredData, setFilteredData] = useState<TData[]>([]);
+  const [filtered, setFiltered] = useState<Boolean>(false);
+  
+  // BUAT REKAP
+  // const [allocationDaily, setAllocationDaily] = useState<{giDate: Date | null, qty: number | undefined}[]>([]);
+  // const [allocationMonthly, setAllocationMonthly] = useState<{giDate: Date | null, allocatedQty: number | undefined[]}[]>([]);
+
+  const generateOptions = () => {
+    const notransOptions = Array.from(new Set(rawData.map((item) => item.bpeNumber))).map(
       (bpeNumber) => ({
         label: bpeNumber,
         value: bpeNumber,
       })
     );
-  }, [data]);
-  
-  const agentNameOptions = useMemo(() => {
-    return Array.from(new Set(data.map((item) => item.agentName))).map(
+    
+    const agentNameOptions = Array.from(new Set(rawData.map((item) => item.agentName))).map(
       (agentName) => ({
         label: agentName,
         value: agentName,
       })
     );
-  }, [data]);
-  
-  const doNumberOptions = useMemo(() => {
-    return Array.from(new Set(data.map((item) => item.deliveryNumber))).map(
+    
+    const doNumberOptions = Array.from(new Set(rawData.map((item) => item.deliveryNumber))).map(
       (deliveryNumber) => ({
         label: deliveryNumber,
         value: deliveryNumber,
       })
     );
-  }, [data]);
 
-  useEffect(() => {
-    const filtered = data.filter((item) => {
+    return { notransOptions, agentNameOptions, doNumberOptions };
+  }
+    
+  const { notransOptions, agentNameOptions, doNumberOptions } = generateOptions();
+
+  const applyFilter = () => {
+    const filtered = rawData.filter((item) => {
       const matchesNoTrans = notrans ? item.bpeNumber === notrans : true;
       const matchesAgentName = agentName ? item.agentName === agentName : true;
       const matchesDoNumber = doNumber
@@ -148,7 +113,7 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
           : // For Single Dates
             item.giDate >= normalizeDateFrom(dateFilter.from) &&
             item.giDate <= normalizeDateTo(dateFilter.from)
-        : dateFilter === "today"
+        : (dateFilter?.from == new Date() && dateFilter?.to == null || dateFilter?.to == new Date())
         ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
         : true;
 
@@ -157,113 +122,101 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
       );
     });
 
+    // console.log(filtered)
     setFilteredData(filtered);
-  }, [notrans, agentName, doNumber, dateFilter, data]);
+    isFiltered = (notrans !== "" || 
+      agentName !== "" || 
+      doNumber !== "" || 
+      (dateFilter?.to === new Date() || dateFilter !==null))
+    // setFiltered(
+    //   notrans !== "" || 
+    //   agentName !== "" || 
+    //   doNumber !== "" || 
+    //   (dateFilter === today || dateFilter !==null)
+    // );
+
+    console.log(filtered)
+    console.log("matchesAgentName:", " >" ,agentName ,agentName === "");
+    console.log("matchesDoNumber:",  " >" ,doNumber ,doNumber === "");
+    console.log("matchesDate:",  " >" ,dateFilter, dateFilter !==null);
+    console.log("matchesDate From:", dateFilter?.from );
+    console.log("matchesDate To:", dateFilter?.to );
+  }
 
   useEffect(() => {
-    setIsAgentFiltered(!!agentName);
-  }, [agentName]);
+    applyFilter();
+  }, [notrans, agentName, doNumber, dateFilter, rawData]);
 
-  const getMonthly = async () => {
-    const data = await getMonthlyAllocation();
-    const monthlyData = data.map((item) => ({
-      giDate: item.date,
-      allocatedQty: item.totalElpiji,
-    }));
-    setAllocationMonthly(monthlyData);
-  };
+  // BUAT REKAP
+  // useEffect(() => {
+  //   setIsAgentFiltered(!!agentName);
+  // }, [agentName]);
 
-  const getAllocattion = async () => {
-    const { data } = await getSummary();
-    const dailyData = data.map((item: any) => ({
+  const loadAllData = async () => {
+    // DISTRIBUTION
+    const dataLPG = (await getAllLpg()) as TData[];
+    setRawData(dataLPG);
+
+    // ALLOCATION
+    const {data} = await getSummary();
+    const dailyData = data.map((item: AllocationData) => ({
       giDate: item.plannedGiDate,
       qty: item.allocatedQty,
     }));
-    setAllocationDaily(dailyData);
-  };
+    // setAllocationDaily(dailyData); // BUAT REKAP
 
+    // MONTHLY
+    const dataMontly = (await getMonthlyAllocation()) as MonthlyAllocation[];
+    const monthlyData = dataMontly.map((item) => ({
+      giDate: item.date,
+      allocatedQty: item.totalElpiji,
+    }));
+    // setAllocationMonthly(monthlyData); //BUAT REKAP
+
+    // applyFilter()
+  };
+  
   useEffect(() => {
-    getMonthly();
-    getAllocattion();
+    isFiltered = true
     setFiltered(true);
-    setDateFilter(today);
+    loadAllData();
   }, []);
 
   const handleClearSearch = () => {
     setAgentName("");
     setDoNumber("");
     setnotrans("");
+
     setDateFilter(null);
-    setFilteredData(data);
     setFiltered(false);
+    loadAllData();
   };
+
   return (
-    <div className="w-full">
-      <div className=" items-center py-4 mx-4">
+    <div className="mx-5">
+      <div className="mb-4">
         <div className="pt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <CalendarCheck className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL TABUNG
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {formatNumberQty(
-                    calculateTotalQty(filteredData, "distributionQty")
-                  )}
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Weight className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL BERAT TABUNG
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {formatNumberQty(
-                    calculateTotalQty(filteredData, "distributionQty") * 3
-                  )}{" "}
-                  <span className="text-xl text-gray-600"> Kg</span>
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Handshake className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL AGEN
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {calculateTotalAgen(filteredData)}
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Database className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL DISTRIBUSI LPG
-                </h1>
-                <p className="text-3xl font-extrabold">{filteredData.length}</p>
-              </div>
-            </div>
-          </Card>
+          <InfoCard
+            icon={<CalendarCheck className="h-10 w-10 text-white" />}
+            title="TOTAL TABUNG"
+            value={formatNumberQty(calculateTotalQty(filteredData, "distributionQty"))}
+          />
+          <InfoCard
+            icon={<Weight className="h-10 w-10 text-white" />}
+            title="TOTAL BERAT TABUNG"
+            value={formatNumberQty(calculateTotalQty(filteredData, "distributionQty") * 3)}
+            unit="Kg"
+          />
+          <InfoCard
+            icon={<Handshake className="h-10 w-10 text-white" />}
+            title="TOTAL AGEN"
+            value={calculateTotalAgen(filteredData)}
+          />
+          <InfoCard
+            icon={<Database className="h-10 w-10 text-white" />}
+            title="TOTAL DISTRIBUSI LPG"
+            value={filteredData.length}
+          />
         </div>
         <Card className="px-6 py-6 my-3 shadow-lg rounded-2xl bg-white border border-gray-200">
           <div className="px-4 text-center">
@@ -313,9 +266,10 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
                 value={dateFilter}
                 onDateChange={setDateFilter}
                 placeholder={
-                  filtered
-                    ? `${format(new Date(), "dd MMMM yyyy", { locale: id })}`
-                    : "Semua Tanggal"
+                  dateFilter == null
+                  ? 
+                  "Semua Tanggal"
+                  :`${format(new Date(), "dd MMMM yyyy", { locale: id })}`
                 }
               />
             </div>
@@ -360,16 +314,23 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
             )}
 
             {/* Bersihkan Pencarian Button */}
-            <div className="w-full sm:w-auto">
+            {filtered && 
+              <div className="w-full sm:w-auto">
               <Button
-                variant="default"
+                variant="destructive"
                 className="w-full sm:w-auto flex items-center justify-center"
-                onClick={handleClearSearch}
+                onClick={() => {
+                  setDateFilter(null)
+                  setFiltered(false);
+                  isFiltered = !isFiltered;
+                  handleClearSearch()
+                }}
               >
                 <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
                 <span className="truncate">Bersihkan Pencarian</span>
               </Button>
             </div>
+            }
           </div>
         </Card>
         <DataTable columns={columns} data={filteredData} />

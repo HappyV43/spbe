@@ -14,12 +14,14 @@ const FormCompanyPage = async () => {
     redirect("/auth/login");
   }
   return (
-    <ContentLayout
-      home={"master-data"}
-      mainpage={"companies"}
-      childpage={"form"}
-      children={<CompanyForm user={user} />}
-    />
+    // <ContentLayout
+    //   home={"master-data"}
+    //   mainpage={"companies"}
+    //   childpage={"form"}
+    //   children={
+        <CompanyForm user={user} />
+    //   }
+    // />
   );
 };
 

@@ -199,6 +199,28 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
 
 export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
+    header: "Tindakan",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const bpeNumber = row.original.bpeNumber;
+      const status = row.original.status;
+      const giDate = row.original.giDate;
+
+      return (
+        <Button variant="outline" disabled={status === "Approved" && bpeNumber !== null && giDate !== null}>
+          <Link
+            href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+            className={
+              status === "Approved" && bpeNumber !== null && giDate !== null ? "cursor-not-allowed" : ""
+            }
+          >
+            <SquarePlus className="h-4 w-4" />
+          </Link>
+        </Button>
+      );
+    },
+  },
+  {
     accessorKey: "status",
     header: "Status",
     enableSorting: false,
@@ -293,28 +315,6 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
-    },
-  },
-  {
-    header: "Tindakan",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const bpeNumber = row.original.bpeNumber;
-      const status = row.original.status;
-      const giDate = row.original.giDate;
-
-      return (
-        <Button variant="outline" disabled={status === "Approved" && bpeNumber !== null && giDate !== null}>
-          <Link
-            href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
-            className={
-              status === "Approved" && bpeNumber !== null && giDate !== null ? "cursor-not-allowed" : ""
-            }
-          >
-            <SquarePlus className="h-4 w-4" />
-          </Link>
-        </Button>
-      );
     },
   },
   // {

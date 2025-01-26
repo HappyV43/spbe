@@ -139,17 +139,40 @@ export const onlyRegister = async (values: SignInValues) => {
 
 export const getCurrentSession = cache(
   async (): Promise<SessionValidationResult> => {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("spbe-auth-cookies")?.value ?? null;
-    if (token === null) {
+    try {
+      const cookieStore = cookies();
+      const token = cookieStore.get("spbe-auth-cookies")?.value ?? null;
+
+      if (token === null) {
+        console.log("No token found in cookies");
+        return { session: null, user: null };
+      }
+
+      const result = await validateSessionToken(token);
+
+      if (!result) {
+        console.log("Session token validation failed or returned null");
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Error during getCurrentSession:", error);
       return { session: null, user: null };
     }
-    const result = await validateSessionToken(token);
-    return result;
   }
 );
 
 export const checkUserDb = cache(async () => {
-  const checkUsername = await prisma.user.findMany();
-  return checkUsername as User[];
+  try {
+    const checkUsername = await prisma.user.findMany();
+
+    if (!checkUsername || checkUsername.length === 0) {
+      console.log("No user data found in the database");
+    }
+
+    return checkUsername as User[];
+  } catch (error) {
+    console.error("Error during checkUserDb:", error);
+    return [];
+  }
 });

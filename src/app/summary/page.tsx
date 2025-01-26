@@ -9,16 +9,17 @@ export const metadata = {
 };
 
 const SummaryPage = async () => {
-  const { data, monthlyAllocations } = await getSummary();
   const { session, user } = await getCurrentSession();
   if (!session && !user) {
     redirect("/auth/login");
   }
   return (
-    <ContentLayout
-      home={"summary"}
-      children={<Summary data={data} monthly={monthlyAllocations} />}
-    />
+    // <ContentLayout
+    //   home={"summary"}
+    //   children={
+      <Summary />
+    // }
+    // />
   );
 };
 

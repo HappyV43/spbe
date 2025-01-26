@@ -28,14 +28,14 @@ const FormLpgPage = async ({
   }
 
   return (
-    <ContentLayout
-      home={"dashboard"}
-      mainpage={"penyaluran-elpiji"}
-      childpage={"form"}
-      children={
+    // <ContentLayout
+    //   home={"dashboard"}
+    //   mainpage={"penyaluran-elpiji"}
+    //   childpage={"form"}
+    //   children={
         <DistributionForm data={data} bpe={bpe} user={user} />
-      }
-    />
+    //   }
+    // />
   );
 };
 

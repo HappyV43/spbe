@@ -9,7 +9,7 @@ interface ComboBoxProps {
     data: { label: any; value: any }[];
     value: string;
     setValue: (value: string) => void;
-    placeholder?: string;
+    placeholder?: string | null;
     sortAsc?: boolean; 
 }
 

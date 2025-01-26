@@ -10,23 +10,21 @@ export const metadata = {
 };
 
 const AlokasiBulananPage = async () => {
-  const data = await getMonthlyAllocation();
   const { session, user } = await getCurrentSession();
   if (!session && !user) {
     redirect("/auth/login");
   }
   return (
-    <ContentLayout
-      home={"dashboard"}
-      mainpage={"alokasi-bulanan"}
-      children={
+  //   <ContentLayout
+  //     home={"dashboard"}
+  //     mainpage={"alokasi-bulanan"}
+  //     children={
         <AlokasiBulanan
           columns={monthlyAllocationColumns}
-          data={data}
           user={user}
         />
-      }
-    />
+    //   }
+    // />
   );
 };
 

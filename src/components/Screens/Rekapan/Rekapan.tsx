@@ -39,7 +39,7 @@ const Rekapan = <TData, TValue>({
   };
   return (
     <div className="w-full">
-      <div className=" items-center py-4 mx-4">
+      <div className=" items-center mx-4">
         <Card className="px-6 py-6 my-3 shadow-lg rounded-2xl bg-white border border-gray-200">
           <div className="px-4 text-center">
             <h1 className="text-lg font-semibold py-2 pb-4">
@@ -105,7 +105,7 @@ const Rekapan = <TData, TValue>({
           {/* Bersihkan Pencarian Button */}
           <div className="w-full sm:w-auto flex gap-2">
             <Button
-              variant="default"
+              variant="destructive"
               className="w-full sm:w-auto flex items-center justify-center"
               onClick={handleClearSearch}
             >

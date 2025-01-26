@@ -15,16 +15,16 @@ const RekapPage = async () => {
     redirect("/auth/login");
     }
   return (
-    <ContentLayout
-        home={"dashboard"}
-        mainpage={"rekap-penyaluran"}
-        children={
+    // <ContentLayout
+    //     home={"dashboard"}
+    //     mainpage={"rekap-penyaluran"}
+    //     children={
         <Rekapan
           data={data}
           user={user}
         />
-      }
-    />
+    //   }
+    // />
   );
 };
 

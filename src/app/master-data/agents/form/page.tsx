@@ -16,12 +16,14 @@ const FormAgentsPage = async () => {
     redirect("/auth/login");
   }
   return (
-    <ContentLayout
-      home={"master-data"}
-      mainpage={"agents"}
-      childpage={"form"}
-      children={<AgentForm companyName={companyName} user={user} />}
-    />
+    // <ContentLayout
+    //   home={"master-data"}
+    //   mainpage={"agents"}
+    //   childpage={"form"}
+    //   children={
+        <AgentForm companyName={companyName} user={user} />
+    //   }
+    // />
   );
 };
 
