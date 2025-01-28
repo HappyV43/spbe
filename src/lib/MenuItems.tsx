@@ -1,4 +1,11 @@
-import { ChartArea, Database, House, LucideIcon, Settings, User } from "lucide-react";
+import {
+  ChartArea,
+  Database,
+  House,
+  LucideIcon,
+  Settings,
+  User,
+} from "lucide-react";
 import { cookies } from "next/headers";
 
 type Submenu = {
@@ -30,10 +37,9 @@ export function getMenuList(pathname: string): Group[] {
           label: "Summary",
           active: pathname === "/summary",
           icon: ChartArea,
-        }
-      ]
-    }
-    ,
+        },
+      ],
+    },
     {
       groupLabel: "Dashboard",
       menus: [
@@ -46,7 +52,7 @@ export function getMenuList(pathname: string): Group[] {
             {
               href: "/dashboard/alokasi-harian",
               label: "Alokasi Harian ",
-              active: pathname === "/dashboard/alokasi-harian"
+              active: pathname === "/dashboard/alokasi-harian",
             },
             {
               href: "/dashboard/penyaluran-elpiji",
@@ -61,8 +67,13 @@ export function getMenuList(pathname: string): Group[] {
             {
               href: "/dashboard/rekap-penyaluran",
               label: "Rekap Penyaluran",
-              active: pathname === "/dashboard/rekap-penyaluran"
-            }
+              active: pathname === "/dashboard/rekap-penyaluran",
+            },
+            {
+              href: "/dashboard/download-rekap",
+              label: "Download Rekap",
+              active: pathname === "/dashboard/download-rekap",
+            },
           ],
         },
       ],

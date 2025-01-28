@@ -13,9 +13,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ComboBoxNelsen from "@/components/FeatureComponents/ComboBoxNelsen";
-import { DataTable } from "@/components/FeatureComponents/data-table-backend";
-import { lpgDistributionColumns } from "@/lib/Column";
-import Pagination from "@/components/FeatureComponents/Pagination";
 import {
   Popover,
   PopoverContent,
@@ -24,7 +21,9 @@ import {
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Printer } from "lucide-react";
 
 type valuesFilter = {
   agentName: string;
@@ -36,6 +35,7 @@ type bpeNumberData = {
   agentName: string;
   deliveryNumber: string;
 };
+
 type LpgDistribution = {
   agentName: string;
   deliveryNumber: string;
@@ -49,7 +49,7 @@ type LpgDistribution = {
   updatedAt: Date;
 };
 
-const Rekapan = ({
+const DownloadPage = ({
   dataBpeDeliveryAgent,
   defaultData,
 }: {
@@ -57,14 +57,7 @@ const Rekapan = ({
   defaultData: any[];
 }) => {
   const [loading, setLoading] = useState(false);
-  const [paginationLoading, setPaginationLoading] = useState(false);
-  const [tableData, setTableData] = useState(defaultData);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    pageSize: 15,
-    total: 0,
-    totalPages: 0,
-  });
+  const [data, setData] = useState<any[]>([]);
 
   const form = useForm<valuesFilter>({
     defaultValues: {
@@ -74,11 +67,10 @@ const Rekapan = ({
     },
   });
 
-  async function fetchData(values: valuesFilter, pageNumber: number) {
-    setPaginationLoading(true);
+  async function fetchData(values: valuesFilter) {
     try {
       const { from, to } = values.range || {};
-      const response = await fetch("/api/penyaluran-elpiji", {
+      const response = await fetch("/api/rekap", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -87,39 +79,21 @@ const Rekapan = ({
             from: from ? format(new Date(from), "yyyy-MM-dd") : null,
             to: to ? format(new Date(to), "yyyy-MM-dd") : null,
           },
-          page: pageNumber,
-          pageSize: pagination.pageSize,
         }),
       });
       const result = await response.json();
-
-      if (response.ok) {
-        setTableData(result.data);
-        setPagination((prev) => ({
-          ...prev,
-          page: pageNumber,
-          total: result.pagination.total,
-          totalPages: result.pagination.totalPages,
-        }));
-      } else {
-        setTableData([]);
-      }
+      setData(result.data);
+      console.log(result.data);
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setPaginationLoading(false);
     }
   }
 
   // Fungsi untuk submit dengan loading
   async function onSubmit(values: valuesFilter) {
     setLoading(true);
-    await fetchData(values, 1);
+    await fetchData(values);
     setLoading(false);
-  }
-
-  function handlePageChange(newPage: number) {
-    fetchData(form.getValues(), newPage);
   }
 
   // Reset form and fetch all data
@@ -238,18 +212,54 @@ const Rekapan = ({
             </Form>
           </div>
         </Card>
-        <div>
-          <DataTable columns={lpgDistributionColumns} data={tableData} />
-          <Pagination
-            currentPage={pagination.page}
-            totalPages={pagination.totalPages}
-            onPageChange={handlePageChange}
-            loading={paginationLoading}
-          />
-        </div>
+        {data ? (
+          <div>
+            <div className="mb-4 p-4 border rounded-lg">
+              {data.map((item, index) => (
+                <ul key={index}>
+                  <li>{item.date}</li>
+                  <li>
+                    {item.records.map((record: any, index: string) => (
+                      <ul key={index}>
+                        <li>ID: {record.id}</li>
+                        <li>BPE Number: {record.bpeNumber}</li>
+                        <li>Agent Name: {record.agentName}</li>
+                        <li>GI Date: {record.giDate}</li>
+                        <li>License Plate: {record.licensePlate}</li>
+                        <li>Delivery Number: {record.deliveryNumber}</li>
+                        <li>Allocated Qty: {record.allocatedQty}</li>
+                        <li>Distribution Qty: {record.distributionQty}</li>
+                        <li>Volume: {record.volume}</li>
+                        <li>Driver Name: {record.driverName}</li>
+                        <li>Bocor: {record.bocor === null ? "No" : "Yes"}</li>
+                        <li>
+                          Isi Kurang: {record.isiKurang === null ? "No" : "Yes"}
+                        </li>
+                      </ul>
+                    ))}
+                  </li>
+                  <li>{`Total elpiji: ${item.quantity.totalElpiji}`}</li>
+                  <li>
+                    {`Total allocated qty: ${item.quantity.totalAllocatedQty}`}
+                  </li>
+                  <li>
+                    {`Total distribution qty: ${item.quantity.totalDistributionQty}`}
+                  </li>
+                  <li>{`Total lo: ${item.quantity.totalLo}`}</li>
+                  <li>{`Total pending: ${item.quantity.totalPending}`}</li>
+                  <li>
+                    {`Total fakultatif: ${item.quantity.totalFakultatif}`}
+                  </li>
+                </ul>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p>No data available.</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default Rekapan;
+export default DownloadPage;

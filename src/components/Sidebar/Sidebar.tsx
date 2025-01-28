@@ -43,6 +43,8 @@ export default function Sidebar({}) {
       updateSelectedKey("9");
     } else if (pathname === "/dashboard/Rekap") {
       updateSelectedKey("10");
+    } else if(pathname === "/dashboard/download-rekap"){
+      updateSelectedKey("11");
     }
     // TODO
     // if (userRole === "admin" && pathname === "/register") {
@@ -80,7 +82,13 @@ export default function Sidebar({}) {
                   : "translate-x-0 opacity-100"
               )}
             >
-              <Image src="/icon.svg" width={100} height={100} alt="ini icon" />
+              <Image
+                src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/PKMU-gLrI0PUvUB6Uv0nucYZDYZsLGMpWDW.svg"
+                width={100}
+                height={100}
+                alt="ini icon"
+                priority={true}
+              />
             </h1>
           </Link>
         </Button>
