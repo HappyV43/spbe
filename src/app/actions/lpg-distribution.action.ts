@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getErrorMessage } from "./error.action";
 import { getCurrentSession } from "./auth.actions";
 import { format } from "date-fns";
+import { cache } from "react";
 
 export const searchDeliveryNumber = async (query: string) => {
   try {
@@ -243,4 +244,45 @@ export const getNextNumber = async () => {
     console.error("Error getting next number:", error);
     throw error;
   }
+};
+
+export const getFilterData = cache(async () => {
+  return await prisma.lpgDistributions.findMany({
+    select: {
+      deliveryNumber: true,
+      agentName: true,
+    },
+    distinct: ["agentName"],
+  });
+});
+
+export const getLpgDataDefault = async () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return await prisma.lpgDistributions.findMany({
+    where: {
+      giDate: {
+        gte: today,
+      },
+    },
+    select: {
+      id: true,
+      bpeNumber: true,
+      giDate: true,
+      agentName: true,
+      licensePlate: true,
+      deliveryNumber: true,
+      allocatedQty: true,
+      distributionQty: true,
+      volume: true,
+      administrasi: true,
+      superVisor: true,
+      gateKeeper: true,
+      driverName: true,
+      bocor: true,
+      isiKurang: true,
+      updatedAt: true,
+    },
+  });
 };

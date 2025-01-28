@@ -43,3 +43,21 @@ export const getSummary = async () => {
   });
   return { data, monthlyAllocations };
 };
+
+export async function getMonthlyAllocationQty() {
+  return await prisma.monthlyAllocations.findMany({
+    select: {
+      date: true,
+      totalElpiji: true,
+    },
+  });
+}
+
+export async function getSummaryQty() {
+  return await prisma.allocations.findMany({
+    select: {
+      allocatedQty: true,
+      plannedGiDate: true,
+    },
+  });
+}
