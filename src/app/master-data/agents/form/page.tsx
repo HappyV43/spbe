@@ -1,7 +1,7 @@
 import { getCurrentSession } from "@/app/actions/auth.actions";
 import { getCompaniesNameData } from "@/app/actions/companies.action";
 import { ContentLayout } from "@/components/ContentLayout";
-import Form from "@/components/Screens/FormComponent/Form";
+import AgentForm from "@/components/Screens/FormComponent/AgentForm";
 import { redirect } from "next/navigation";
 import React from "react";
 
@@ -16,12 +16,14 @@ const FormAgentsPage = async () => {
     redirect("/auth/login");
   }
   return (
-    <ContentLayout
-      home={"master-data"}
-      mainpage={"agents"}
-      childpage={"form"}
-      children={<Form page={"agents"} companyName={companyName} user={user} />}
-    />
+    // <ContentLayout
+    //   home={"master-data"}
+    //   mainpage={"agents"}
+    //   childpage={"form"}
+    //   children={
+        <AgentForm companyName={companyName} user={user} />
+    //   }
+    // />
   );
 };
 

@@ -139,7 +139,7 @@ export const postLpgData = async (formData: FormData) => {
   }
 };
 
-export const getAllLpg = async () => {
+export const getAllLpg = async (): Promise<LpgDistributions[]> => {
   try {
     const data = await prisma.lpgDistributions.findMany({
       where: {

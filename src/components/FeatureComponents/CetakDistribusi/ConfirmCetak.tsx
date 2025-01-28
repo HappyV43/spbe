@@ -20,33 +20,33 @@ import CetakPlastikWrap from "./CetakPlastikWrap";
 
 const ConfirmCetak = ({ row, type }: any) => {
     const [id, setId] = useState(row.id);
-    const [platKendaraan, setPlatKendaraan] = useState(row.licensePlate);
-    const [namaSopir, setNamaSopir] = useState(row.driverName);
-    const [namaSupervisor, setNamaSupervisor] = useState(row.superVisor);
-    const [namaGateKeeper, setNamaGateKeeper] = useState(row.gateKeeper);
-    const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi);
-    const [jumlahTabungBocor, setJumlahTabungBocor] = useState(row.bocor);
-    const [isiKurang, setIsiKurang] = useState(row.isiKurang);
+    const [platKendaraan, setPlatKendaraan] = useState(row.licensePlate ?? "");
+    const [namaSopir, setNamaSopir] = useState(row.driverName ?? "");
+    const [namaSupervisor, setNamaSupervisor] = useState(row.superVisor ?? null);
+    const [namaGateKeeper, setNamaGateKeeper] = useState(row.gateKeeper ?? null);
+    const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? null);
+    const [jumlahTabungBocor, setJumlahTabungBocor] = useState(row.bocor ?? 0);
+    const [isiKurang, setIsiKurang] = useState(row.isiKurang ?? 0);
 
     return (
         <Dialog>
         <DialogTrigger>
             <Button
-            variant="outline"
-            className="text-center align-center justify-center w-1"
-            >
-            {type == "wrap" ?
-                <PackageOpen
-                className="h-4 w-4 text-center align-center text-green-500 cursor-pointer"
-                aria-hidden="true" 
-                />
-                :
-                <Printer
-                    className="h-4 w-4 text-center align-center cursor-pointer"
-                    style={{ color: "blue" }}
+                variant="outline"
+                className="text-center align-center justify-center w-1"
+                >
+                {type == "wrap" ?
+                    <PackageOpen
+                    className="h-4 w-4 text-center align-center text-green-500 cursor-pointer"
                     aria-hidden="true" 
-                />
-            }
+                    />
+                    :
+                    <Printer
+                        className="h-4 w-4 text-center align-center cursor-pointer"
+                        style={{ color: "blue" }}
+                        aria-hidden="true" 
+                    />
+                }
             </Button>
         </DialogTrigger>
         <DialogContent>

@@ -14,57 +14,90 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { Pencil } from "lucide-react";
+import { Loader2, Pencil } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { redirect } from "next/navigation";
+import { format } from "date-fns";
+import { DatePick } from "../DatePick";
 
 const EditFormLpg = ({ row }: any) => {
   const ref = useRef<HTMLFormElement>(null);
+  const [open, setOpen] = useState(false); 
   const [id, setId] = useState(row.id);
+  const [loading, setLoading] = useState(false);
+  const [giDate, setGiDate] = useState<any>(row.giDate);
   const [platKendaraan, setPlatKendaraan] = useState(row.licensePlate);
   const [namaSopir, setNamaSopir] = useState(row.driverName);
-  const [namaSupervisor, setNamaSupervisor] = useState(row.superVisor);
-  const [namaGateKeeper, setNamaGateKeeper] = useState(row.gateKeeper);
-  const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi);
+  const [namaSupervisor, setNamaSupervisor] = useState(row.superVisor ?? "");
+const [namaGateKeeper, setNamaGateKeeper] = useState(row.gateKeeper ?? "");
+const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "");
   const [jumlahTabungBocor, setJumlahTabungBocor] = useState(row.bocor);
   const [isiKurang, setIsiKurang] = useState(row.isiKurang);
 
   const handleEditAgent = async (formData: FormData) => {
+    setLoading(true);
+    // console.log(giDate)
     if (
       !platKendaraan ||
       !namaSopir ||
       !namaAdministrasi ||
-      !namaGateKeeper ||
-      !namaSupervisor
+      !namaGateKeeper
     ) {
+      console.log(giDate, platKendaraan, namaSopir, namaAdministrasi, namaGateKeeper);
       toast({
         title: "Gagal",
         description: "Ada field yang kosong",
         variant: "destructive",
       });
+      setLoading(false);
       return;
     }
-
+    formData.set("waktuPengambilan", giDate)
+    
     const result = await UpdateLpgData(formData);
 
     if (result?.error) {
+      setLoading(false);
       toast({
         title: "Gagal",
         description: result.error,
         variant: "destructive",
       });
+
     } else {
+      setLoading(false);
       ref.current?.reset();
       toast({
         title: "Berhasil",
         description: "Penyaluran Lpg berhasil diupdate",
       });
+        setOpen(false);
       redirect("/dashboard/penyaluran-elpiji");
     }
   };
 
+  const resetFormState = () => {
+    setId(row.id);
+    setGiDate(new Date(row.giDate));
+    setPlatKendaraan(row.licensePlate);
+    setNamaSopir(row.driverName);
+    setNamaSupervisor(row.superVisor);
+    setNamaGateKeeper(row.gateKeeper);
+    setNamaAdministrasi(row.administrasi);
+    setJumlahTabungBocor(row.bocor);
+    setIsiKurang(row.isiKurang);
+  };
+
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          resetFormState(); 
+        }
+      }}
+    >
       <DialogTrigger>
         <Button
           variant="outline"
@@ -93,7 +126,24 @@ const EditFormLpg = ({ row }: any) => {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Plat Kendaraan</Label>
+                <Label>Waktu Pengambilan</Label>
+                <DatePick
+                    value={giDate}
+                    onDateChange={setGiDate}
+                    className="col-span-3"
+                  />
+                {/* <Input
+                  id="giDate"
+                  name="giDate"
+                                          placeholder={format(new Date(), "dd MMMM yyyy", { locale: id })}
+                  
+                  value={format(giDate, 'dddd MM yyyy'), locale}
+                  onChange={(e) => setGiDate(e.target.value)}
+                  className="col-span-3"
+                /> */}
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label>Plat Kendaraan</Label>
                 <Input
                   id="platKendaraan"
                   name="platKendaraan"
@@ -103,7 +153,7 @@ const EditFormLpg = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Nama Sopir</Label>
+                <Label>Nama Sopir</Label>
                 <Input
                   id="namaSopir"
                   name="namaSopir"
@@ -113,7 +163,7 @@ const EditFormLpg = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">GateKeeper</Label>
+                <Label>GateKeeper</Label>
                 <Input
                   id="gateKeeper"
                   name="gateKeeper"
@@ -123,7 +173,7 @@ const EditFormLpg = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Supervisor</Label>
+                <Label>Supervisor</Label>
                 <Input
                   id="superVisor"
                   name="superVisor"
@@ -133,7 +183,7 @@ const EditFormLpg = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Administrasi</Label>
+                <Label>Administrasi</Label>
                 <Input
                   id="administrasi"
                   name="administrasi"
@@ -143,7 +193,7 @@ const EditFormLpg = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Tabung Bocor</Label>
+                <Label>Tabung Bocor</Label>
                 <Input
                   id="jumlahTabungBocor"
                   name="jumlahTabungBocor"
@@ -156,7 +206,7 @@ const EditFormLpg = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Isi Kurang</Label>
+                <Label>Isi Kurang</Label>
                 <Input
                   id="isiKurang"
                   name="isiKurang"
@@ -180,12 +230,52 @@ const EditFormLpg = ({ row }: any) => {
               </div>
             </div>
             <DialogFooter>
-              <DialogClose asChild>
+              {loading ? (
+                <Button type="button" className="px-9" disabled>
+                  <Loader2 className="animate-spin mr-2" />
+                  Menyimpan...
+                </Button>
+              ) : (
                 <Button type="submit">Simpan Perubahan</Button>
-              </DialogClose>
+              )}
+              {/* <DialogClose asChild>
+                <Button type="submit">Simpan Perubahan</Button>
+                {loading ? (
+                  <Button type="submit" className="px-9" disabled>
+                    <Loader2 className="animate-spin" />
+                    Menyimpan...
+                  </Button>
+                  ) : (
+                  <Button type="submit">
+                    Simpan Perubahan
+                  </Button>
+                )}
+              </DialogClose> */}
               <DialogClose asChild>
-                <Button>Kembali</Button>
+                <Button
+                  onClick={(e) => {
+                    if (
+                      platKendaraan !== row.licensePlate ||
+                      namaSopir !== row.driverName ||
+                      namaSupervisor !== row.superVisor ||
+                      namaGateKeeper !== row.gateKeeper ||
+                      namaAdministrasi !== row.administrasi ||
+                      jumlahTabungBocor !== row.bocor ||
+                      isiKurang !== row.isiKurang
+                    ) {
+                      const confirmClose = confirm(
+                        "Perubahan belum disimpan. Apakah Anda yakin ingin keluar?"
+                      );
+                      if (!confirmClose) {
+                        e.preventDefault();
+                      }
+                    }
+                  }}
+                >
+                  Kembali
+                </Button>
               </DialogClose>
+
             </DialogFooter>
           </div>
         </form>

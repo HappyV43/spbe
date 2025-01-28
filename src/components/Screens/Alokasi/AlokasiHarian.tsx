@@ -27,11 +27,11 @@ import type { User } from "@prisma/client";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Allocation } from "@/lib/types";
-
+import InfoCard from "@/components/InfoCard";
+import { getAllokasiAll } from "@/app/actions/alokasi.action";
 
 interface AlokasiProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
   user: User;
 }
 
@@ -39,48 +39,56 @@ const today = {
   from: new Date(),
   to: new Date(),
 };
+var isFiltered = false;
 
 const AlokasiHarian = <
   TData extends Allocation,
   TValue
 >({
   columns,
-  data,
   user,
 }: AlokasiProps<TData, TValue>) => {
+  const [rawData, setRawData] = useState<TData[]>([]);
   const optionStatus = ["Pending", "Approved"];
-  const [status, setStatus] = useState("Pending");
-  const [agentName, setAgentName] = useState("");
-  const [doNumber, setDoNumber] = useState("");
-  const [dateFilter, setDateFilter] = useState<any>("today");
-  const [filteredData, setFilteredData] = useState<TData[]>(data);
+  const [status, setStatus] = useState<string>("Pending");
+
+  const [agentName, setAgentName] = useState<string>("");
+  const [doNumber, setDoNumber] = useState<string>("");
+  const [dateFilter, setDateFilter] = useState<{ from: Date | null; to: Date | null } | null>({from: new Date() , to: null});
+
+  const [filteredData, setFilteredData] = useState<TData[]>([]);
   const [filtered, setFiltered] = useState<Boolean>(false);
   
-  const statusOptions = optionStatus.map((item) => ({
-    label: item,
-    value: item,
-  }));
-
-  const agentNameOptions = Array.from(new Set(data.map((item) => item.agentName)))
-    .map((agentName) => ({
-      label: agentName,
-      value: agentName,
+  const generateOptions = () => {
+    const statusOptions = optionStatus.map((item) => ({
+      label: item,
+      value: item,
     }));
 
-  const doNumberOptions = Array.from(new Set(data.map((item) => item.deliveryNumber)))
-    .map((deliveryNumber) => ({
-      label: deliveryNumber,
-      value: deliveryNumber,
-    }));
+    const agentNameOptions = Array.from(new Set(rawData.map((item) => item.agentName)))
+      .map((agentName) => ({
+        label: agentName,
+        value: agentName,
+      }));
 
-  useEffect(() => {
-    const filtered = data.filter((item) => {
+    const doNumberOptions = Array.from(new Set(rawData.map((item) => item.deliveryNumber)))
+      .map((deliveryNumber) => ({
+        label: deliveryNumber,
+        value: deliveryNumber,
+      }));
+
+    return { statusOptions, agentNameOptions, doNumberOptions };
+  };
+  const { statusOptions, agentNameOptions, doNumberOptions } = generateOptions();
+
+  const applyFilter = () => {
+    const filtered = rawData.filter((item) => {
       const matchesStatus = status ? item.status === status : true;
       const matchesAgentName = agentName ? item.agentName === agentName : true;
       const matchesDoNumber = doNumber
         ? item.deliveryNumber === doNumber
         : true;
-
+  
       const matchesDate = dateFilter?.from
         ? dateFilter?.to
           ? normalizeDateFrom(item.plannedGiDate) >=
@@ -91,101 +99,98 @@ const AlokasiHarian = <
               normalizeDateFrom(dateFilter.from) &&
             normalizeDateTo(item.plannedGiDate) <=
               normalizeDateTo(dateFilter.from)
-        : dateFilter === "today"
+        : (dateFilter?.from == new Date() && dateFilter?.to == null || dateFilter?.to == new Date())
         ? normalizeDateFrom(item.plannedGiDate) === normalizeDateTo(new Date())
         : true;
+
+      // console.log("ARDINE")
+      // console.log(status, agentName, doNumber, dateFilter)
+      // console.log(matchesStatus, matchesAgentName, matchesDoNumber, matchesDate)
+
       return (
         matchesStatus && matchesAgentName && matchesDoNumber && matchesDate
       );
     });
-
+  
     setFilteredData(filtered);
-  }, [status, agentName, doNumber, dateFilter, data]);
+    isFiltered = (status !== "" || 
+    agentName !== "" || 
+    doNumber !== "" || 
+    (dateFilter?.to === new Date() || dateFilter !==null))
 
-  useEffect(() => {
-    if (data.length > 0) {
-      setStatus("Pending");
-    }
-    setFiltered(true);
-    setDateFilter(today);
-  }, []);
+    // console.log(filtered)
+    // console.log(filtered)
+    // console.log("matchesStatus:",  " >" ,status,status === "");
+    // console.log("matchesAgentName:", " >" ,agentName ,agentName === "");
+    // console.log("matchesDoNumber:",  " >" ,doNumber ,doNumber === "");
+    // console.log("matchesDate:",  " >" ,dateFilter, dateFilter !==null);
+    // console.log("matchesDate From:", dateFilter?.from );
+    // console.log("matchesDate To:", dateFilter?.to );
+    setFiltered(
+      status !== "" || 
+      agentName !== "" || 
+      doNumber !== "" || 
+      (dateFilter === today || dateFilter !==null)
+    );
+  }
 
   const handleClearSearch = () => {
+    // isFiltered = !isFiltered
     setStatus("");
     setAgentName("");
     setDoNumber("");
+    
     setDateFilter(null);
-    setFilteredData(data);
     setFiltered(false);
+    loadAllData();
   };
 
+  const loadAllData = async () => {
+    const data = (await getAllokasiAll()) as TData[];
+    setRawData(data);
+    // applyFilter()
+  };
+  
+  useEffect(() => {
+    applyFilter()
+  }, [status, agentName, doNumber, dateFilter, rawData]);
+  
+  useEffect(() => {
+    isFiltered = true
+    setFiltered(true)
+    loadAllData();
+    // if (rawData.length > 0) {
+    //   // isFiltered = true
+    //   setStatus("Pending");
+    // }
+    // applyFilter();
+  }, []);
+
   return (
-    <div className="w-full">
-      <div className="items-center py-4 mx-4">
+    <div className="mx-5">
+      <div className="mb-4">
         <div className="pt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <CalendarCheck className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL TABUNG
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {formatNumberQty(
-                    calculateTotalQty(filteredData, "allocatedQty")
-                  )}
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Weight className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL BERAT TABUNG
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {formatNumberQty(
-                    calculateTotalQty(filteredData, "allocatedQty") * 3
-                  )}
-                  <span className="text-xl text-gray-600"> Kg</span>
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Handshake className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL AGEN
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {calculateTotalAgen(filteredData)}
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Database className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL ALOKASI HARIAN
-                </h1>
-                <p className="text-3xl font-extrabold">{filteredData.length}</p>
-              </div>
-            </div>
-          </Card>
+          <InfoCard
+            icon={<CalendarCheck className="h-10 w-10 text-white" />}
+            title="TOTAL TABUNG"
+            value={formatNumberQty(calculateTotalQty(filteredData, "allocatedQty"))}
+          />
+          <InfoCard
+            icon={<Weight className="h-10 w-10 text-white" />}
+            title="TOTAL BERAT TABUNG"
+            value={formatNumberQty(calculateTotalQty(filteredData, "allocatedQty") * 3)}
+            unit="Kg"
+          />
+          <InfoCard
+            icon={<Handshake className="h-10 w-10 text-white" />}
+            title="TOTAL AGEN"
+            value={calculateTotalAgen(filteredData)}
+          />
+          <InfoCard
+            icon={<Database className="h-10 w-10 text-white" />}
+            title="TOTAL ALOKASI HARIAN"
+            value={filteredData.length}
+          />
         </div>
         <Card className="px-6 py-6 my-3 shadow-lg rounded-2xl bg-white border border-gray-200">
           <div className="px-4 text-center">
@@ -235,9 +240,10 @@ const AlokasiHarian = <
                 value={dateFilter}
                 onDateChange={setDateFilter}
                 placeholder={
-                  filtered
-                    ? `${format(new Date(), "dd MMMM yyyy", { locale: id })}`
-                    : "Semua Tanggal"
+                  dateFilter == null
+                  ? 
+                  "Semua Tanggal"
+                  :`${format(new Date(), "dd MMMM yyyy", { locale: id })}`
                 }
               />
             </div>
@@ -259,16 +265,23 @@ const AlokasiHarian = <
               </div>
             )}
 
-            <div className="w-full sm:w-auto">
-              <Button
-                variant="default"
-                className="w-full sm:w-auto flex items-center justify-center"
-                onClick={handleClearSearch}
-              >
-                <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
-                <span className="truncate">Bersihkan Pencarian</span>
-              </Button>
-            </div>
+            {(isFiltered)&&
+              <div className="w-full sm:w-auto">
+                <Button
+                  variant="destructive"
+                  className="w-full sm:w-auto flex items-center justify-center"
+                  onClick={() =>{
+                    setDateFilter(null)
+                    setFiltered(false);
+                    isFiltered = !isFiltered;
+                    handleClearSearch()
+                  }}
+                >
+                  <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
+                  <span className="truncate">Bersihkan Pencarian</span>
+                </Button>
+              </div>
+            }
           </div>
         </Card>
         <DataTable columns={columns} data={filteredData} />

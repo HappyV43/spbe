@@ -21,11 +21,16 @@ const RekapPage = async () => {
     redirect("/auth/login");
   }
   return (
-    <ContentLayout
-      home={"dashboard"}
-      mainpage={"rekap-penyaluran"}
-      children={<Rekapan dataBpeDeliveryAgent={dataBpeDeliveryAgent} defaultData={defaultData} />}
-    />
+    // <ContentLayout
+    //     home={"dashboard"}
+    //     mainpage={"rekap-penyaluran"}
+    //     children={
+        <Rekapan
+          data={data}
+          user={user}
+        />
+    //   }
+    // />
   );
 };
 

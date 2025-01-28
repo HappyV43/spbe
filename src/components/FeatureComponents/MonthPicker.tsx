@@ -23,14 +23,17 @@ import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover
   interface MonthPickerProps {
     currentMonth: Date;
     placeholder?: string;
+    className? :string;
     onMonthChange: (newMonth: Date) => void;
   }
   
   export default function MonthPicker({
     placeholder = "Pilih Bulan",
     currentMonth,
+    className,
     onMonthChange,
   }: MonthPickerProps) {
+    const [popoverOpen, setPopoverOpen] = React.useState(false); 
     const [currentYear, setCurrentYear] = React.useState(
       format(currentMonth, 'yyyy', { locale: id })
     );
@@ -50,10 +53,18 @@ import { Popover, PopoverContent, PopoverTrigger } from '@radix-ui/react-popover
       let firstDayNextYear = add(firstDayCurrentYear, { years: 1 });
       setCurrentYear(format(firstDayNextYear, 'yyyy'));
     }
+
+    function handlePopoverChange(open: boolean) {
+        setPopoverOpen(open);
+        if (!open) {
+          setCurrentYear(format(currentMonth, 'yyyy', { locale: id }));
+        }
+      }
+    
   
     return (
-        <div className={cn("grid gap-2")}>
-            <Popover>
+        <div className={cn("grid gap-2", className)}>
+            <Popover open={popoverOpen} onOpenChange={handlePopoverChange}>
                 <PopoverTrigger asChild>
                     <Button
                         id="date"

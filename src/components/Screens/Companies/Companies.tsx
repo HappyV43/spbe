@@ -17,8 +17,8 @@ const Companies = <TData, TValue>({
   user,
 }: CompaniesProps<TData, TValue>) => {
   return (
-    <div className="w-full">
-      <div className=" items-center py-4 mx-4">
+    <div className="mx-5">
+      <div className="mb-4">
         {/* {user.role === "ADMIN" && (
           <div className="justify-start mb-1">
             <Button variant="default" className="ml-auto justify-start" asChild>

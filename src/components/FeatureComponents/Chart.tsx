@@ -1,8 +1,10 @@
 import * as React from "react";
-import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, LabelList, Line } from "recharts";
+import { Area, AreaChart, XAxis, YAxis, CartesianGrid, Tooltip, LabelList, Line, Bar } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { generateColor } from "@/utils/page";
@@ -15,7 +17,6 @@ interface DataItem {
 }
 
 interface ChartProps<TData> {
-  config: ChartConfig;
   data: Array<{ date: string; qty: number }>;
   data2: Array<{ date: string; qty: number }>; 
   data3: Array<{ date: string; qty: number }>; 
@@ -27,15 +28,27 @@ export function ChartComponent<TData extends DataItem>({
   data,
   data2,
   data3,
-  config,
   title,
   timeFrame,
 }: ChartProps<TData>) {
-  // console.log(data);
-  // console.log(data2);
-  // console.log(data3);
   const startDate = startOfWeek(new Date());
   const endDate = endOfWeek(new Date());
+
+
+  const chartConfig = {
+    monthlyQty: {
+      label: "Bulanan",
+      color: "hsl(var(--chart-1))",
+    },
+    dailyQty: {
+      label: "Harian",
+      color: "hsl(var(--chart-2))",
+    },
+    distributionQty: {
+      label: "Penyaluran LPG",
+      color: "hsl(var(--chart-3))",
+    },
+  } satisfies ChartConfig;
 
   const combinedData = React.useMemo(() => {
     const map = new Map<string, { date: string; dailyQty?: number; monthlyQty?: number; distributionQty?: number }>();
@@ -122,7 +135,7 @@ export function ChartComponent<TData extends DataItem>({
   return (
     <div className="flex flex-col md:flex-row justify-between space-y-6 md:space-y-0 md:space-x-4 py-4">
       <div className="flex-grow my-5">
-        <ChartContainer config={config} className="mx-auto w-full max-w-[600px] md:max-w-full aspect-square" style={{ height: '400px', maxHeight: '400px' }}>
+        <ChartContainer config={chartConfig} className="mx-auto w-full max-w-[600px] md:max-w-full aspect-square" style={{ height: '400px', maxHeight: '400px' }}>
           <AreaChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis 
@@ -160,7 +173,7 @@ export function ChartComponent<TData extends DataItem>({
                 r: 6,
               }}
             />
-            {/* <LabelList dataKey="dailyQty" position="top" /> */}
+            <ChartLegend content={<ChartLegendContent />} />
           </AreaChart>
         </ChartContainer>
       </div>
