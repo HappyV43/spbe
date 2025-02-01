@@ -29,8 +29,8 @@ const EditFormLpg = ({ row }: any) => {
   const [platKendaraan, setPlatKendaraan] = useState(row.licensePlate);
   const [namaSopir, setNamaSopir] = useState(row.driverName);
   const [namaSupervisor, setNamaSupervisor] = useState(row.superVisor ?? "");
-const [namaGateKeeper, setNamaGateKeeper] = useState(row.gateKeeper ?? "");
-const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "");
+  const [namaGateKeeper, setNamaGateKeeper] = useState(row.gateKeeper ?? "");
+  const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "");
   const [jumlahTabungBocor, setJumlahTabungBocor] = useState(row.bocor);
   const [isiKurang, setIsiKurang] = useState(row.isiKurang);
 
@@ -43,7 +43,7 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
       !namaAdministrasi ||
       !namaGateKeeper
     ) {
-      console.log(giDate, platKendaraan, namaSopir, namaAdministrasi, namaGateKeeper);
+      // console.log(giDate, platKendaraan, namaSopir, namaAdministrasi, namaGateKeeper);
       toast({
         title: "Gagal",
         description: "Ada field yang kosong",
@@ -87,6 +87,27 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
     setJumlahTabungBocor(row.bocor);
     setIsiKurang(row.isiKurang);
   };
+
+  const handleCancel = (e: React.MouseEvent) => {
+      if (
+        platKendaraan !== row.licensePlate ||
+        namaSopir !== row.driverName ||
+        namaSupervisor !== row.superVisor ||
+        namaGateKeeper !== row.gateKeeper ||
+        namaAdministrasi !== row.administrasi ||
+        jumlahTabungBocor !== row.bocor ||
+        isiKurang !== row.isiKurang
+      ) {
+        const confirmClose = confirm(
+          "Perubahan belum disimpan. Apakah Anda yakin ingin keluar?"
+        );
+        if (!confirmClose) {
+          e.preventDefault(); 
+        } else {
+          resetFormState(); 
+        }
+      }
+    };
 
   return (
     <Dialog
@@ -238,44 +259,9 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
               ) : (
                 <Button type="submit">Simpan Perubahan</Button>
               )}
-              {/* <DialogClose asChild>
-                <Button type="submit">Simpan Perubahan</Button>
-                {loading ? (
-                  <Button type="submit" className="px-9" disabled>
-                    <Loader2 className="animate-spin" />
-                    Menyimpan...
-                  </Button>
-                  ) : (
-                  <Button type="submit">
-                    Simpan Perubahan
-                  </Button>
-                )}
-              </DialogClose> */}
               <DialogClose asChild>
-                <Button
-                  onClick={(e) => {
-                    if (
-                      platKendaraan !== row.licensePlate ||
-                      namaSopir !== row.driverName ||
-                      namaSupervisor !== row.superVisor ||
-                      namaGateKeeper !== row.gateKeeper ||
-                      namaAdministrasi !== row.administrasi ||
-                      jumlahTabungBocor !== row.bocor ||
-                      isiKurang !== row.isiKurang
-                    ) {
-                      const confirmClose = confirm(
-                        "Perubahan belum disimpan. Apakah Anda yakin ingin keluar?"
-                      );
-                      if (!confirmClose) {
-                        e.preventDefault();
-                      }
-                    }
-                  }}
-                >
-                  Kembali
-                </Button>
+                <Button onClick={handleCancel}>Kembali</Button>
               </DialogClose>
-
             </DialogFooter>
           </div>
         </form>

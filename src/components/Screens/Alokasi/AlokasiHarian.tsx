@@ -89,19 +89,18 @@ const AlokasiHarian = <
         ? item.deliveryNumber === doNumber
         : true;
   
-      const matchesDate = dateFilter?.from
-        ? dateFilter?.to
-          ? normalizeDateFrom(item.plannedGiDate) >=
-              normalizeDateFrom(dateFilter.from) &&
-            normalizeDateTo(item.plannedGiDate) <=
-              normalizeDateTo(dateFilter.to)
-          : normalizeDateFrom(item.plannedGiDate) >=
-              normalizeDateFrom(dateFilter.from) &&
-            normalizeDateTo(item.plannedGiDate) <=
-              normalizeDateTo(dateFilter.from)
-        : (dateFilter?.from == new Date() && dateFilter?.to == null || dateFilter?.to == new Date())
-        ? normalizeDateFrom(item.plannedGiDate) === normalizeDateTo(new Date())
-        : true;
+        const matchesDate = item.giDate
+        ? dateFilter?.from
+          ? dateFilter?.to
+            ? normalizeDateFrom(item.giDate) >= normalizeDateFrom(dateFilter.from) &&
+              normalizeDateTo(item.giDate) <= normalizeDateTo(dateFilter.to)
+            : normalizeDateFrom(item.giDate) >= normalizeDateFrom(dateFilter.from) &&
+              normalizeDateTo(item.giDate) <= normalizeDateTo(dateFilter.from)
+          : (dateFilter?.from?.toDateString() === new Date().toDateString() &&
+            (dateFilter?.to == null || dateFilter?.to?.toDateString() === new Date().toDateString()))
+          ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
+          : true
+      : false;
 
       // console.log("ARDINE")
       // console.log(status, agentName, doNumber, dateFilter)
