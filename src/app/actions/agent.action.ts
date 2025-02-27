@@ -72,7 +72,7 @@ export const postAgentData = async (formData: FormData) => {
     const errorMessage = getErrorMessage(error);
     console.error("Database Error: ", errorMessage);
     return {
-      error: "Terjadi kesalahan saat menyimpan data. Silakan coba lagi.",
+      error: getErrorMessage(error),
     };
   }
 };
