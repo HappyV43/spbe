@@ -35,14 +35,14 @@ const ComboBoxNelsen = <T extends Record<string, any>>({
   displayKey,
 }: ComboBoxProps<T>) => {
   return (
-    <div>
+    <div className="my-2">
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             role="combobox"
             className={cn(
-              "w-[200px] justify-between",
+              "w-full sm:w-[300] justify-between truncate",
               !selectedValue && "text-muted-foreground"
             )}
           >
@@ -51,12 +51,12 @@ const ComboBoxNelsen = <T extends Record<string, any>>({
                   displayKey
                 ]
               : placeholder}
-            <ChevronsUpDown className="opacity-50" />
+            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[200px] p-0">
+        <PopoverContent className="p-0 w-full sm:w-96">
           <Command>
-            <CommandInput placeholder={`cari data `} className="h-9" />
+            <CommandInput placeholder={`Cari data`} className="h-9" />
             <CommandList>
               <CommandEmpty>No data found.</CommandEmpty>
               <CommandGroup>
@@ -64,7 +64,11 @@ const ComboBoxNelsen = <T extends Record<string, any>>({
                   <CommandItem
                     key={item[valueKey] || index}
                     value={item[valueKey]}
-                    onSelect={() => onSelect(item[valueKey])}
+                    onSelect={() =>
+                      onSelect(
+                        item[valueKey] === selectedValue ? "" : item[valueKey]
+                      )
+                    }
                   >
                     {item[displayKey]}
                     <Check
