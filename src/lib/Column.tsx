@@ -15,6 +15,8 @@ import EditFormAgents from "../components/FeatureComponents/CRUD/EditFormAgents"
 import EditFormLpg from "@/components/FeatureComponents/CRUD/EditFormLpg";
 import { formatDateTime } from "@/utils/page";
 import ConfirmCetak from "@/components/FeatureComponents/CetakDistribusi/ConfirmCetak";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
@@ -23,9 +25,9 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-1">
-          <ConfirmCetak row={row.original} type={"print"}/>
+          <ConfirmCetak row={row.original} type={"print"} />
           <EditFormLpg row={row.original} />
-          <ConfirmCetak row={row.original} type={"wrap"}/>
+          <ConfirmCetak row={row.original} type={"wrap"} />
         </div>
       );
     },
@@ -138,17 +140,15 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     cell: ({ row }) => {
       const date = row.original.plannedGiDate
         ? new Date(row.original.plannedGiDate)
-        : null;
+        : new Date(row.original.plannedGiDate);
       return (
         <div className="flex-[1]">
-          {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
-            : "-"}
+          {`${date.toLocaleDateString("id-ID", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })}`}
         </div>
       );
     },
@@ -156,21 +156,21 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "giDate",
     header: "GI Date",
-    cell: ({ row }) => {
-      const date = row.original.giDate ? new Date(row.original.giDate) : null;
-      return (
-        <div className="flex-[1]">
-          {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
-            : "-"}
-        </div>
-      );
-    },
+    // cell: ({ row }) => {
+    //   const date = row.original.giDate ? new Date(row.original.giDate) : null;
+    //   return (
+    //     <div className="flex-[1]">
+    //       {date
+    //         ? `${date.toLocaleDateString("id-ID", {
+    //             weekday: "long",
+    //             day: "2-digit",
+    //             month: "long",
+    //             year: "numeric",
+    //           })}`
+    //         : "-"}
+    //     </div>
+    //   );
+    // },
   },
   {
     accessorKey: "bpeNumber",
@@ -178,17 +178,17 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     enableSorting: false,
     cell: ({ row }) => {
       const bpe = row.original.bpeNumber;
-      return <>{bpe ? bpe : "-"}</>;
+      return <>{bpe ? bpe : bpe}</>;
     },
   },
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
     size: 1,
-    cell: ({ row }) => {
-      const date = row.original.updatedAt;
-      return <div>{formatDateTime(date)}</div>;
-    },
+    // cell: ({ row }) => {
+    //   const date = row.original.updatedAt;
+    //   return <div>{formatDateTime(date)}</div>;
+    // },
   },
   // {
   //   accessorKey: "createdAt",
@@ -207,11 +207,18 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
       const giDate = row.original.giDate;
 
       return (
-        <Button variant="outline" disabled={status === "Approved" && bpeNumber !== null && giDate !== null}>
+        <Button
+          variant="outline"
+          disabled={
+            status === "Approved" && bpeNumber !== null && giDate !== null
+          }
+        >
           <Link
             href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
             className={
-              status === "Approved" && bpeNumber !== null && giDate !== null ? "cursor-not-allowed" : ""
+              status === "Approved" && bpeNumber !== null && giDate !== null
+                ? "cursor-not-allowed"
+                : ""
             }
           >
             <SquarePlus className="h-4 w-4" />
@@ -262,38 +269,24 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "plannedGiDate",
     header: "Planned GI Date",
-    cell: ({ row }) => {
-      const date = row.original.plannedGiDate
-        ? new Date(row.original.plannedGiDate)
-        : null;
-      return (
-        <div className="flex-[1]">
-          {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
-            : "-"}
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="flex-[1]">
+        {format(new Date(row.original.plannedGiDate), "EEEE, d MMMM yyyy", {
+          locale: id,
+        })}
+      </div>
+    ),
   },
   {
     accessorKey: "giDate",
     header: "GI Date",
     cell: ({ row }) => {
       const date = row.original.giDate ? new Date(row.original.giDate) : null;
+
       return (
         <div className="flex-[1]">
           {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
+            ? format(date, "EEEE, d MMMM yyyy", { locale: id })
             : "-"}
         </div>
       );
@@ -314,9 +307,17 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-      return <div>{formatDateTime(date)}</div>;
+
+      return (
+        <div>
+          {date
+            ? format(date, "EEEE, d MMMM yyyy", { locale: id })
+            : "Belum diperbarui"}
+        </div>
+      );
     },
   },
+
   // {
   //   accessorKey: "createdAt",
   //   header: "Created At",

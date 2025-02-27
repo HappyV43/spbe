@@ -1,19 +1,18 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { Allocation, AllocationData, DataConfig, MonthlyAllocation, SummaryProps } from "@/lib/types";
-import type { MonthlyAllocations } from "@prisma/client";
+import {
+  Allocation,
+  AllocationData,
+  DataConfig,
+  MonthlyAllocation,
+  SummaryProps,
+} from "@/lib/types";
+import type { MonthlyAllocations } from "../../../generated/prisma_client";
+import { cache } from "react";
 
 export async function getAllokasiAll(): Promise<Allocation[]> {
-  const data = await prisma.allocations.findMany({
-    where: {
-      AND: {
-        status: {
-          in: ["Pending", "Approved"],
-        },
-      },
-    },
-  });
+  const data = await prisma.allocations.findMany();
   return data as Allocation[];
 }
 
@@ -80,3 +79,50 @@ export async function getSummaryQty() {
     },
   });
 }
+
+export const getAllocationDefault = async () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return await prisma.allocations.findMany({
+    where: {
+      AND: [
+        {
+          createdAt: {
+            gte: today,
+          },
+        },
+        {
+          status:{
+            equals: "Pending"
+          }
+        }
+      ],
+    },
+    orderBy: { bpeNumber: "desc" },
+    select: {
+      id: true,
+      status: true,
+      deliveryNumber: true,
+      shipTo: true,
+      agentName: true,
+      materialName: true,
+      allocatedQty: true,
+      plannedGiDate: true,
+      giDate: true,
+      bpeNumber: true,
+      updatedAt: true,
+    },
+  });
+};
+
+export const getFilterDataAllocation = cache(async () => {
+  return await prisma.allocations.findMany({
+    select: {
+      status: true,
+      deliveryNumber: true,
+      agentName: true,
+    },
+    distinct: ["agentName", "status"],
+  });
+});
