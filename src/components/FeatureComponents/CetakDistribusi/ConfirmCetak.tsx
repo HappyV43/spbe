@@ -30,7 +30,7 @@ const ConfirmCetak = ({ row, type }: any) => {
 
     return (
         <Dialog>
-        <DialogTrigger>
+        <DialogTrigger asChild>
             <Button
                 variant="outline"
                 className="text-center align-center justify-center w-1"
