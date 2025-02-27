@@ -185,8 +185,8 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
 
   // Apply filters when date filter changes
   useEffect(() => {
-    const filteredDailyData = data.filter((item: { plannedGiDate: any }) =>
-      filterByDate(item.plannedGiDate)
+    const filteredDailyData = data.filter((item: AllocationData) => 
+      item.lpgDistribution?.giDate ? filterByDate(item.lpgDistribution.giDate) : false
     );
 
     const filteredMonthlyData = monthly.filter((item) =>

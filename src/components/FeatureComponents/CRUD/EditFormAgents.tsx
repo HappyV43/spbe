@@ -25,6 +25,7 @@ const EditFormAgents = ({ row }: any) => {
   const [fax, setFax] = useState(row.fax);
   const [address, setAddress] = useState(row.address);
   const [city, setCity] = useState(row.city);
+  const [open, setOpen] = useState(false); 
 
   const handleEditAgent = async (formData: FormData) => {
     const result = await updateAgentData(formData);
@@ -47,9 +48,44 @@ const EditFormAgents = ({ row }: any) => {
 
   const noSpinner = "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
 
+  const resetFormState = () => {
+    setAgentName(row.agentName);
+    setAddress(row.address);
+    setCity(row.city);
+    setPhone(row.phone);
+    setFax(row.fax);
+  };
+
+  const handleCancel = (e: React.MouseEvent) => {
+    if (
+      agentName !== row.agentName ||
+      address !== row.address ||
+      city !== row.city ||
+      fax !== row.fax ||
+      phone !== row.phone
+    ) {
+      const confirmClose = confirm(
+        "Perubahan belum disimpan. Apakah Anda yakin ingin keluar?"
+      );
+      if (!confirmClose) {
+        e.preventDefault(); 
+      } else {
+        resetFormState(); 
+      }
+    }
+  };
+
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen)
+        if(!isOpen){
+          resetFormState
+        }
+      }}
+    >
       <DialogTrigger className="text-center align-center justify-center">
         <Button
           variant="outline"
@@ -146,7 +182,7 @@ const EditFormAgents = ({ row }: any) => {
             <DialogFooter>
               <Button type="submit">Simpan Perubahan</Button>
               <DialogClose asChild>
-                <Button>Kembali</Button>
+                <Button onClick={handleCancel}>Kembali</Button>
               </DialogClose>
             </DialogFooter>
           </div>

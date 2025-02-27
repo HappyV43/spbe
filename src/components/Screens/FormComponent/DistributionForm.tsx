@@ -25,7 +25,6 @@ const DistributionForm = ({ data, bpe, user }: FormSubmit) => {
     const pathName = usePathname();
     const { replace } = useRouter();
     const handleSearch = useDebouncedCallback((term: string) => {
-        console.log(term);
         const params = new URLSearchParams(searchParams);
         term ? params.set("query", term) : params.delete("query");
         replace(`${pathName}?${params.toString()}`);
