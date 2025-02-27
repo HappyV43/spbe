@@ -65,9 +65,9 @@ export function getMenuList(pathname: string): Group[] {
               active: pathname === "/dashboard/alokasi-bulanan",
             },
             {
-              href: "/dashboard/rekap-penyaluran",
+              href: "/dashboard/penyaluran-elpiji-be",
               label: "Rekap Penyaluran",
-              active: pathname === "/dashboard/rekap-penyaluran",
+              active: pathname === "/dashboard/penyaluran-elpiji-be",
             },
             {
               href: "/dashboard/download-rekap",
