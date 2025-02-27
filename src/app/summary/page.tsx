@@ -1,23 +1,39 @@
 import { redirect } from "next/navigation";
 import { getCurrentSession } from "../actions/auth.actions";
-import { ContentLayout } from "@/components/ContentLayout";
 import Summary from "@/components/Screens/Summary/Summary";
-import { getSummary } from "../actions/alokasi.action";
+import {
+  allDataDefault,
+  getSummaryToday,
+  getWeeklySummaryDefault,
+  getYearlySummaryData,
+} from "../actions/summary.action";
 
 export const metadata = {
   title: "Data Summary PKMU",
 };
 
 const SummaryPage = async () => {
-  const { session, user } = await getCurrentSession();
+  const [sessionData, summaryData, weekly, yearly, allData] = await Promise.all([
+    getCurrentSession(),
+    getSummaryToday(),
+    getWeeklySummaryDefault(),
+    getYearlySummaryData(),
+    allDataDefault()
+  ]);
+
+  const { session, user } = sessionData;
   if (!session && !user) {
     redirect("/auth/login");
   }
+
   return (
     // <ContentLayout
     //   home={"summary"}
     //   children={
-      <Summary />
+    <>
+      <Summary defaultdata={summaryData} weekly={weekly} yearly={yearly} allData={allData} />
+    </>
+
     // }
     // />
   );
