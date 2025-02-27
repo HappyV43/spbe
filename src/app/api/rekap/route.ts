@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     const filteredData = await prisma.lpgDistributions.findMany({
       where:
         Object.keys(whereConditions).length > 0 ? whereConditions : undefined,
-      orderBy: { bpeNumber: "asc" },
+      orderBy: { bpeNumber: "desc" },
       select: {
         id: true,
         bpeNumber: true,
@@ -68,8 +68,35 @@ export async function POST(req: NextRequest) {
         driverName: true,
         bocor: true,
         isiKurang: true,
+        allocationId: true, // Tambahkan allocationId untuk mencocokkan data
       },
     });
+
+    const allocationData = await prisma.allocations.findMany({
+      where: {
+        id: {
+          in: filteredData.map((d) => d.allocationId), 
+        },
+      },
+      select: {
+        id: true, 
+        materialName: true,
+      },
+    });
+
+    const allocationMap = new Map(
+      allocationData.map((item) => [
+        item.id,
+        item.materialName.includes("REFILL") ? "REFILL" : item.materialName, 
+      ])
+    );
+
+    // Gabungkan data berdasarkan allocationId
+    const mergedData = filteredData.map((item) => ({
+      ...item,
+      materialName: allocationMap.get(item.allocationId) || null, // Tambahkan materialName
+    }));
+
 
     const monthlyData = await prisma.monthlyAllocations.findMany({
       where: {
@@ -85,7 +112,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Group data by date
-    const groupedData = filteredData.reduce((acc: any, item) => {
+    const groupedData = mergedData.reduce((acc: any, item) => {
       const dateKey = new Date(item.giDate).toISOString().split("T")[0];
 
       if (!acc[dateKey]) {
