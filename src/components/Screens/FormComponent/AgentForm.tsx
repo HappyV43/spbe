@@ -18,7 +18,7 @@ import { FormSubmit } from "@/lib/types";
 
 
 const AgentForm = ({ companyName, user }: FormSubmit) => {
-    const [selectedCompanyId, setSelectedCompanyId] = useState(0);
+    const [selectedCompanyId, setSelectedCompanyId] = useState(1);
     const [phone, setPhone] = useState("");
     const [fax, setFax] = useState("");
     const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ const AgentForm = ({ companyName, user }: FormSubmit) => {
         const selectedCompany = companyName?.find(
             (company) => company.companyName === value
         );
-        setSelectedCompanyId(Number(selectedCompany?.id) || 0);
+        setSelectedCompanyId(Number(selectedCompany?.id) || 1);
     };
 
     const handleSubmitAgents = async (formData: FormData) => {
@@ -132,8 +132,8 @@ return (
                     <SelectValue placeholder="Perusahaan Asal" />
                 </SelectTrigger>
                 <SelectContent>
-                    {companyName?.map((names) => (
-                    <SelectItem key={names.id} value={names.companyName}>
+                    {companyName?.map((names,index) => (
+                    <SelectItem key={index} value={names.companyName}>
                         {names.companyName}
                     </SelectItem>
                     ))}

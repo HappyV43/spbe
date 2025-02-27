@@ -3,7 +3,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { ColumnDef } from "@tanstack/react-table";
 import { Plus } from "lucide-react";
 import Link from "next/link";
-import type { User } from "@prisma/client";
+import type { User } from "../../../../generated/prisma_client";
 
 interface CompaniesProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

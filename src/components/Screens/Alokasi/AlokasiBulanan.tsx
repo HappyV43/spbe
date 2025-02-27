@@ -13,7 +13,7 @@ import { id } from "date-fns/locale";
 import { MonthlyAllocation } from "@/lib/types";
 import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
 import InfoCard from "@/components/InfoCard";
-import { User } from "@prisma/client";
+import { User } from "../../../../generated/prisma_client";
 
 interface AlokasiBulananProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

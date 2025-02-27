@@ -3,7 +3,7 @@ import { DataTable } from "../../ui/data-table";
 import { Button } from "../../ui/button";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import type { User } from "@prisma/client";
+import type { User } from "../../../../generated/prisma_client";
 
 interface AgentsProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];

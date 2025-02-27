@@ -23,7 +23,7 @@ import {
   normalizeDateTo,
 } from "@/utils/page";
 import { Card } from "../../ui/card";
-import type { User } from "@prisma/client";
+import type { User } from "../../../../generated/prisma_client";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 import { Allocation } from "@/lib/types";

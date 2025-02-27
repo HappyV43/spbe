@@ -21,7 +21,7 @@ import { getErrorMessage } from "./error.action";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { redirect } from "next/navigation";
-import type { User } from "@prisma/client";
+import type { User } from "../../../generated/prisma_client";
 
 export const signIn = async (values: SignInValues) => {
   try {

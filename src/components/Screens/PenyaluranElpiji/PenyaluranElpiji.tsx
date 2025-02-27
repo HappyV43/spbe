@@ -30,7 +30,7 @@ import { Card } from "@/components/ui/card";
 import { DataTable } from "@/components/ui/data-table";
 import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
-import type { User } from "@prisma/client";
+import type { User } from "../../../../generated/prisma_client";
 import { id } from "date-fns/locale";
 import { AllocationData, LpgDistributions, MonthlyAllocation, SummaryProps } from "@/lib/types";
 import DownloadRekap from "./DownloadRekap";
