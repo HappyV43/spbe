@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -15,10 +15,11 @@ import {
 import { id } from "date-fns/locale";
 
 interface DatePickerProps extends React.HTMLAttributes<HTMLDivElement> {
-  onDateChange?: (date: Date | null | string ) => void;
+  onDateChange?: (date: Date | null | string) => void;
   placeholder?: string;
   value?: Date | null;
   className?: string;
+  name?: string;
 }
 
 export function DatePick({
@@ -26,8 +27,9 @@ export function DatePick({
   placeholder = "Pilih tanggal",
   onDateChange,
   value,
+  name,
 }: DatePickerProps) {
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
   const [date, setDate] = useState<any>(value ?? null);
 
   useEffect(() => {
@@ -36,15 +38,21 @@ export function DatePick({
     }
   }, [value]);
 
-const handleDateChange = (newDate: any) => {
-  setDate(newDate);
-  if (onDateChange) {
-    onDateChange(format(newDate, "dd MMMM yyyy", { locale: id }));
-  }
-};
+  const handleDateChange = (newDate: any) => {
+    setDate(newDate);
+    if (onDateChange) {
+      onDateChange(format(newDate, "dd MMMM yyyy", { locale: id }));
+    }
+  };
 
   return (
-      <Popover 
+    <div className={cn("relative", className)}>
+      <input
+        type="hidden"
+        name={name}
+        value={date ? format(date, "yyyy-MM-dd") : ""}
+      />
+      <Popover
         modal={open}
         onOpenChange={(isOpen) => {
           setOpen(isOpen);
@@ -57,7 +65,7 @@ const handleDateChange = (newDate: any) => {
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? (
-                format(date, "dd MMMM yyyy", { locale: id })
+              format(date, "dd MMMM yyyy", { locale: id })
             ) : (
               <span>{placeholder}</span>
             )}
@@ -77,5 +85,6 @@ const handleDateChange = (newDate: any) => {
           />
         </PopoverContent>
       </Popover>
+    </div>
   );
 }

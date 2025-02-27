@@ -158,6 +158,7 @@ export const UpdateLpgData = async (formData: FormData) => {
   const id = formData.get("id") as string; // ambil ID
   const platKendaraan = formData.get("platKendaraan") as string;
   const namaSopir = formData.get("namaSopir") as string;
+  const giDate = new Date(formData.get("giDate") as string);
   const jumlahTabungBocor = parseInt(
     formData.get("jumlahTabungBocor") as string
   );
@@ -178,6 +179,7 @@ export const UpdateLpgData = async (formData: FormData) => {
         id: parseInt(id),
       },
       data: {
+        giDate: giDate,
         licensePlate: platKendaraan,
         driverName: namaSopir,
         bocor: jumlahTabungBocor,

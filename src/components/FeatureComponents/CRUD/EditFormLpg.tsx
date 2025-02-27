@@ -17,7 +17,6 @@ import { toast } from "@/hooks/use-toast";
 import { Loader2, Pencil } from "lucide-react";
 import React, { useRef, useState } from "react";
 import { redirect } from "next/navigation";
-import { format } from "date-fns";
 import { DatePick } from "../DatePick";
 
 const EditFormLpg = ({ row }: any) => {
@@ -36,14 +35,13 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
 
   const handleEditAgent = async (formData: FormData) => {
     setLoading(true);
-    // console.log(giDate)
+    console.log(giDate)
     if (
       !platKendaraan ||
       !namaSopir ||
       !namaAdministrasi ||
       !namaGateKeeper
     ) {
-      console.log(giDate, platKendaraan, namaSopir, namaAdministrasi, namaGateKeeper);
       toast({
         title: "Gagal",
         description: "Ada field yang kosong",
@@ -52,7 +50,6 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
       setLoading(false);
       return;
     }
-    formData.set("waktuPengambilan", giDate)
     
     const result = await UpdateLpgData(formData);
 
@@ -98,7 +95,7 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
         }
       }}
     >
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button
           variant="outline"
           className="text-center align-center justify-center w-1"
@@ -128,10 +125,11 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
               <div className="grid grid-cols-4 items-center gap-4">
                 <Label>Waktu Pengambilan</Label>
                 <DatePick
-                    value={giDate}
-                    onDateChange={setGiDate}
-                    className="col-span-3"
-                  />
+                  value={giDate}
+                  onDateChange={setGiDate}
+                  className="col-span-3"
+                  name="giDate"
+                />
                 {/* <Input
                   id="giDate"
                   name="giDate"
@@ -278,7 +276,7 @@ const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "")
 
             </DialogFooter>
           </div>
-        </form>
+        </form> 
       </DialogContent>
     </Dialog>
   );
