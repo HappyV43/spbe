@@ -41,10 +41,7 @@ const today = {
 };
 var isFiltered = false;
 
-const AlokasiHarian = <
-  TData extends Allocation,
-  TValue
->({
+const AlokasiHarian = <TData extends Allocation, TValue>({
   columns,
   user,
 }: AlokasiProps<TData, TValue>) => {
@@ -54,32 +51,38 @@ const AlokasiHarian = <
 
   const [agentName, setAgentName] = useState<string>("");
   const [doNumber, setDoNumber] = useState<string>("");
-  const [dateFilter, setDateFilter] = useState<{ from: Date | null; to: Date | null } | null>({from: new Date() , to: null});
+  const [dateFilter, setDateFilter] = useState<{
+    from: Date | null;
+    to: Date | null;
+  } | null>({ from: new Date(), to: null });
 
   const [filteredData, setFilteredData] = useState<TData[]>([]);
   const [filtered, setFiltered] = useState<Boolean>(false);
-  
+
   const generateOptions = () => {
     const statusOptions = optionStatus.map((item) => ({
       label: item,
       value: item,
     }));
 
-    const agentNameOptions = Array.from(new Set(rawData.map((item) => item.agentName)))
-      .map((agentName) => ({
-        label: agentName,
-        value: agentName,
-      }));
+    const agentNameOptions = Array.from(
+      new Set(rawData.map((item) => item.agentName))
+    ).map((agentName) => ({
+      label: agentName,
+      value: agentName,
+    }));
 
-    const doNumberOptions = Array.from(new Set(rawData.map((item) => item.deliveryNumber)))
-      .map((deliveryNumber) => ({
-        label: deliveryNumber,
-        value: deliveryNumber,
-      }));
+    const doNumberOptions = Array.from(
+      new Set(rawData.map((item) => item.deliveryNumber))
+    ).map((deliveryNumber) => ({
+      label: deliveryNumber,
+      value: deliveryNumber,
+    }));
 
     return { statusOptions, agentNameOptions, doNumberOptions };
   };
-  const { statusOptions, agentNameOptions, doNumberOptions } = generateOptions();
+  const { statusOptions, agentNameOptions, doNumberOptions } =
+    generateOptions();
 
   const applyFilter = () => {
     const filtered = rawData.filter((item) => {
@@ -88,19 +91,22 @@ const AlokasiHarian = <
       const matchesDoNumber = doNumber
         ? item.deliveryNumber === doNumber
         : true;
-  
-        const matchesDate = item.giDate
+
+      const matchesDate = item.giDate
         ? dateFilter?.from
           ? dateFilter?.to
-            ? normalizeDateFrom(item.giDate) >= normalizeDateFrom(dateFilter.from) &&
+            ? normalizeDateFrom(item.giDate) >=
+                normalizeDateFrom(dateFilter.from) &&
               normalizeDateTo(item.giDate) <= normalizeDateTo(dateFilter.to)
-            : normalizeDateFrom(item.giDate) >= normalizeDateFrom(dateFilter.from) &&
+            : normalizeDateFrom(item.giDate) >=
+                normalizeDateFrom(dateFilter.from) &&
               normalizeDateTo(item.giDate) <= normalizeDateTo(dateFilter.from)
-          : (dateFilter?.from?.toDateString() === new Date().toDateString() &&
-            (dateFilter?.to == null || dateFilter?.to?.toDateString() === new Date().toDateString()))
+          : dateFilter?.from?.toDateString() === new Date().toDateString() &&
+            (dateFilter?.to == null ||
+              dateFilter?.to?.toDateString() === new Date().toDateString())
           ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
           : true
-      : false;
+        : false;
 
       // console.log("ARDINE")
       // console.log(status, agentName, doNumber, dateFilter)
@@ -110,12 +116,14 @@ const AlokasiHarian = <
         matchesStatus && matchesAgentName && matchesDoNumber && matchesDate
       );
     });
-  
+
     setFilteredData(filtered);
-    isFiltered = (status !== "" || 
-    agentName !== "" || 
-    doNumber !== "" || 
-    (dateFilter?.to === new Date() || dateFilter !==null))
+    isFiltered =
+      status !== "" ||
+      agentName !== "" ||
+      doNumber !== "" ||
+      dateFilter?.to === new Date() ||
+      dateFilter !== null;
 
     // console.log(filtered)
     // console.log(filtered)
@@ -126,19 +134,20 @@ const AlokasiHarian = <
     // console.log("matchesDate From:", dateFilter?.from );
     // console.log("matchesDate To:", dateFilter?.to );
     setFiltered(
-      status !== "" || 
-      agentName !== "" || 
-      doNumber !== "" || 
-      (dateFilter === today || dateFilter !==null)
+      status !== "" ||
+        agentName !== "" ||
+        doNumber !== "" ||
+        dateFilter === today ||
+        dateFilter !== null
     );
-  }
+  };
 
   const handleClearSearch = () => {
     // isFiltered = !isFiltered
     setStatus("");
     setAgentName("");
     setDoNumber("");
-    
+
     setDateFilter(null);
     setFiltered(false);
     loadAllData();
@@ -149,14 +158,14 @@ const AlokasiHarian = <
     setRawData(data);
     // applyFilter()
   };
-  
+
   useEffect(() => {
-    applyFilter()
+    applyFilter();
   }, [status, agentName, doNumber, dateFilter, rawData]);
-  
+
   useEffect(() => {
-    isFiltered = true
-    setFiltered(true)
+    isFiltered = true;
+    setFiltered(true);
     loadAllData();
     // if (rawData.length > 0) {
     //   // isFiltered = true
@@ -172,12 +181,16 @@ const AlokasiHarian = <
           <InfoCard
             icon={<CalendarCheck className="h-10 w-10 text-white" />}
             title="TOTAL TABUNG"
-            value={formatNumberQty(calculateTotalQty(filteredData, "allocatedQty"))}
+            value={formatNumberQty(
+              calculateTotalQty(filteredData, "allocatedQty")
+            )}
           />
           <InfoCard
             icon={<Weight className="h-10 w-10 text-white" />}
             title="TOTAL BERAT TABUNG"
-            value={formatNumberQty(calculateTotalQty(filteredData, "allocatedQty") * 3)}
+            value={formatNumberQty(
+              calculateTotalQty(filteredData, "allocatedQty") * 3
+            )}
             unit="Kg"
           />
           <InfoCard
@@ -240,9 +253,8 @@ const AlokasiHarian = <
                 onDateChange={setDateFilter}
                 placeholder={
                   dateFilter == null
-                  ? 
-                  "Semua Tanggal"
-                  :`${format(new Date(), "dd MMMM yyyy", { locale: id })}`
+                    ? "Semua Tanggal"
+                    : `${format(new Date(), "dd MMMM yyyy", { locale: id })}`
                 }
               />
             </div>
@@ -264,23 +276,23 @@ const AlokasiHarian = <
               </div>
             )}
 
-            {(isFiltered)&&
+            {isFiltered && (
               <div className="w-full sm:w-auto">
                 <Button
                   variant="destructive"
                   className="w-full sm:w-auto flex items-center justify-center"
-                  onClick={() =>{
-                    setDateFilter(null)
+                  onClick={() => {
+                    setDateFilter(null);
                     setFiltered(false);
                     isFiltered = !isFiltered;
-                    handleClearSearch()
+                    handleClearSearch();
                   }}
                 >
                   <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
-                  <span className="truncate">Bersihkan Pencarian</span>
+                  <span className="truncate">Reset</span>
                 </Button>
               </div>
-            }
+            )}
           </div>
         </Card>
         <DataTable columns={columns} data={filteredData} />

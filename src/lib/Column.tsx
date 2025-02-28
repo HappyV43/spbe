@@ -20,6 +20,70 @@ import { id } from "date-fns/locale";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
+    accessorKey: "bpeNumber",
+    header: "Nomor BPE",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "giDate",
+    header: "Tanggal",
+    cell: ({ row }) => {
+      const date = row.original.giDate ? new Date(row.original.giDate) : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "agentName",
+    header: "Nama Agen",
+  },
+  {
+    accessorKey: "licensePlate",
+    header: "Nomor Plat",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "deliveryNumber",
+    header: "Nomor DO",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "allocatedQty",
+    header: "Jumlah Alokasi",
+  },
+  {
+    accessorKey: "distributionQty",
+    header: "Jumlah Tabung",
+  },
+  {
+    accessorKey: "volume",
+    header: "Volume Tabung",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+    sortingFn: "datetime",
+    sortDescFirst: true,
+    cell: ({ row }) => {
+      const date = row.original.updatedAt;
+      return <div>{formatDateTime(date)}</div>;
+    },
+  },
+];
+
+export const adminLpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
+  {
     header: "Tindakan",
     enableSorting: false,
     cell: ({ row }) => {
@@ -88,10 +152,10 @@ export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
     header: "Diperbarui",
     sortingFn: "datetime",
     sortDescFirst: true,
-    // cell: ({ row }) => {
-    //   const date = row.original.updatedAt;
-    //   return <div>{formatDateTime(date)}</div>;
-    // },
+    cell: ({ row }) => {
+      const date = row.original.updatedAt;
+      return <div>{formatDateTime(date)}</div>;
+    },
   },
 ];
 
@@ -185,10 +249,10 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     accessorKey: "updatedAt",
     header: "Diperbarui",
     size: 1,
-    // cell: ({ row }) => {
-    //   const date = row.original.updatedAt;
-    //   return <div>{formatDateTime(date)}</div>;
-    // },
+    cell: ({ row }) => {
+      const date = row.original.updatedAt;
+      return <div>{formatDateTime(date)}</div>;
+    },
   },
   // {
   //   accessorKey: "createdAt",
@@ -285,9 +349,7 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
 
       return (
         <div className="flex-[1]">
-          {date
-            ? format(date, "EEEE, d MMMM yyyy", { locale: id })
-            : "-"}
+          {date ? format(date, "EEEE, d MMMM yyyy", { locale: id }) : "-"}
         </div>
       );
     },
@@ -307,14 +369,7 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
-
-      return (
-        <div>
-          {date
-            ? format(date, "EEEE, d MMMM yyyy", { locale: id })
-            : "Belum diperbarui"}
-        </div>
-      );
+      return <div>{formatDateTime(date)}</div>;
     },
   },
 
@@ -332,7 +387,11 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     sortDescFirst: false,
     cell: ({ row }) => {
       const date = row.original.date;
-      return <div>{formatDateTime(date)}</div>;
+      return (
+        <div className="flex-[1]">
+          {date ? format(date, "EEEE, d MMMM yyyy", { locale: id }) : "-"}
+        </div>
+      );
     },
   },
   {

@@ -27,6 +27,19 @@ export const sidebarItems = {
           title: "Alokasi Bulanan",
           url: "/dashboard/alokasi-bulanan",
         },
+        {
+          title: "Rekap Penyaluran",
+          url: "/dashboard/download-rekap",
+        },
+        // 3 DIBAWAH HANYA KHUSUS DEV, ELSE COMMENT
+        {
+          title: "ALOKASI BE",
+          url: "/dashboard/alokasi-harian/test-be",
+        },
+        {
+          title: "PENYALURAN BE",
+          url: "/dashboard/penyaluran-elpiji-be",
+        },
       ],
     },
   ],

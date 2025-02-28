@@ -6,7 +6,6 @@ import {
 } from "@/app/actions/lpg-distribution.action";
 import RekapanScreen from "@/components/Screens/Rekapan/RekapanScreen";
 
-
 export const metadata = {
   title: "Rekap Penyaluran PKMU",
 };
@@ -25,6 +24,7 @@ const RekapPage: React.FC = async () => {
   return (
     <>
       <RekapanScreen
+        user={user}
         dataBpeDeliveryAgent={dataBpeDeliveryAgent}
         defaultData={defaultData}
       />

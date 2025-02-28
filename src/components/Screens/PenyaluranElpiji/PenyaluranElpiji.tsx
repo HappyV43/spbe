@@ -32,7 +32,12 @@ import { Label } from "@radix-ui/react-label";
 import { Button } from "@/components/ui/button";
 import type { User } from "../../../../generated/prisma_client";
 import { id } from "date-fns/locale";
-import { AllocationData, LpgDistributions, MonthlyAllocation, SummaryProps } from "@/lib/types";
+import {
+  AllocationData,
+  LpgDistributions,
+  MonthlyAllocation,
+  SummaryProps,
+} from "@/lib/types";
 import DownloadRekap from "./DownloadRekap";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import InfoCard from "@/components/InfoCard";
@@ -61,41 +66,45 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
 
   const [agentName, setAgentName] = useState("");
   const [doNumber, setDoNumber] = useState("");
-  const [dateFilter, setDateFilter] = useState<{ from: Date | null; to: Date | null } | null>({from: new Date() , to: null});
+  const [dateFilter, setDateFilter] = useState<{
+    from: Date | null;
+    to: Date | null;
+  } | null>({ from: new Date(), to: null });
 
   const [filteredData, setFilteredData] = useState<TData[]>([]);
   const [filtered, setFiltered] = useState<Boolean>(false);
-  
+
   // BUAT REKAP
   // const [allocationDaily, setAllocationDaily] = useState<{giDate: Date | null, qty: number | undefined}[]>([]);
   // const [allocationMonthly, setAllocationMonthly] = useState<{giDate: Date | null, allocatedQty: number | undefined[]}[]>([]);
 
   const generateOptions = () => {
-    const notransOptions = Array.from(new Set(rawData.map((item) => item.bpeNumber))).map(
-      (bpeNumber) => ({
-        label: bpeNumber,
-        value: bpeNumber,
-      })
-    );
-    
-    const agentNameOptions = Array.from(new Set(rawData.map((item) => item.agentName))).map(
-      (agentName) => ({
-        label: agentName,
-        value: agentName,
-      })
-    );
-    
-    const doNumberOptions = Array.from(new Set(rawData.map((item) => item.deliveryNumber))).map(
-      (deliveryNumber) => ({
-        label: deliveryNumber,
-        value: deliveryNumber,
-      })
-    );
+    const notransOptions = Array.from(
+      new Set(rawData.map((item) => item.bpeNumber))
+    ).map((bpeNumber) => ({
+      label: bpeNumber,
+      value: bpeNumber,
+    }));
+
+    const agentNameOptions = Array.from(
+      new Set(rawData.map((item) => item.agentName))
+    ).map((agentName) => ({
+      label: agentName,
+      value: agentName,
+    }));
+
+    const doNumberOptions = Array.from(
+      new Set(rawData.map((item) => item.deliveryNumber))
+    ).map((deliveryNumber) => ({
+      label: deliveryNumber,
+      value: deliveryNumber,
+    }));
 
     return { notransOptions, agentNameOptions, doNumberOptions };
-  }
-    
-  const { notransOptions, agentNameOptions, doNumberOptions } = generateOptions();
+  };
+
+  const { notransOptions, agentNameOptions, doNumberOptions } =
+    generateOptions();
 
   const applyFilter = () => {
     const filtered = rawData.filter((item) => {
@@ -113,7 +122,8 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
           : // For Single Dates
             item.giDate >= normalizeDateFrom(dateFilter.from) &&
             item.giDate <= normalizeDateTo(dateFilter.from)
-        : (dateFilter?.from == new Date() && dateFilter?.to == null || dateFilter?.to == new Date())
+        : (dateFilter?.from == new Date() && dateFilter?.to == null) ||
+          dateFilter?.to == new Date()
         ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
         : true;
 
@@ -124,24 +134,26 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
 
     // console.log(filtered)
     setFilteredData(filtered);
-    isFiltered = (notrans !== "" || 
-      agentName !== "" || 
-      doNumber !== "" || 
-      (dateFilter?.to === new Date() || dateFilter !==null))
+    isFiltered =
+      notrans !== "" ||
+      agentName !== "" ||
+      doNumber !== "" ||
+      dateFilter?.to === new Date() ||
+      dateFilter !== null;
     // setFiltered(
-    //   notrans !== "" || 
-    //   agentName !== "" || 
-    //   doNumber !== "" || 
+    //   notrans !== "" ||
+    //   agentName !== "" ||
+    //   doNumber !== "" ||
     //   (dateFilter === today || dateFilter !==null)
     // );
 
-    console.log(filtered)
-    console.log("matchesAgentName:", " >" ,agentName ,agentName === "");
-    console.log("matchesDoNumber:",  " >" ,doNumber ,doNumber === "");
-    console.log("matchesDate:",  " >" ,dateFilter, dateFilter !==null);
-    console.log("matchesDate From:", dateFilter?.from );
-    console.log("matchesDate To:", dateFilter?.to );
-  }
+    console.log(filtered);
+    console.log("matchesAgentName:", " >", agentName, agentName === "");
+    console.log("matchesDoNumber:", " >", doNumber, doNumber === "");
+    console.log("matchesDate:", " >", dateFilter, dateFilter !== null);
+    console.log("matchesDate From:", dateFilter?.from);
+    console.log("matchesDate To:", dateFilter?.to);
+  };
 
   useEffect(() => {
     applyFilter();
@@ -158,7 +170,7 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
     setRawData(dataLPG);
 
     // ALLOCATION
-    const {data} = await getSummary();
+    const { data } = await getSummary();
     const dailyData = data.map((item: AllocationData) => ({
       giDate: item.plannedGiDate,
       qty: item.allocatedQty,
@@ -175,9 +187,9 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
 
     // applyFilter()
   };
-  
+
   useEffect(() => {
-    isFiltered = true
+    isFiltered = true;
     setFiltered(true);
     loadAllData();
   }, []);
@@ -199,12 +211,16 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
           <InfoCard
             icon={<CalendarCheck className="h-10 w-10 text-white" />}
             title="TOTAL TABUNG"
-            value={formatNumberQty(calculateTotalQty(filteredData, "distributionQty"))}
+            value={formatNumberQty(
+              calculateTotalQty(filteredData, "distributionQty")
+            )}
           />
           <InfoCard
             icon={<Weight className="h-10 w-10 text-white" />}
             title="TOTAL BERAT TABUNG"
-            value={formatNumberQty(calculateTotalQty(filteredData, "distributionQty") * 3)}
+            value={formatNumberQty(
+              calculateTotalQty(filteredData, "distributionQty") * 3
+            )}
             unit="Kg"
           />
           <InfoCard
@@ -267,9 +283,8 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
                 onDateChange={setDateFilter}
                 placeholder={
                   dateFilter == null
-                  ? 
-                  "Semua Tanggal"
-                  :`${format(new Date(), "dd MMMM yyyy", { locale: id })}`
+                    ? "Semua Tanggal"
+                    : `${format(new Date(), "dd MMMM yyyy", { locale: id })}`
                 }
               />
             </div>
@@ -313,24 +328,24 @@ const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
               </div>
             )}
 
-            {/* Bersihkan Pencarian Button */}
-            {filtered && 
+            {/* Reset Button */}
+            {filtered && (
               <div className="w-full sm:w-auto">
-              <Button
-                variant="destructive"
-                className="w-full sm:w-auto flex items-center justify-center"
-                onClick={() => {
-                  setDateFilter(null)
-                  setFiltered(false);
-                  isFiltered = !isFiltered;
-                  handleClearSearch()
-                }}
-              >
-                <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
-                <span className="truncate">Bersihkan Pencarian</span>
-              </Button>
-            </div>
-            }
+                <Button
+                  variant="destructive"
+                  className="w-full sm:w-auto flex items-center justify-center"
+                  onClick={() => {
+                    setDateFilter(null);
+                    setFiltered(false);
+                    isFiltered = !isFiltered;
+                    handleClearSearch();
+                  }}
+                >
+                  <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
+                  <span className="truncate">Reset</span>
+                </Button>
+              </div>
+            )}
           </div>
         </Card>
         <DataTable columns={columns} data={filteredData} />

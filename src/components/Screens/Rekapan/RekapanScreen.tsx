@@ -13,7 +13,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import ComboBoxNelsen from "@/components/FeatureComponents/ComboBoxNelsen";
-import { lpgDistributionColumns } from "@/lib/Column";
+import {
+  adminLpgDistributionColumns,
+  lpgDistributionColumns,
+} from "@/lib/Column";
 import Pagination from "@/components/FeatureComponents/Pagination";
 import {
   Popover,
@@ -25,8 +28,19 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import InfoCard from "@/components/InfoCard";
-import { CalendarCheck, Database, Handshake, Weight } from "lucide-react";
+import {
+  CalendarCheck,
+  Database,
+  Handshake,
+  Search,
+  SearchX,
+  Weight,
+  X,
+} from "lucide-react";
 import { DataTableBackEnd } from "@/components/FeatureComponents/DataTableBackEnd";
+import { DataTable } from "@/components/ui/data-table";
+import { id } from "date-fns/locale";
+import { User } from "../../../../generated/prisma_client";
 
 type valuesFilter = {
   agentName: string;
@@ -40,9 +54,11 @@ type bpeNumberData = {
 };
 
 export default function RekapanScreen({
+  user,
   dataBpeDeliveryAgent,
   defaultData,
 }: {
+  user: User;
   dataBpeDeliveryAgent: bpeNumberData[];
   defaultData: any[];
 }) {
@@ -65,6 +81,7 @@ export default function RekapanScreen({
   const formattedTotalBeratQty = totalBeratQty.toLocaleString("id-ID");
 
   const [loading, setLoading] = useState(false);
+  const [isFiltered, setIsFiltered] = useState(true);
   const [paginationLoading, setPaginationLoading] = useState(false);
   const [tableData, setTableData] = useState(defaultData);
   const [pagination, setPagination] = useState({
@@ -92,6 +109,7 @@ export default function RekapanScreen({
   });
 
   async function fetchData(values: valuesFilter, pageNumber: number) {
+    setIsFiltered(true);
     setPaginationLoading(true);
     try {
       const { from, to } = values.range || {};
@@ -176,18 +194,15 @@ export default function RekapanScreen({
           <div className="px-4 text-center">
             <h1 className="text-lg font-semibold py-2 pb-4">Filter Rekap</h1>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 mb-4">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
                 <FormField
                   control={form.control}
                   name="agentName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name Agent</FormLabel>
+                      <FormLabel className="text-lg">Nama Agen</FormLabel>
                       <FormControl>
                         <ComboBoxNelsen
                           placeholder="Pilih Nama Agen"
@@ -207,10 +222,10 @@ export default function RekapanScreen({
                   name="deliveryNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>No Delivery</FormLabel>
+                      <FormLabel className="text-lg">No DO</FormLabel>
                       <FormControl>
                         <ComboBoxNelsen
-                          placeholder="Pilih Nomor Delivery"
+                          placeholder="Pilih Nomor DO"
                           data={dataBpeDeliveryAgent}
                           selectedValue={field.value}
                           onSelect={field.onChange}
@@ -227,13 +242,13 @@ export default function RekapanScreen({
                   name="range"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="block">Rentang Tanggal</FormLabel>
+                      <FormLabel className="block text-lg">Tanggal</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
                             variant={"outline"}
                             className={cn(
-                              "w-[300px] justify-start text-left font-normal my-2",
+                              "w-full justify-start text-left font-normal my-2",
                               !field.value && "text-muted-foreground"
                             )}
                           >
@@ -241,14 +256,21 @@ export default function RekapanScreen({
                             {field.value?.from ? (
                               field.value?.to ? (
                                 <>
-                                  {format(field.value.from, "PPP")} -{" "}
-                                  {format(field.value.to, "PPP")}
+                                  {format(field.value.from, "PPP", {
+                                    locale: id,
+                                  })}{" "}
+                                  -{" "}
+                                  {format(field.value.to, "PPP", {
+                                    locale: id,
+                                  })}
                                 </>
                               ) : (
-                                format(field.value.from, "PPP")
+                                format(field.value.from, "PPP", {
+                                  locale: id,
+                                })
                               )
                             ) : (
-                              <span>Pick a date</span>
+                              <span>Pilih Tanggal</span>
                             )}
                           </Button>
                         </PopoverTrigger>
@@ -262,6 +284,7 @@ export default function RekapanScreen({
                               date > new Date() || date < new Date("2000-01-01")
                             }
                             numberOfMonths={2}
+                            locale={id}
                           />
                         </PopoverContent>
                       </Popover>
@@ -269,27 +292,51 @@ export default function RekapanScreen({
                     </FormItem>
                   )}
                 />
-
-                <div className="flex justify-between items-center">
-                  <Button type="submit" disabled={loading}>
-                    {loading ? "Loading..." : "Submit"}
-                  </Button>
-                  <Button type="button" variant="outline" onClick={handleReset}>
-                    Reset
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
+              </div>
+              <div className="flex w-full sm:w-auto md:justify-end sm:justify-end">
+                <Button
+                  type="submit"
+                  className="flex w-full sm:w-auto items-center mr-2"
+                  disabled={loading}
+                >
+                  <Search className="h-4 w-4 cursor-pointer" />
+                  {loading ? "Loading..." : "Cari"}
+                </Button>
+                {/* {isFiltered && ( */}
+                <Button
+                  type="button"
+                  variant="destructive"
+                  className="flex items-center justify-center"
+                  onClick={() => {
+                    handleReset();
+                    setIsFiltered(false);
+                  }}
+                >
+                  <X className="h-4 w-4 cursor-pointer" />
+                </Button>
+                {/* )} */}
+              </div>
+            </form>
+          </Form>
         </Card>
         <div>
-          <DataTableBackEnd columns={lpgDistributionColumns} data={tableData} />
-          <Pagination
+          <DataTableBackEnd
+            columns={
+              user.role === "ADMIN"
+                ? adminLpgDistributionColumns
+                : lpgDistributionColumns
+            }
+            data={tableData}
+            onPageChange={handlePageChange}
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+          />
+          {/* <Pagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
             onPageChange={handlePageChange}
             loading={paginationLoading}
-          />
+          /> */}
         </div>
       </div>
     </div>

@@ -23,9 +23,9 @@ import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import { Loader, Printer } from "lucide-react";
+import { Download, Loader, Printer, SearchX } from "lucide-react";
 import RekapPenyaluranBe from "@/components/FeatureComponents/CetakDistribusi/RekapPenyaluranBe";
-
+import { id } from "date-fns/locale";
 
 type valuesFilter = {
   agentName: string;
@@ -60,6 +60,7 @@ export default function DownloadComponent({
 }) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
+  const [isAgentFiltered, setIsAgentFiltered] = useState<boolean>(false);
   const downloadLinkRef = useRef<HTMLButtonElement>(null);
 
   const form = useForm<valuesFilter>({
@@ -72,6 +73,7 @@ export default function DownloadComponent({
 
   async function fetchData(values: valuesFilter) {
     try {
+      setIsAgentFiltered(values.agentName != "");
       const { from, to } = values.range || {};
       const response = await fetch("/api/rekap", {
         method: "POST",
@@ -85,7 +87,7 @@ export default function DownloadComponent({
         }),
       });
       const result = await response.json();
-      console.log(result);
+      console.log(result, "API RESULT");
       setData(result.data);
       // Menunggu PDF ter-generate sebelum klik
       setTimeout(() => {
@@ -106,7 +108,7 @@ export default function DownloadComponent({
   // Reset form and fetch all data
   function handleReset() {
     form.reset();
-    onSubmit(form.getValues());
+    // onSubmit(form.getValues());
   }
 
   return (
@@ -116,18 +118,19 @@ export default function DownloadComponent({
           <div className="px-4 text-center">
             <h1 className="text-lg font-semibold py-2 pb-4">Filter Rekap</h1>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 mb-4">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-8"
-              >
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col space-y-4"
+            >
+              <div className="grid grid-cols-3 gap-4 items-end">
+                {/* Agent Name */}
                 <FormField
                   control={form.control}
                   name="agentName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name Agent</FormLabel>
+                      <FormLabel className="text-lg">Nama Agen</FormLabel>
                       <FormControl>
                         <ComboBoxNelsen
                           placeholder="Pilih Nama Agen"
@@ -142,15 +145,17 @@ export default function DownloadComponent({
                     </FormItem>
                   )}
                 />
+
+                {/* Delivery Number */}
                 <FormField
                   control={form.control}
                   name="deliveryNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>No Delivery</FormLabel>
+                      <FormLabel className="text-lg">Nomor DO</FormLabel>
                       <FormControl>
                         <ComboBoxNelsen
-                          placeholder="Pilih Nomor Delivery"
+                          placeholder="Pilih Nomor DO"
                           data={dataBpeDeliveryAgent}
                           selectedValue={field.value}
                           onSelect={field.onChange}
@@ -162,43 +167,52 @@ export default function DownloadComponent({
                     </FormItem>
                   )}
                 />
+
+                {/* Date Range */}
                 <FormField
                   control={form.control}
                   name="range"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Rentang Tanggal</FormLabel>
+                      <FormLabel className="text-lg"> Tanggal</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
                               variant={"outline"}
                               className={cn(
-                                "w-[240px] pl-3 text-left font-normal",
+                                "w-full justify-start text-left font-normal my-2",
                                 !field.value && "text-muted-foreground"
                               )}
                             >
+                              <CalendarIcon />
                               {field.value?.from && field.value?.to ? (
                                 <>
-                                  {format(field.value.from, "PPP")} -{" "}
-                                  {format(field.value.to, "PPP")}
+                                  {format(field.value.from, "PPP", {
+                                    locale: id,
+                                  })}{" "}
+                                  -{" "}
+                                  {format(field.value.to, "PPP", {
+                                    locale: id,
+                                  })}
                                 </>
                               ) : (
-                                <span>Pick a date</span>
+                                <span>Pilih Tanggal</span>
                               )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
                           </FormControl>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
                           <Calendar
-                            mode="range" // Mengubah mode menjadi range
-                            selected={field.value} // Menyambungkan nilai yang dipilih dengan field value
-                            onSelect={field.onChange} // Memperbarui form dengan nilai yang dipilih
+                            mode="range"
+                            selected={field.value}
+                            onSelect={field.onChange}
                             disabled={(date) =>
                               date > new Date() || date < new Date("1900-01-01")
-                            } // Validasi untuk tanggal yang tidak bisa dipilih
+                            }
                             initialFocus
+                            numberOfMonths={2}
+                            locale={id}
                           />
                         </PopoverContent>
                       </Popover>
@@ -206,46 +220,53 @@ export default function DownloadComponent({
                     </FormItem>
                   )}
                 />
-
-                <div className="flex justify-between items-center">
-                  <Button type="button" variant="outline" onClick={handleReset}>
-                    Reset
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="w-full sm:w-auto flex items-center justify-center"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <Loader className="h-4 w-4 animate-spin mr-2" />
-                        <span className="truncate">Memproses...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-                        <span className="truncate">Cetak Rekap</span>
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </div>
+              </div>
+              <div className="flex justify-end space-x-2 mt-5">
+                <Button
+                  type="submit"
+                  className="flex items-center"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <>
+                      <Loader className="h-4 w-4 animate-spin mr-2" />
+                      <span className="truncate">Memproses...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+                      <span className="truncate">Unduh Rekap</span>
+                    </>
+                  )}
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleReset}
+                >
+                  <SearchX className="h-4 w-4 cursor-pointer" />
+                  <span className="truncate">Reset</span>
+                </Button>
+              </div>
+            </form>
+            {/* Buttons */}
+          </Form>
         </Card>
         {/* Trigger PDF download automatically after form submission */}
-        {data.length > 0 && (
-          <PDFDownloadLink
-            className="text-center"
-            document={<RekapPenyaluranBe data={data} />}
-            fileName={`Rekap Penyaluran Elpiji.pdf`}
-          >
-            <Button ref={downloadLinkRef} className="hidden">
-              <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-              <span className="truncate">Cetak Rekap</span>
-            </Button>
-          </PDFDownloadLink>
-        )}
+        {/* {data.length > 0 && ( */}
+        <PDFDownloadLink
+          className="text-center"
+          document={
+            <RekapPenyaluranBe data={data} isAgentFiltered={isAgentFiltered} />
+          }
+          fileName={`Rekap Penyaluran Elpiji.pdf`}
+        >
+          <Button ref={downloadLinkRef} className="hidden">
+            <Download className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
+            <span className="truncate">Unduh Rekap</span>
+          </Button>
+        </PDFDownloadLink>
+        {/* )} */}
         {/* {data ? (
           <div>
             <div className="mb-4 p-4 border rounded-lg">

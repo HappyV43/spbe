@@ -27,6 +27,7 @@ import {
   CalendarCheck,
   CalendarDays,
   CalendarX2,
+  ChartSpline,
   Clock4,
   Download,
   PackagePlus,
@@ -62,6 +63,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
   const [allDataSummary, setAllDataSummary] = useState(allData);
   const [weeklySummary, setWeeklySummary] = useState(weekly);
   const [yearlySummary, setYearlySummary] = useState(yearly);
+
   const [data, setData] = useState<AllocationData[]>([]);
   const [monthly, setMonthly] = useState<DataConfig[]>([]);
   // Summary Chart
@@ -76,18 +78,18 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
     to: Date | null;
   } | null>();
 
-  const [filteredDaily, setFilteredDaily] = useState<AllocationData[]>([]);
-  const [filteredMonthly, setFilteredMonthly] = useState<DataConfig[]>([]);
-  const [filteredDistribution, setFilteredDistribution] = useState<
-    AllocationData[]
-  >([]);
+  // const [filteredDaily, setFilteredDaily] = useState<AllocationData[]>([]);
+  // const [filteredMonthly, setFilteredMonthly] = useState<DataConfig[]>([]);
+  // const [filteredDistribution, setFilteredDistribution] = useState<
+  //   AllocationData[]
+  // >([]);
 
-  const totalDailyQty = calculateSummaryQty(filteredDaily, "allocatedQty");
-  const totalMonthlyQty = calculateSummaryQty(filteredMonthly, "qty");
-  const totalDistributionlyQty = calculateSummaryQty(
-    filteredDistribution,
-    "lpgDistribution.distributionQty"
-  );
+  // const totalDailyQty = calculateSummaryQty(filteredDaily, "allocatedQty");
+  // const totalMonthlyQty = calculateSummaryQty(filteredMonthly, "qty");
+  // const totalDistributionlyQty = calculateSummaryQty(
+  //   filteredDistribution,
+  //   "lpgDistribution.distributionQty"
+  // );
 
   const filterByDate = (itemDate: Date, day?: string) => {
     const matchesDate = dateFilter?.from
@@ -102,32 +104,41 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
     return matchesDate;
   };
 
-  const loadAllData = async () => {
-    const { data, monthly } = await getSummary();
-    setData(data);
-    setMonthly(monthly);
+  // Initial load
+  // useEffect(() => {
+  //   loadAllData();
+  // }, []);
 
-    const monthlyData = monthly.map((item: any) => ({
-      date: item.date,
-      qty: item.qty,
-    }));
-
-    const dailyData = data.map((item: any) => ({
-      date: item.plannedGiDate,
-      qty: item.allocatedQty,
-    }));
-
-    const distributionData = data
-      .filter((item: any) => item.lpgDistribution !== null)
-      .map((item: any) => ({
-        date: item.lpgDistribution.giDate,
-        qty: item.lpgDistribution.distributionQty ?? 0,
-      }));
-
-    setDailyAllocation(dailyData);
-    setMonthlyAllocation(monthlyData);
-    setDailyDistribution(distributionData);
+  const clearFilters = () => {
+    setDateFilter(null);
   };
+
+  // const loadAllData = async () => {
+  //   const { data, monthly } = await getSummary();
+  //   setData(data);
+  //   setMonthly(monthly);
+
+  //   const monthlyData = monthly.map((item: any) => ({
+  //     date: item.date,
+  //     qty: item.qty,
+  //   }));
+
+  //   const dailyData = data.map((item: any) => ({
+  //     date: item.plannedGiDate,
+  //     qty: item.allocatedQty,
+  //   }));
+
+  //   const distributionData = data
+  //     .filter((item: any) => item.lpgDistribution !== null)
+  //     .map((item: any) => ({
+  //       date: item.lpgDistribution.giDate,
+  //       qty: item.lpgDistribution.distributionQty ?? 0,
+  //     }));
+
+  //   setDailyAllocation(dailyData);
+  //   setMonthlyAllocation(monthlyData);
+  //   setDailyDistribution(distributionData);
+  // };
 
   const allocationData = weeklySummary.weeklySummary.map((item) => ({
     date: new Date(item.date).toLocaleDateString("id-ID"), // Format jadi YYYY-MM-DD
@@ -184,36 +195,29 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
   // }, [data, monthly]);
 
   // Apply filters when date filter changes
-  useEffect(() => {
-    const filteredDailyData = data.filter((item: AllocationData) => 
-      item.lpgDistribution?.giDate ? filterByDate(item.lpgDistribution.giDate) : false
-    );
+  // useEffect(() => {
+  //   const filteredDailyData = data.filter((item: AllocationData) =>
+  //     item.lpgDistribution?.giDate
+  //       ? filterByDate(item.lpgDistribution.giDate)
+  //       : false
+  //   );
 
-    const filteredMonthlyData = monthly.filter((item) =>
-      filterByDate(item.date)
-    );
+  //   const filteredMonthlyData = monthly.filter((item) =>
+  //     filterByDate(item.date)
+  //   );
 
-    const filteredDistributionData = data
-      .filter((item) => item.lpgDistribution !== null)
-      .filter((item) =>
-        item.lpgDistribution?.giDate
-          ? filterByDate(item.lpgDistribution.giDate)
-          : false
-      );
+  //   const filteredDistributionData = data
+  //     .filter((item) => item.lpgDistribution !== null)
+  //     .filter((item) =>
+  //       item.lpgDistribution?.giDate
+  //         ? filterByDate(item.lpgDistribution.giDate)
+  //         : false
+  //     );
 
-    setFilteredDaily(filteredDailyData);
-    setFilteredMonthly(filteredMonthlyData);
-    setFilteredDistribution(filteredDistributionData);
-  }, [data, monthly, dateFilter]);
-
-  // Initial load
-  useEffect(() => {
-    loadAllData();
-  }, []);
-
-  const clearFilters = () => {
-    setDateFilter(null);
-  };
+  //   setFilteredDaily(filteredDailyData);
+  //   setFilteredMonthly(filteredMonthlyData);
+  //   setFilteredDistribution(filteredDistributionData);
+  // }, [data, monthly, dateFilter]);
 
   // const downloadPDF = async () => {
   //   try {
@@ -409,7 +413,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               } Kg`}
             />
 
-            <SummaryItems
+            {/* <SummaryItems
               icon={<Clock4 className="h-10 w-10 text-white" />}
               title={"PENDING HARIAN"}
               value={`${formatNumberQty(
@@ -418,7 +422,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               additionalInfo={`${formatNumberQty(
                 calcSummary(dailyAllocation, dailyDistribution) * 3
               )} Kg`}
-            />
+            /> */}
 
             <SummaryItems
               icon={<Clock4 className="h-10 w-10 text-white" />}
@@ -427,10 +431,9 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               additionalInfo={`${(
                 (summaryData?.pending ?? 0) * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
             />
 
-            <SummaryItems
+            {/* <SummaryItems
               icon={<PackagePlus className="h-10 w-10 text-white" />}
               title={"FAKULTATIF"}
               value={`${formatNumberQty(
@@ -439,7 +442,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               additionalInfo={`${formatNumberQty(
                 calcSummary(dailyAllocation, monthlyAllocation) * 3
               )} Kg`}
-            />
+            /> */}
 
             <SummaryItems
               icon={<PackagePlus className="h-10 w-10 text-white" />}
@@ -448,10 +451,9 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               additionalInfo={`${(
                 (summaryData?.fakultatif ?? 0) * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
             />
 
-            <SummaryItems
+            {/* <SummaryItems
               icon={<CalendarX2 className="h-10 w-10 text-white" />}
               title={"ALOKASI TIDAK DITEBUS"}
               value={`${formatNumberQty(
@@ -460,7 +462,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               additionalInfo={`${formatNumberQty(
                 calcSummary(monthlyAllocation, dailyAllocation) * 3
               )} Kg`}
-            />
+            /> */}
 
             <SummaryItems
               icon={<CalendarX2 className="h-10 w-10 text-white" />}
@@ -469,7 +471,6 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               additionalInfo={`${(
                 (summaryData?.tidakTembus ?? 0) * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
             />
           </div>
         </Card>
@@ -585,7 +586,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
                   className="flex items-center justify-center flex-2"
                 >
                   <X className="h-5 w-5 cursor-pointer" />
-                  {/* <span className="truncate">Bersihkan Pencarian</span> */}
+                  {/* <span className="truncate">Reset</span> */}
                 </Button>
               )}
             </div>
@@ -664,9 +665,11 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
             />
 
             <SummaryItems
-              icon={<CalendarX2 className="h-10 w-10 text-white" />}
+              icon={<ChartSpline className="h-10 w-10 text-white" />}
               title={"RATA-RATA DISTRIBUSI"}
-              value={`${Number(allDataSummary.average).toLocaleString("id-ID")} / `}
+              value={`${Number(allDataSummary.average).toLocaleString(
+                "id-ID"
+              )} / `}
               additionalInfo={`${(
                 Number(allDataSummary.average) * 3
               ).toLocaleString("id-ID")} Kg`}
@@ -676,29 +679,30 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
         </Card>
       </div>
 
-      <div className="mb-16"></div>
+      <div className="mb-16" />
       <div className="my-5">
         <div className="pl-2 mt-5">
-          <div className="flex items-center justify-between mx-1 mb-4">
+          <div className="md:flex items-center justify-between mx-1 mb-4">
             <h1 className="text-2xl font-semibold">Chart Jumlah Tabung</h1>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2 justify-center md:justify-end">
               <Button
                 onClick={downloadWeeklyChart}
-                className="w-auto flex items-center justify-center"
+                className="w-full md:w-auto flex items-center justify-center"
               >
-                <Download className="h-5 w-5 mr-2 cursor-pointer" />
+                <Download className="h-5 w-5 mr-2" />
                 <span className="truncate">Chart Mingguan</span>
               </Button>
               <Button
                 onClick={downloadYearlyChart}
-                className="w-auto flex items-center justify-center"
+                className="w-full md:w-auto flex items-center justify-center"
               >
-                <Download className="h-5 w-5 mr-2 cursor-pointer" />
+                <Download className="h-5 w-5 mr-2" />
                 <span className="truncate">Chart Tahunan</span>
               </Button>
             </div>
           </div>
         </div>
+
         <div ref={weeklyChartRef} id="chart-weekly">
           <Card className="flex flex-col w-full h-[550px] pb-3 shadow-lg rounded-2xl bg-white ">
             <CardHeader className="pb-0">

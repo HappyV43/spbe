@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { format, parse } from "date-fns";
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const RekapPenyaluranBe = ({ data }: any) => {
+const RekapPenyaluranBe = ({ data, isAgentFiltered }: any) => {
   const TOTAL = data.reduce((acc: any, item: any) => {
     const subtotal = item.records.reduce(
       (sum: any, record: any) => sum + record.allocatedQty,
@@ -235,121 +235,123 @@ const RekapPenyaluranBe = ({ data }: any) => {
                         {formatNumberQty(item.quantity.totalAllocatedQty * 3)}
                       </Text>
                     </View>
-                    <>
-                      <View
-                        style={[styles.tableRow, styles.summaryRow]}
-                        wrap={false}
-                      >
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            {
-                              flex: 11,
-                              fontWeight: "bold",
-                              textAlign: "left",
-                              fontFamily: "Times-Bold",
-                            },
-                          ]}
+                    {isAgentFiltered == "" && (
+                      <>
+                        <View
+                          style={[styles.tableRow, styles.summaryRow]}
                           wrap={false}
                         >
-                          Total Pending
-                        </Text>
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            { flex: 1, fontWeight: "bold" },
-                          ]}
-                          wrap={false}
-                        >
-                          {formatNumberQty(item.quantity.totalPending)}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            { flex: 1, fontWeight: "bold" },
-                          ]}
-                          wrap={false}
-                        >
-                          {formatNumberQty(item.quantity.totalPending * 3)}
-                        </Text>
-                      </View>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              {
+                                flex: 11,
+                                fontWeight: "bold",
+                                textAlign: "left",
+                                fontFamily: "Times-Bold",
+                              },
+                            ]}
+                            wrap={false}
+                          >
+                            Total Pending
+                          </Text>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              { flex: 1, fontWeight: "bold" },
+                            ]}
+                            wrap={false}
+                          >
+                            {formatNumberQty(item.quantity.totalPending)}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              { flex: 1, fontWeight: "bold" },
+                            ]}
+                            wrap={false}
+                          >
+                            {formatNumberQty(item.quantity.totalPending * 3)}
+                          </Text>
+                        </View>
 
-                      <View
-                        style={[styles.tableRow, styles.summaryRow]}
-                        wrap={false}
-                      >
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            {
-                              flex: 11,
-                              fontWeight: "bold",
-                              textAlign: "left",
-                              fontFamily: "Times-Bold",
-                            },
-                          ]}
+                        <View
+                          style={[styles.tableRow, styles.summaryRow]}
                           wrap={false}
                         >
-                          Total Fakultatif
-                        </Text>
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            { flex: 1, fontWeight: "bold" },
-                          ]}
-                          wrap={false}
-                        >
-                          {formatNumberQty(item.quantity.totalFakultatif)}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            { flex: 1, fontWeight: "bold" },
-                          ]}
-                          wrap={false}
-                        >
-                          {formatNumberQty(item.quantity.totalFakultatif * 3)}
-                        </Text>
-                      </View>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              {
+                                flex: 11,
+                                fontWeight: "bold",
+                                textAlign: "left",
+                                fontFamily: "Times-Bold",
+                              },
+                            ]}
+                            wrap={false}
+                          >
+                            Total Fakultatif
+                          </Text>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              { flex: 1, fontWeight: "bold" },
+                            ]}
+                            wrap={false}
+                          >
+                            {formatNumberQty(item.quantity.totalFakultatif)}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              { flex: 1, fontWeight: "bold" },
+                            ]}
+                            wrap={false}
+                          >
+                            {formatNumberQty(item.quantity.totalFakultatif * 3)}
+                          </Text>
+                        </View>
 
-                      <View
-                        style={[styles.tableRow, styles.summaryRow]}
-                        wrap={false}
-                      >
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            {
-                              flex: 11,
-                              fontWeight: "bold",
-                              textAlign: "left",
-                              fontFamily: "Times-Bold",
-                            },
-                          ]}
+                        <View
+                          style={[styles.tableRow, styles.summaryRow]}
                           wrap={false}
                         >
-                          Total LO Tidak Ditebus
-                        </Text>
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            { flex: 1, fontWeight: "bold" },
-                          ]}
-                          wrap={false}
-                        >
-                          {formatNumberQty(item.quantity.totalLo)}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.tableCell,
-                            { flex: 1, fontWeight: "bold" },
-                          ]}
-                          wrap={false}
-                        >
-                          {formatNumberQty(item.quantity.totalLo * 3)}
-                        </Text>
-                      </View>
-                    </>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              {
+                                flex: 11,
+                                fontWeight: "bold",
+                                textAlign: "left",
+                                fontFamily: "Times-Bold",
+                              },
+                            ]}
+                            wrap={false}
+                          >
+                            Total LO Tidak Ditebus
+                          </Text>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              { flex: 1, fontWeight: "bold" },
+                            ]}
+                            wrap={false}
+                          >
+                            {formatNumberQty(item.quantity.totalLo)}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.tableCell,
+                              { flex: 1, fontWeight: "bold" },
+                            ]}
+                            wrap={false}
+                          >
+                            {formatNumberQty(item.quantity.totalLo * 3)}
+                          </Text>
+                        </View>
+                      </>
+                    )}
                   </View>
                 </View>
               </View>
@@ -357,7 +359,7 @@ const RekapPenyaluranBe = ({ data }: any) => {
           </View>
         ) : (
           <Text style={{ textAlign: "center", marginTop: 20 }}>
-          Data tidak ditemukan
+            Data tidak ditemukan
           </Text>
         )}
 

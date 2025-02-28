@@ -15,7 +15,6 @@ import { Card } from "@/components/ui/card";
 import ComboBoxNelsen from "@/components/FeatureComponents/ComboBoxNelsen";
 import { DataTableBackEnd } from "@/components/FeatureComponents/DataTableBackEnd";
 import { adminAllocationColumns, allocationColumns } from "@/lib/Column";
-import Pagination from "@/components/FeatureComponents/Pagination";
 import {
   Popover,
   PopoverContent,
@@ -31,11 +30,14 @@ import {
   CalendarCheck,
   Database,
   Handshake,
+  Search,
   SearchX,
   Upload,
   Weight,
+  X,
 } from "lucide-react";
 import InfoCard from "@/components/InfoCard";
+import { id } from "date-fns/locale";
 
 type valuesFilter = {
   status: string;
@@ -77,6 +79,7 @@ const AlokasiHarianBe = ({
   const formattedTotalQty = totalQty.toLocaleString("id-ID");
   const formattedTotalBeratQty = totalBeratQty.toLocaleString("id-ID");
 
+  const [isFiltered, setIsFiltered] = useState(true);
   const [loading, setLoading] = useState(false);
   const [paginationLoading, setPaginationLoading] = useState(false);
   const [tableData, setTableData] = useState(defaultdata);
@@ -111,6 +114,7 @@ const AlokasiHarianBe = ({
   });
 
   async function fetchData(values: valuesFilter, pageNumber: number) {
+    setIsFiltered(true);
     setPaginationLoading(true);
     try {
       const { from, to } = values.range || {};
@@ -200,120 +204,127 @@ const AlokasiHarianBe = ({
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 mb-4"
+                className="flex flex-col space-y-4"
               >
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status</FormLabel>
-                      <FormControl>
-                        <ComboBoxNelsen
-                          placeholder="Pilih Status"
-                          data={statusOptions}
-                          selectedValue={field.value}
-                          onSelect={field.onChange}
-                          valueKey="value"
-                          displayKey="label"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="agentName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name Agent</FormLabel>
-                      <FormControl>
-                        <ComboBoxNelsen
-                          placeholder="Pilih Nama Agen"
-                          data={dataBpeDeliveryAgent}
-                          selectedValue={field.value}
-                          onSelect={field.onChange}
-                          valueKey="agentName"
-                          displayKey="agentName"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="deliveryNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>No Delivery</FormLabel>
-                      <FormControl>
-                        <ComboBoxNelsen
-                          placeholder="Pilih Nomor Delivery"
-                          data={dataBpeDeliveryAgent}
-                          selectedValue={field.value}
-                          onSelect={field.onChange}
-                          valueKey="deliveryNumber"
-                          displayKey="deliveryNumber"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="range"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="block">Rentang Tanggal</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            className={cn(
-                              "w-[300px] justify-start text-left font-normal my-2",
-                              !field.value && "text-muted-foreground"
-                            )}
-                          >
-                            <CalendarIcon />
-                            {field.value?.from ? (
-                              field.value?.to ? (
-                                <>
-                                  {format(field.value.from, "PPP")} -{" "}
-                                  {format(field.value.to, "PPP")}
-                                </>
-                              ) : (
-                                format(field.value.from, "PPP")
-                              )
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            initialFocus
-                            mode="range"
-                            selected={field.value}
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg">Status</FormLabel>
+                        <FormControl>
+                          <ComboBoxNelsen
+                            placeholder="Pilih Status"
+                            data={statusOptions}
+                            selectedValue={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) =>
-                              date > new Date() || date < new Date("2000-01-01")
-                            }
-                            numberOfMonths={2}
+                            valueKey="value"
+                            displayKey="label"
                           />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex justify-between items-center">
-                  <Button type="submit" disabled={loading}>
-                    {loading ? "Loading..." : "Submit"}
-                  </Button>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="agentName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg">Nama Agen</FormLabel>
+                        <FormControl>
+                          <ComboBoxNelsen
+                            placeholder="Pilih Nama Agen"
+                            data={dataBpeDeliveryAgent}
+                            selectedValue={field.value}
+                            onSelect={field.onChange}
+                            valueKey="agentName"
+                            displayKey="agentName"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="deliveryNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-lg">Nomer DO</FormLabel>
+                        <FormControl>
+                          <ComboBoxNelsen
+                            placeholder="Pilih Nomor DO"
+                            data={dataBpeDeliveryAgent}
+                            selectedValue={field.value}
+                            onSelect={field.onChange}
+                            valueKey="deliveryNumber"
+                            displayKey="deliveryNumber"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="range"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-lg">Tanggal</FormLabel>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={"outline"}
+                              className={cn(
+                                "w-full justify-start text-left font-normal my-2",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              <CalendarIcon />
+                              {field.value?.from ? (
+                                field.value?.to ? (
+                                  <>
+                                    {format(field.value.from, "PPP", {
+                                      locale: id,
+                                    })}{" "}
+                                    -{" "}
+                                    {format(field.value.to, "PPP", {
+                                      locale: id,
+                                    })}
+                                  </>
+                                ) : (
+                                  format(field.value.from, "PPP", {
+                                    locale: id,
+                                  })
+                                )
+                              ) : (
+                                <span>Pilih Tanggal</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              initialFocus
+                              mode="range"
+                              selected={field.value}
+                              onSelect={field.onChange}
+                              disabled={(date) =>
+                                date > new Date() ||
+                                date < new Date("2000-01-01")
+                              }
+                              numberOfMonths={2}
+                              locale={id}
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2">
                   {user.role === "ADMIN" && (
                     <div className="w-full sm:w-auto">
                       <Button
@@ -328,16 +339,28 @@ const AlokasiHarianBe = ({
                       </Button>
                     </div>
                   )}
-                  <div className="w-full sm:w-auto">
+                  <div className="flex w-full sm:w-auto">
+                    <Button
+                      type="submit"
+                      className="flex w-full sm:w-auto items-center mr-2"
+                      disabled={loading}
+                    >
+                      <Search className="h-4 w-4 cursor-pointer" />
+                      {loading ? "Loading..." : "Cari"}
+                    </Button>
+                    {/* {isFiltered && ( */}
                     <Button
                       type="button"
                       variant="destructive"
-                      className="w-full sm:w-auto flex items-center justify-center"
-                      onClick={handleReset}
+                      className="flex items-center justify-center"
+                      onClick={() => {
+                        handleReset();
+                        setIsFiltered(false);
+                      }}
                     >
-                      <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
-                      <span className="truncate">Bersihkan Pencarian</span>
+                      <X className="h-4 w-4 cursor-pointer" />
                     </Button>
+                    {/* )} */}
                   </div>
                 </div>
               </form>
@@ -351,13 +374,16 @@ const AlokasiHarianBe = ({
               user.role === "ADMIN" ? adminAllocationColumns : allocationColumns
             }
             data={tableData}
+            onPageChange={handlePageChange}
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
           />
-          <Pagination
+          {/* <Pagination
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
             onPageChange={handlePageChange}
             loading={paginationLoading}
-          />
+          /> */}
         </div>
       </div>
     </div>

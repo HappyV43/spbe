@@ -2,21 +2,6 @@
 
 import type * as React from "react";
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  ChartArea,
-  Command,
-  Database,
-  Frame,
-  GalleryVerticalEnd,
-  House,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
-import {
   Sidebar,
   SidebarContent,
   SidebarFooter,

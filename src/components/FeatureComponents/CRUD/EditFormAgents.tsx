@@ -25,7 +25,7 @@ const EditFormAgents = ({ row }: any) => {
   const [fax, setFax] = useState(row.fax);
   const [address, setAddress] = useState(row.address);
   const [city, setCity] = useState(row.city);
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
 
   const handleEditAgent = async (formData: FormData) => {
     const result = await updateAgentData(formData);
@@ -43,10 +43,11 @@ const EditFormAgents = ({ row }: any) => {
         description: "Agent berhasil diupdate",
       });
       redirect("/master-data/agents");
-    }    
+    }
   };
 
-  const noSpinner = "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
+  const noSpinner =
+    "[&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none";
 
   const resetFormState = () => {
     setAgentName(row.agentName);
@@ -68,31 +69,36 @@ const EditFormAgents = ({ row }: any) => {
         "Perubahan belum disimpan. Apakah Anda yakin ingin keluar?"
       );
       if (!confirmClose) {
-        e.preventDefault(); 
+        e.preventDefault();
       } else {
-        resetFormState(); 
+        resetFormState();
       }
     }
   };
-
 
   return (
     <Dialog
       open={open}
       onOpenChange={(isOpen) => {
-        setOpen(isOpen)
-        if(!isOpen){
-          resetFormState
+        setOpen(isOpen);
+        if (!isOpen) {
+          resetFormState();
         }
       }}
     >
-      <DialogTrigger className="text-center align-center justify-center">
-        <Button
-          variant="outline"
-          className="text-center align-center justify-center"
-        >
-          <Pencil className="h-4 w-4 text-center align-center cursor-pointer" style={{color:"orange"}} aria-label="Edit"/>
-        </Button>
+      <DialogTrigger asChild>
+        <span>
+          <Button
+            variant="outline"
+            className="text-center align-center justify-center"
+          >
+            <Pencil
+              className="h-4 w-4 text-center align-center cursor-pointer"
+              style={{ color: "orange" }}
+              aria-label="Edit"
+            />
+          </Button>
+        </span>
       </DialogTrigger>
       <DialogContent>
         <form
@@ -110,7 +116,9 @@ const EditFormAgents = ({ row }: any) => {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Nama Agen <span className="text-red-500 text-[16px]"> *</span></Label>
+                <Label className="text-center">
+                  Nama Agen <span className="text-red-500 text-[16px]"> *</span>
+                </Label>
                 <Input
                   id="agentName"
                   name="agentName"
@@ -121,7 +129,10 @@ const EditFormAgents = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Nomor Telepon <span className="text-red-500 text-[16px]"> *</span></Label>
+                <Label className="text-center">
+                  Nomor Telepon{" "}
+                  <span className="text-red-500 text-[16px]"> *</span>
+                </Label>
                 <Input
                   id="phone"
                   name="phone"
@@ -148,7 +159,9 @@ const EditFormAgents = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Alamat <span className="text-red-500 text-[16px]"> *</span></Label>
+                <Label className="text-center">
+                  Alamat <span className="text-red-500 text-[16px]"> *</span>
+                </Label>
                 <Input
                   id="address"
                   name="address"
@@ -159,7 +172,9 @@ const EditFormAgents = ({ row }: any) => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label className="text-center">Kota <span className="text-red-500 text-[16px]"> *</span></Label>
+                <Label className="text-center">
+                  Kota <span className="text-red-500 text-[16px]"> *</span>
+                </Label>
                 <Input
                   id="city"
                   name="city"
