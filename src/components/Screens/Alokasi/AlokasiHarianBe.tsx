@@ -165,9 +165,25 @@ const AlokasiHarianBe = ({
 
   // Reset form and fetch all data
   function handleReset() {
-    form.reset();
-    onSubmit(form.getValues());
-    form.setValue("range", null);
+    form.reset({
+      status: "",
+      agentName: "",
+      deliveryNumber: "",
+      range: null,
+    });
+
+    // Ambil semua data tanpa filter
+    fetchData(
+      {
+        status: "",
+        agentName: "",
+        deliveryNumber: "",
+        range: { from: null, to: null },
+      },
+      1
+    );
+
+    setIsFiltered(false);
   }
 
   return (

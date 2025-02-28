@@ -26,7 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import InfoCard from "@/components/InfoCard";
 import {
   CalendarCheck,
@@ -160,8 +160,27 @@ export default function RekapanScreen({
 
   // Reset form and fetch all data
   function handleReset() {
-    form.reset();
-    onSubmit(form.getValues());
+    form.reset({
+      agentName: "",
+      deliveryNumber: "",
+      range: {
+        from: null,
+        to: null,
+      },
+    });
+
+    fetchData(
+      {
+        agentName: "",
+        deliveryNumber: "",
+        range: {
+          from: null,
+          to: null,
+        },
+      },
+      1
+    );
+    setIsFiltered(false);
   }
 
   return (
