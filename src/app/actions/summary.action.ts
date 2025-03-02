@@ -163,10 +163,11 @@ export const getYearlySummaryData = async () => {
   }).map((month) => ({
     startDate: new Date(Date.UTC(year, month.getMonth(), 1, 0, 0, 0, 0)),
     endDate: new Date(Date.UTC(year, month.getMonth() + 1, 0, 23, 59, 59, 999)),
+    month: month.getMonth() + 1,
   }));
 
   const allData = await Promise.all(
-    months.map(async ({ startDate, endDate }) => {
+    months.map(async ({ startDate, endDate, month }) => {
       const [dailySummary, distributionSummary, monthlySummary] =
         await prisma.$transaction([
           prisma.allocations.groupBy({
@@ -182,82 +183,50 @@ export const getYearlySummaryData = async () => {
             orderBy: { giDate: "asc" },
           }),
           prisma.monthlyAllocations.findMany({
-            where: {
-              date: { gte: startDate, lt: endDate },
-            },
+            where: { date: { gte: startDate, lt: endDate } },
             select: { totalElpiji: true, date: true },
           }),
         ]);
-      return { dailySummary, distributionSummary, monthlySummary };
+
+      return {
+        month,
+        totalAllocatedQty: dailySummary.reduce(
+          (sum, entry) => sum + (entry._sum?.allocatedQty || 0),
+          0
+        ),
+        totalDistributionQty: distributionSummary.reduce(
+          (sum, entry) => sum + (entry._sum?.distributionQty || 0),
+          0
+        ),
+        totalMonthlyElpiji: monthlySummary.reduce(
+          (sum, entry) => sum + (entry.totalElpiji || 0),
+          0
+        ),
+      };
     })
   );
 
-  // Fungsi untuk mengelompokkan berdasarkan bulan
-  const groupByMonth = (data: any, key: any, dateKey = "giDate") => {
-    return data.reduce((acc: any, item: any) => {
-      const date = new Date(item[dateKey]);
-      const monthKey = `${date.getFullYear()}-${String(
-        date.getMonth() + 1
-      ).padStart(2, "0")}`;
+  // Pastikan semua bulan ada, meskipun datanya kosong
+  const mergedData = months.map(({ month }) => {
+    const data = allData.find((item) => item.month === month) || {
+      totalAllocatedQty: 0,
+      totalDistributionQty: 0,
+      totalMonthlyElpiji: 0,
+    };
 
-      const existing = acc.find((m: any) => m.month === monthKey);
-      if (!existing) {
-        acc.push({
-          month: monthKey,
-          totalAllocated:
-            key === "allocatedQty" ? item._sum?.allocatedQty || 0 : 0,
-          totalDistributed:
-            key === "distributionQty" ? item._sum?.distributionQty || 0 : 0,
-          totalElpiji: key === "totalElpiji" ? item.totalElpiji || 0 : 0,
-        });
-      } else {
-        if (key === "allocatedQty") {
-          existing.totalAllocated += item._sum?.allocatedQty || 0;
-        } else if (key === "distributionQty") {
-          existing.totalDistributed += item._sum?.distributionQty || 0;
-        } else if (key === "totalElpiji") {
-          existing.totalElpiji += item.totalElpiji || 0;
-        }
-      }
-      return acc;
-    }, []);
-  };
-
-  const mergedData: any[] = [];
-  allData.forEach(({ dailySummary, distributionSummary, monthlySummary }) => {
-    const allocations = groupByMonth(dailySummary, "allocatedQty");
-    const distributions = groupByMonth(distributionSummary, "distributionQty");
-    const monthly = groupByMonth(monthlySummary, "totalElpiji", "date");
-
-    allocations.forEach((alloc: any) => {
-      const existing = mergedData.find((m) => m.month === alloc.month);
-      if (!existing) {
-        mergedData.push({ ...alloc });
-      } else {
-        existing.totalAllocated += alloc.totalAllocated;
-      }
-    });
-
-    distributions.forEach((distri: any) => {
-      const existing = mergedData.find((m) => m.month === distri.month);
-      if (!existing) {
-        mergedData.push({ ...distri });
-      } else {
-        existing.totalDistributed += distri.totalDistributed;
-      }
-    });
-    monthly.forEach((month: any) => {
-      const existing = mergedData.find((m) => m.month === month.month);
-      if (!existing) {
-        mergedData.push({ ...month });
-      } else {
-        existing.totalElpiji += month.totalElpiji;
-      }
-    });
+    return {
+      month: String(`${year}-${String(month).padStart(2, "0")}`),
+      totalAllocatedQty: data.totalAllocatedQty,
+      totalDistributionQty: data.totalDistributionQty,
+      totalMonthlyElpiji: data.totalMonthlyElpiji,
+    };
   });
 
+  // console.log(mergedData);
   return mergedData;
 };
+
+// Dengan ini, datanya jadi lebih ringkas, langsung teragregasi per bulan, dan kalau nggak ada data, nilainya jadi 0. 🚀
 
 export const allDataDefault = async () => {
   const [allSummary, allDistributionSummary, allMonthlyData, uniqueDate] =

@@ -10,51 +10,57 @@ export async function POST(req: NextRequest) {
 
     const { from, to } = body;
 
-    const fromDate = new Date(from);
-    let toDate = to ? new Date(to) : new Date(from);
+    const fromDate = from ? new Date(from) : null;
+    let toDate = to ? new Date(to) : null;
 
-    // Pastikan toDate mencakup akhir hari (optional)
-    toDate.setHours(23, 59, 59, 999);
+    if (!fromDate && !toDate) {
+      // Kalau dari dan ke sama-sama null, ambil semua data
+      console.log("Ambil semua data tanpa filter tanggal");
+    } else if (fromDate && !toDate) {
+      // Kalau cuma ada fromDate, set toDate ke akhir hari itu
+      toDate = new Date(fromDate);
+      toDate.setHours(23, 59, 59, 999);
+    } else {
+      // Kalau ada kedua tanggal, set jam dari toDate ke akhir hari
+      fromDate?.setHours(0, 0, 0, 0);
+      toDate?.setHours(23, 59, 59, 999);
+    }
+
+    console.log(fromDate, toDate);
 
     const [dailySummary, distributionSummary, monthlyData, uniqueDate] =
       await prisma.$transaction([
         prisma.allocations.aggregate({
           _sum: { allocatedQty: true },
           _count: { allocatedQty: true },
-          where: {
-            giDate: { gte: fromDate, lte: toDate },
-          },
+          where: fromDate && toDate ? { giDate: { gte: fromDate, lte: toDate } } : {},
           orderBy: { plannedGiDate: "asc" },
         }),
         prisma.lpgDistributions.aggregate({
           _sum: { distributionQty: true },
           _count: { distributionQty: true },
-          where: {
-            giDate: { gte: fromDate, lte: toDate },
-          },
+          where: fromDate && toDate ? { giDate: { gte: fromDate, lte: toDate } } : {},
           orderBy: { giDate: "asc" },
         }),
         prisma.monthlyAllocations.aggregate({
           _sum: { totalElpiji: true },
           _count: { totalElpiji: true },
-          where: {
-            date: { gte: fromDate, lt: toDate },
-          },
+          where: fromDate && toDate ? { date: { gte: fromDate, lte: toDate } } : {},
           orderBy: { date: "asc" },
         }),
         prisma.lpgDistributions.findMany({
-          distinct: ["giDate"], // Ambil tanggal unik
+          distinct: ["giDate"],
           select: {
-            giDate: true, // Cuma ambil tanggalnya aja
+            giDate: true,
           },
-          where: {
-            giDate: { gte: fromDate, lt: toDate },
-          },
+          where: fromDate && toDate ? { giDate: { gte: fromDate, lte: toDate } } : {},
           orderBy: {
-            giDate: "asc", // Urutkan dari yang paling awal
+            giDate: "asc",
           },
         }),
       ]);
+
+    console.log(monthlyData);
 
     const totalProps = uniqueDate.reduce(
       (a, obj) => a + Object.keys(obj).length,

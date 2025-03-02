@@ -157,17 +157,17 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
 
   const allocationDataYearly = yearlySummary.map((item: any) => ({
     date: item.month,
-    qty: item.totalAllocated,
+    qty: item.totalAllocatedQty,
   }));
 
   const distributionDataYearly = yearlySummary.map((item: any) => ({
     date: item.month,
-    qty: item.totalDistributed,
+    qty: item.totalDistributionQty,
   }));
 
   const totalElpijiDataYearly = yearlySummary.map((item: any) => ({
     date: item.month,
-    qty: item.totalElpiji,
+    qty: item.totalMonthlyElpiji,
   }));
 
   // Configure data format and apply initial transformations
