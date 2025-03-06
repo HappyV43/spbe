@@ -51,6 +51,16 @@ export const postAgentData = async (formData: FormData) => {
     };
   }
   try {
+    const checkSameAgent = await prisma.agents.findFirst({
+      where: {
+        agentName: agentName,
+      },
+    })
+    if (checkSameAgent) {
+      return {
+        error: "Nama agent sudah digunakan",
+      };
+    }
     const postData: Agents = await prisma.agents.create({
       data: {
         agentName: agentName,
