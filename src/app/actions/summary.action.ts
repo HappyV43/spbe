@@ -15,7 +15,7 @@ export const getSummaryToday = async () => {
         _sum: { allocatedQty: true },
         _count: { _all: true },
         where: {
-          giDate: { gte: today, lt: tomorrow },
+          plannedGiDate: { gte: today, lt: tomorrow },
         },
       }),
       prisma.lpgDistributions.aggregate({
@@ -73,19 +73,58 @@ export const getWeeklySummaryDefault = async () => {
   let startDate, endDate;
 
   if (day >= 1 && day <= 7) {
-    startDate = startMonth;
-    endDate = new Date(startMonth.getFullYear(), startMonth.getMonth(), 7);
+    startDate = new Date(
+      Date.UTC(startMonth.getFullYear(), startMonth.getMonth(), 1)
+    );
+    endDate = new Date(
+      Date.UTC(
+        startMonth.getFullYear(),
+        startMonth.getMonth(),
+        7,
+        23,
+        59,
+        59,
+        999
+      )
+    );
   } else if (day >= 8 && day <= 14) {
-    startDate = new Date(startMonth.getFullYear(), startMonth.getMonth(), 8);
-    endDate = new Date(startMonth.getFullYear(), startMonth.getMonth(), 14);
+    startDate = new Date(
+      Date.UTC(startMonth.getFullYear(), startMonth.getMonth(), 8)
+    );
+    endDate = new Date(
+      Date.UTC(
+        startMonth.getFullYear(),
+        startMonth.getMonth(),
+        14,
+        23,
+        59,
+        59,
+        999
+      )
+    );
   } else if (day >= 15 && day <= 21) {
-    startDate = new Date(startMonth.getFullYear(), startMonth.getMonth(), 15);
-    endDate = new Date(startMonth.getFullYear(), startMonth.getMonth(), 21);
+    startDate = new Date(
+      Date.UTC(startMonth.getFullYear(), startMonth.getMonth(), 15)
+    );
+    endDate = new Date(
+      Date.UTC(
+        startMonth.getFullYear(),
+        startMonth.getMonth(),
+        21,
+        23,
+        59,
+        59,
+        999
+      )
+    );
   } else {
-    startDate = new Date(startMonth.getFullYear(), startMonth.getMonth(), 22);
-    endDate = endMonth;
+    startDate = new Date(
+      Date.UTC(startMonth.getFullYear(), startMonth.getMonth(), 22)
+    );
+    endDate = new Date(
+      Date.UTC(endMonth.getFullYear(), endMonth.getMonth(), endMonth.getDate())
+    );
   }
-
   const [dailySummary, distributionSummary, monthlyData] =
     await prisma.$transaction([
       prisma.allocations.groupBy({
@@ -206,6 +245,20 @@ export const getYearlySummaryData = async () => {
     })
   );
 
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
   // Pastikan semua bulan ada, meskipun datanya kosong
   const mergedData = months.map(({ month }) => {
     const data = allData.find((item) => item.month === month) || {
@@ -215,14 +268,13 @@ export const getYearlySummaryData = async () => {
     };
 
     return {
-      month: String(`${year}-${String(month).padStart(2, "0")}`),
+      month: String(`${monthNames[month - 1]}`),
       totalAllocatedQty: data.totalAllocatedQty,
       totalDistributionQty: data.totalDistributionQty,
       totalMonthlyElpiji: data.totalMonthlyElpiji,
     };
   });
 
-  // console.log(mergedData);
   return mergedData;
 };
 
@@ -278,7 +330,7 @@ export const allDataDefault = async () => {
       ? (dailyMonthly ?? 0 ?? 0) - (dailyAllo ?? 0)
       : 0;
 
-  console.log(allDistributionSummary._count?._all);
+  // console.log(allDistributionSummary._count?._all);
 
   const average = ((dailyAllo ?? 0) / totalProps).toFixed(2);
 
