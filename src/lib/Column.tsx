@@ -248,6 +248,7 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
@@ -366,6 +367,7 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
@@ -415,7 +417,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
@@ -466,7 +468,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
@@ -523,7 +525,7 @@ export const adminAgentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
@@ -559,7 +561,7 @@ export const companiesColumns: ColumnDef<Companies>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;

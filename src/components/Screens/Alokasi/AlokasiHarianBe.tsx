@@ -138,6 +138,7 @@ const AlokasiHarianBe = ({
         totalAgen: result.cardInfo.totalAgenCount,
         totalAlokasiHarian: result.cardInfo.totalAlokasiHarian,
       });
+      // console.log(result.data);
       setTableData(result.data);
       setPagination((prev) => ({
         ...prev,

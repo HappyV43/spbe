@@ -21,7 +21,7 @@ import { DatePick } from "../DatePick";
 
 const EditFormLpg = ({ row }: any) => {
   const ref = useRef<HTMLFormElement>(null);
-  const [open, setOpen] = useState(false); 
+  const [open, setOpen] = useState(false);
   const [id, setId] = useState(row.id);
   const [loading, setLoading] = useState(false);
   const [giDate, setGiDate] = useState<any>(row.giDate);
@@ -29,28 +29,26 @@ const EditFormLpg = ({ row }: any) => {
   const [namaSopir, setNamaSopir] = useState(row.driverName);
   const [namaSupervisor, setNamaSupervisor] = useState(row.superVisor ?? "");
   const [namaGateKeeper, setNamaGateKeeper] = useState(row.gateKeeper ?? "");
-  const [namaAdministrasi, setNamaAdministrasi] = useState(row.administrasi ?? "");
+  const [namaAdministrasi, setNamaAdministrasi] = useState(
+    row.administrasi ?? ""
+  );
   const [jumlahTabungBocor, setJumlahTabungBocor] = useState(row.bocor);
   const [isiKurang, setIsiKurang] = useState(row.isiKurang);
 
   const handleEditAgent = async (formData: FormData) => {
     setLoading(true);
-    console.log(giDate)
-    if (
-      !platKendaraan ||
-      !namaSopir ||
-      !namaAdministrasi ||
-      !namaGateKeeper
-    ) {
+    console.log(giDate);
+    if (!platKendaraan || !namaSopir || !namaAdministrasi || !namaGateKeeper) {
       toast({
         title: "Gagal",
         description: "Ada field yang kosong",
         variant: "destructive",
+        duration: 3000,
       });
       setLoading(false);
       return;
     }
-    
+
     const result = await UpdateLpgData(formData);
 
     if (result?.error) {
@@ -59,16 +57,17 @@ const EditFormLpg = ({ row }: any) => {
         title: "Gagal",
         description: result.error,
         variant: "destructive",
+        duration: 3000,
       });
-
     } else {
       setLoading(false);
       ref.current?.reset();
       toast({
         title: "Berhasil",
         description: "Penyaluran Lpg berhasil diupdate",
+        duration: 3000,
       });
-        setOpen(false);
+      setOpen(false);
       redirect("/dashboard/penyaluran-elpiji");
     }
   };
@@ -86,25 +85,25 @@ const EditFormLpg = ({ row }: any) => {
   };
 
   const handleCancel = (e: React.MouseEvent) => {
-      if (
-        platKendaraan !== row.licensePlate ||
-        namaSopir !== row.driverName ||
-        namaSupervisor !== row.superVisor ||
-        namaGateKeeper !== row.gateKeeper ||
-        namaAdministrasi !== row.administrasi ||
-        jumlahTabungBocor !== row.bocor ||
-        isiKurang !== row.isiKurang
-      ) {
-        const confirmClose = confirm(
-          "Perubahan belum disimpan. Apakah Anda yakin ingin keluar?"
-        );
-        if (!confirmClose) {
-          e.preventDefault(); 
-        } else {
-          resetFormState(); 
-        }
+    if (
+      platKendaraan !== row.licensePlate ||
+      namaSopir !== row.driverName ||
+      namaSupervisor !== row.superVisor ||
+      namaGateKeeper !== row.gateKeeper ||
+      namaAdministrasi !== row.administrasi ||
+      jumlahTabungBocor !== row.bocor ||
+      isiKurang !== row.isiKurang
+    ) {
+      const confirmClose = confirm(
+        "Perubahan belum disimpan. Apakah Anda yakin ingin keluar?"
+      );
+      if (!confirmClose) {
+        e.preventDefault();
+      } else {
+        resetFormState();
       }
-    };
+    }
+  };
 
   return (
     <Dialog
@@ -112,7 +111,7 @@ const EditFormLpg = ({ row }: any) => {
       onOpenChange={(isOpen) => {
         setOpen(isOpen);
         if (!isOpen) {
-          resetFormState(); 
+          resetFormState();
         }
       }}
     >
@@ -128,7 +127,7 @@ const EditFormLpg = ({ row }: any) => {
           />
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent onInteractOutside={(e) => e.preventDefault()}>
         <form
           ref={ref}
           action={async (formData) => {
@@ -262,7 +261,7 @@ const EditFormLpg = ({ row }: any) => {
               </DialogClose>
             </DialogFooter>
           </div>
-        </form> 
+        </form>
       </DialogContent>
     </Dialog>
   );
