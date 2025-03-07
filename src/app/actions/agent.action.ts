@@ -7,15 +7,14 @@ import { getCompaniesAll } from "./companies.action";
 import { redirect } from "next/navigation";
 import { getCurrentSession } from "./auth.actions";
 import { cache } from "react";
+import { error } from "console";
 
 export const getAgentsAll = cache(async () => {
   const companiesData = await getCompaniesAll();
   if (!companiesData) {
     redirect("/master-data/companies/form");
   }
-  return prisma.agents.findMany({
-    distinct: ["agentName"],
-  });
+  return prisma.agents.findMany();
 });
 
 export const getAgentsName = cache(async () => {
@@ -52,6 +51,16 @@ export const postAgentData = async (formData: FormData) => {
     };
   }
   try {
+    const checkSameAgent = await prisma.agents.findFirst({
+      where: {
+        agentName: agentName,
+      },
+    })
+    if (checkSameAgent) {
+      return {
+        error: "Nama agent sudah digunakan",
+      };
+    }
     const postData: Agents = await prisma.agents.create({
       data: {
         agentName: agentName,
@@ -96,22 +105,29 @@ export const updateAgentData = async (formData: FormData) => {
   }
 
   try {
-    // Update data di tabel 'agents'
-    const updatedData = await prisma.agents.update({
+    // Cek duplikasi nama agent
+    const sameAgentName = await prisma.agents.findFirst({
       where: {
-        id: agentId,
-      },
-      data: {
         agentName: agentNameLabel,
-        shipTo,
-        address,
-        city,
-        fax,
-        phone,
+        id: {
+          not: agentId,
+        },
       },
     });
 
-    if (updatedData) {
+    if (sameAgentName) {
+      return {
+        error: "Terdapat nama agent yang sama",
+      };
+    }
+
+    // Update data agent
+    const updatedAgent = await prisma.agents.update({
+      where: { id: agentId },
+      data: { agentName: agentNameLabel, shipTo, address, city, fax, phone },
+    });
+
+    if (updatedAgent) {
       await prisma.allocations.updateMany({
         where: {
           agentId: agentId,
@@ -122,7 +138,7 @@ export const updateAgentData = async (formData: FormData) => {
       });
     }
 
-    if (updatedData) {
+    if (updatedAgent) {
       // Dapatkan semua allocationId yang terkait dengan agentId
       const allocations = await prisma.allocations.findMany({
         where: { agentId: agentId },
@@ -138,7 +154,7 @@ export const updateAgentData = async (formData: FormData) => {
       });
     }
     revalidatePath("/data-master/agents");
-    return { success: true, data: updatedData };
+    return { success: true, data: updatedAgent };
   } catch (error) {
     return {
       error: getErrorMessage(error),
