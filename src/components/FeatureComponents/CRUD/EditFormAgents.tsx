@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
-import { Pencil } from "lucide-react";
+import { Loader2, Pencil } from "lucide-react";
 import { redirect } from "next/navigation";
 import React, { useRef, useState } from "react";
 
@@ -26,21 +26,32 @@ const EditFormAgents = ({ row }: any) => {
   const [address, setAddress] = useState(row.address);
   const [city, setCity] = useState(row.city);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleEditAgent = async (formData: FormData) => {
+    setLoading(true);
+
     const result = await updateAgentData(formData);
 
     if (result?.error) {
+      setLoading(false);
+
+      setOpen(false);
       toast({
         title: "Gagal",
         description: result.error,
         variant: "destructive",
+        duration: 3000,
       });
     } else {
       ref.current?.reset();
+      setLoading(false);
+
+      setOpen(false);
       toast({
         title: "Berhasil",
         description: "Agent berhasil diupdate",
+        duration: 3000,
       });
       redirect("/master-data/agents");
     }
@@ -100,7 +111,7 @@ const EditFormAgents = ({ row }: any) => {
           </Button>
         </span>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent onInteractOutside={(e) => e.preventDefault()}>
         <form
           ref={ref}
           action={async (formData) => {
@@ -195,7 +206,14 @@ const EditFormAgents = ({ row }: any) => {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Simpan Perubahan</Button>
+              {loading ? (
+                <Button type="button" className="px-9" disabled>
+                  <Loader2 className="animate-spin mr-2" />
+                  Menyimpan...
+                </Button>
+              ) : (
+                <Button type="submit">Simpan Perubahan</Button>
+              )}
               <DialogClose asChild>
                 <Button onClick={handleCancel}>Kembali</Button>
               </DialogClose>
