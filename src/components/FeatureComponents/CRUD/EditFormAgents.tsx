@@ -15,10 +15,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Pencil } from "lucide-react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 
 const EditFormAgents = ({ row }: any) => {
+  const router = useRouter();
   const ref = useRef<HTMLFormElement>(null);
   const [agentName, setAgentName] = useState(row.agentName);
   const [phone, setPhone] = useState(row.phone);
@@ -29,31 +30,37 @@ const EditFormAgents = ({ row }: any) => {
   const [loading, setLoading] = useState(false);
 
   const handleEditAgent = async (formData: FormData) => {
-    setLoading(true);
-
-    const result = await updateAgentData(formData);
-
-    if (result?.error) {
-      setLoading(false);
-
-      setOpen(false);
+    try {
+      setLoading(true);
+      const result = await updateAgentData(formData);
+  
+      if (result?.error) {
+        toast({
+          title: "Gagal",
+          description: result.error,
+          variant: "destructive",
+          duration: 3000,
+        });
+      } else {
+        ref.current?.reset();
+        toast({
+          title: "Berhasil",
+          description: "Agent berhasil diupdate",
+          duration: 3000,
+        });
+        router.push("/master-data/agents");
+      }
+    } catch (error) {
+      console.error("Error updating agent:", error);
       toast({
-        title: "Gagal",
-        description: result.error,
+        title: "Error",
+        description: "Terjadi kesalahan saat memperbarui agent",
         variant: "destructive",
         duration: 3000,
       });
-    } else {
-      ref.current?.reset();
+    } finally {
       setLoading(false);
-
       setOpen(false);
-      toast({
-        title: "Berhasil",
-        description: "Agent berhasil diupdate",
-        duration: 3000,
-      });
-      redirect("/master-data/agents");
     }
   };
 
@@ -115,7 +122,6 @@ const EditFormAgents = ({ row }: any) => {
         <form
           ref={ref}
           action={async (formData) => {
-            setLoading(true);
             await handleEditAgent(formData);
           }}
         >
@@ -213,14 +219,7 @@ const EditFormAgents = ({ row }: any) => {
                   Menyimpan...
                 </Button>
               ) : (
-                <Button
-                  type="submit"
-                  onClick={() => {
-                    setLoading(true);
-                  }}
-                >
-                  Simpan Perubahan
-                </Button>
+                <Button type="submit">Simpan Perubahan</Button>
               )}
               <DialogClose asChild>
                 <Button onClick={handleCancel}>Kembali</Button>

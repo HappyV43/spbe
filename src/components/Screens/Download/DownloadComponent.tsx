@@ -185,20 +185,27 @@ export default function DownloadComponent({
                                 !field.value && "text-muted-foreground"
                               )}
                             >
-                              <CalendarIcon />
-                              {field.value?.from && field.value?.to ? (
-                                <>
-                                  {format(field.value.from, "PPP", {
+                              <CalendarIcon />⁠
+                              {field.value?.from ? (
+                                field.value?.to ? (
+                                  <>
+                                    {format(field.value.from, "PPP", {
+                                      locale: id,
+                                    })}{" "}
+                                    -{" "}
+                                    {format(field.value.to, "PPP", {
+                                      locale: id,
+                                    })}
+                                  </>
+                                ) : (
+                                  format(field.value.from, "PPP", {
                                     locale: id,
-                                  })}{" "}
-                                  -{" "}
-                                  {format(field.value.to, "PPP", {
-                                    locale: id,
-                                  })}
-                                </>
+                                  })
+                                )
                               ) : (
                                 <span>Pilih Tanggal</span>
                               )}
+                              ⁠
                             </Button>
                           </FormControl>
                         </PopoverTrigger>

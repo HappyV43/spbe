@@ -16,10 +16,11 @@ import { Label } from "@/components/ui/label";
 import { toast } from "@/hooks/use-toast";
 import { Loader2, Pencil } from "lucide-react";
 import React, { useRef, useState } from "react";
-import { redirect } from "next/navigation";
 import { DatePick } from "../DatePick";
+import { redirect, useRouter } from "next/navigation";
 
 const EditFormLpg = ({ row }: any) => {
+  const router = useRouter();
   const ref = useRef<HTMLFormElement>(null);
   const [open, setOpen] = useState(false);
   const [id, setId] = useState(row.id);
@@ -36,39 +37,51 @@ const EditFormLpg = ({ row }: any) => {
   const [isiKurang, setIsiKurang] = useState(row.isiKurang);
 
   const handleEditAgent = async (formData: FormData) => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    if (!platKendaraan || !namaSopir || !namaAdministrasi || !namaGateKeeper) {
-      toast({
-        title: "Gagal",
-        description: "Ada field yang kosong",
-        variant: "destructive",
-        duration: 3000,
-      });
-      setLoading(false);
-      return;
-    }
+      if (
+        !platKendaraan ||
+        !namaSopir ||
+        !namaAdministrasi ||
+        !namaGateKeeper
+      ) {
+        toast({
+          title: "Gagal",
+          description: "Ada field yang kosong",
+          variant: "destructive",
+          duration: 3000,
+        });
+        setLoading(false);
+        return;
+      }
 
-    const result = await UpdateLpgData(formData);
+      const result = await UpdateLpgData(formData);
 
-    if (result?.error) {
+      if (result?.error) {
+        setLoading(false);
+        toast({
+          title: "Gagal",
+          description: result.error,
+          variant: "destructive",
+          duration: 3000,
+        });
+      } else {
+        setLoading(false);
+        ref.current?.reset();
+        toast({
+          title: "Berhasil",
+          description: "Penyaluran Lpg berhasil diupdate",
+          duration: 3000,
+        });
+        setOpen(false);
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Error updating agent:", error);
+    } finally {
       setLoading(false);
-      toast({
-        title: "Gagal",
-        description: result.error,
-        variant: "destructive",
-        duration: 3000,
-      });
-    } else {
-      setLoading(false);
-      ref.current?.reset();
-      toast({
-        title: "Berhasil",
-        description: "Penyaluran Lpg berhasil diupdate",
-        duration: 3000,
-      });
       setOpen(false);
-      redirect("/dashboard/penyaluran-elpiji");
     }
   };
 
@@ -131,7 +144,6 @@ const EditFormLpg = ({ row }: any) => {
         <form
           ref={ref}
           action={async (formData) => {
-            setLoading(true);
             await handleEditAgent(formData);
           }}
         >
@@ -255,14 +267,7 @@ const EditFormLpg = ({ row }: any) => {
                   Menyimpan...
                 </Button>
               ) : (
-                <Button
-                  type="submit"
-                  onClick={() => {
-                    setLoading(true);
-                  }}
-                >
-                  Simpan Perubahan
-                </Button>
+                <Button type="submit">Simpan Perubahan</Button>
               )}
               <DialogClose asChild>
                 <Button onClick={handleCancel}>Kembali</Button>
