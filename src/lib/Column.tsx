@@ -280,6 +280,8 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
         >
           <Link
             href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+            //BUAT ALOKASI HARIAN BE
+            // href={`../penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
             className={
               status === "Approved" && bpeNumber !== null && giDate !== null
                 ? "cursor-not-allowed"
