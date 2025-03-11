@@ -428,7 +428,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
 
             <SummaryItems
               icon={<Clock4 className="h-10 w-10 text-white" />}
-              title={"PENDING HARIAN BETA"}
+              title={"PENDING HARIAN"}
               value={`${summaryData?.pending.toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 (summaryData?.pending ?? 0) * 3
@@ -437,7 +437,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
 
             <SummaryItems
               icon={<PackagePlus className="h-10 w-10 text-white" />}
-              title={"TOTAL FAKULTATIF BETA"}
+              title={"TOTAL FAKULTATIF"}
               value={`${summaryData?.fakultatif.toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 (summaryData?.fakultatif ?? 0) * 3
@@ -446,7 +446,7 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
 
             <SummaryItems
               icon={<CalendarX2 className="h-10 w-10 text-white" />}
-              title={"TOTAL ALOKASI TIDAK DITEBUS BETA"}
+              title={"TOTAL ALOKASI TIDAK DITEBUS"}
               value={`${summaryData?.tidakTembus.toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 (summaryData?.tidakTembus ?? 0) * 3
