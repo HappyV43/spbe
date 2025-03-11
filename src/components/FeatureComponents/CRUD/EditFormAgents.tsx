@@ -115,6 +115,7 @@ const EditFormAgents = ({ row }: any) => {
         <form
           ref={ref}
           action={async (formData) => {
+            setLoading(true);
             await handleEditAgent(formData);
           }}
         >
@@ -212,7 +213,14 @@ const EditFormAgents = ({ row }: any) => {
                   Menyimpan...
                 </Button>
               ) : (
-                <Button type="submit">Simpan Perubahan</Button>
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    setLoading(true);
+                  }}
+                >
+                  Simpan Perubahan
+                </Button>
               )}
               <DialogClose asChild>
                 <Button onClick={handleCancel}>Kembali</Button>

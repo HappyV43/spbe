@@ -37,7 +37,7 @@ const EditFormLpg = ({ row }: any) => {
 
   const handleEditAgent = async (formData: FormData) => {
     setLoading(true);
-    console.log(giDate);
+
     if (!platKendaraan || !namaSopir || !namaAdministrasi || !namaGateKeeper) {
       toast({
         title: "Gagal",
@@ -131,6 +131,7 @@ const EditFormLpg = ({ row }: any) => {
         <form
           ref={ref}
           action={async (formData) => {
+            setLoading(true);
             await handleEditAgent(formData);
           }}
         >
@@ -254,7 +255,14 @@ const EditFormLpg = ({ row }: any) => {
                   Menyimpan...
                 </Button>
               ) : (
-                <Button type="submit">Simpan Perubahan</Button>
+                <Button
+                  type="submit"
+                  onClick={() => {
+                    setLoading(true);
+                  }}
+                >
+                  Simpan Perubahan
+                </Button>
               )}
               <DialogClose asChild>
                 <Button onClick={handleCancel}>Kembali</Button>

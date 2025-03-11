@@ -57,9 +57,20 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: "#f0f0f0",
   },
+  noResultsRow: {
+    flexDirection: "row",
+    minHeight: 50, // Ensure some height for visibility
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  noResultsText: {
+    textAlign: "center",
+    fontSize: 12,
+  },
 });
 
 const RekapPenyaluranBe = ({ data, isAgentFiltered }: any) => {
+  console.log(data);
   const TOTAL = data.reduce((acc: any, item: any) => {
     const subtotal = item.records.reduce(
       (sum: any, record: any) => sum + record.allocatedQty,
@@ -358,9 +369,38 @@ const RekapPenyaluranBe = ({ data, isAgentFiltered }: any) => {
             ))}
           </View>
         ) : (
-          <Text style={{ textAlign: "center", marginTop: 20 }}>
-            Data tidak ditemukan
-          </Text>
+          <View style={{ marginVertical: 20 }}>
+            <View style={styles.table}>
+              {/* Table Header */}
+              <View style={styles.tableRow} wrap={false}>
+                <Text style={[styles.tableCellHeader, { flex: 1.5 }]}>
+                  No Transaksi
+                </Text>
+                <Text style={[styles.tableCellHeader, { flex: 3 }]}>
+                  Nama Agen
+                </Text>
+                <Text style={[styles.tableCellHeader, { flex: 1 }]}>Sopir</Text>
+                <Text style={[styles.tableCellHeader, { flex: 1 }]}>Nopol</Text>
+                <Text style={[styles.tableCellHeader, { flex: 1.5 }]}>
+                  No DO
+                </Text>
+                <Text style={[styles.tableCellHeader, { flex: 1 }]}>
+                  Status
+                </Text>
+                <Text style={[styles.tableCellHeader, { flex: 1 }]}>
+                  Jumlah
+                </Text>
+                <Text style={[styles.tableCellHeader, { flex: 1 }]}>Kg</Text>
+              </View>
+
+              {/* No Results Row */}
+              <View style={styles.noResultsRow} wrap={false}>
+                <Text style={[styles.noResultsText, { flex: 10 }]} wrap={false}>
+                  Data tidak ditemukan
+                </Text>
+              </View>
+            </View>
+          </View>
         )}
 
         <View style={[styles.table, { marginTop: 20 }]}>
