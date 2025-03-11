@@ -218,7 +218,7 @@ export default function PenyaluranElpiji({
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 mb-4">
                 <FormField
                   control={form.control}
                   name="agentName"
@@ -239,7 +239,7 @@ export default function PenyaluranElpiji({
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="deliveryNumber"
                   render={({ field }) => (
@@ -258,7 +258,7 @@ export default function PenyaluranElpiji({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
                 <FormField
                   control={form.control}
                   name="range"
