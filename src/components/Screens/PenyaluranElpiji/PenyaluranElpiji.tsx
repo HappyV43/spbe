@@ -172,17 +172,17 @@ export default function PenyaluranElpiji({
       },
     });
 
-    fetchData(
-      {
-        agentName: "",
-        deliveryNumber: "",
-        range: {
-          from: null,
-          to: null,
-        },
-      },
-      1
-    );
+    // fetchData(
+    //   {
+    //     agentName: "",
+    //     deliveryNumber: "",
+    //     range: {
+    //       from: null,
+    //       to: null,
+    //     },
+    //   },
+    //   1
+    // );
     setIsFiltered(false);
   }
 
@@ -218,7 +218,7 @@ export default function PenyaluranElpiji({
           </div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2 mb-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols- mb-4">
                 <FormField
                   control={form.control}
                   name="agentName"

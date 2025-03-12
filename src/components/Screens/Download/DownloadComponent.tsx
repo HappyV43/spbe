@@ -31,8 +31,8 @@ const PDFDownloadLink = dynamic(
   () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
   {
     ssr: false,
-    loading: () => <p>Loading...</p>,
-  },
+    loading: () => <p className="hidden">Loading...</p>,
+  }
 );
 
 type valuesFilter = {
@@ -96,7 +96,7 @@ export default function DownloadComponent({
         }),
       });
       const result = await response.json();
-      console.log(result, "API RESULT");
+      // console.log(result, "API RESULT");
       setData(result.data);
       // Menunggu PDF ter-generate sebelum klik
       setTimeout(() => {
@@ -139,7 +139,7 @@ export default function DownloadComponent({
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col space-y-4"
             >
-              <div className="grid grid-cols-3 gap-4 items-end">
+              <div className="grid sm: grid-cols-1 md:grid-cols-2 gap-4 items-end">
                 {/* Agent Name */}
                 <FormField
                   control={form.control}
@@ -163,7 +163,7 @@ export default function DownloadComponent({
                 />
 
                 {/* Delivery Number */}
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="deliveryNumber"
                   render={({ field }) => (
@@ -182,7 +182,7 @@ export default function DownloadComponent({
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
 
                 {/* Date Range */}
                 <FormField

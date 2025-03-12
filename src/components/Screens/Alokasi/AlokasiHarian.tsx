@@ -174,15 +174,15 @@ const AlokasiHarian = ({
     });
 
     // Ambil semua data tanpa filter
-    fetchData(
-      {
-        status: "",
-        agentName: "",
-        deliveryNumber: "",
-        range: { from: null, to: null },
-      },
-      1
-    );
+    // fetchData(
+    //   {
+    //     status: "",
+    //     agentName: "",
+    //     deliveryNumber: "",
+    //     range: { from: null, to: null },
+    //   },
+    //   1
+    // );
 
     setIsFiltered(false);
   }
