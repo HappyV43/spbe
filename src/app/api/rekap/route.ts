@@ -74,8 +74,6 @@ export async function POST(req: NextRequest) {
         distributionQty: true,
         volume: true,
         driverName: true,
-        bocor: true,
-        isiKurang: true,
         allocationId: true, // Tambahkan allocationId untuk mencocokkan data
       },
     });
