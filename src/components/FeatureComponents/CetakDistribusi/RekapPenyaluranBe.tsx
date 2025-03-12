@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { formatNumberQty } from "@/utils/page";
 import { id } from "date-fns/locale";
 
@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
 });
 
 const RekapPenyaluranBe = ({ data, isAgentFiltered }: any) => {
-  console.log(data);
   const TOTAL = data.reduce((acc: any, item: any) => {
     const subtotal = item.records.reduce(
       (sum: any, record: any) => sum + record.allocatedQty,

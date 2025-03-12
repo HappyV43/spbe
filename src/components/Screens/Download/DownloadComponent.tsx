@@ -1,5 +1,4 @@
 "use client";
-
 import { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -22,10 +21,19 @@ import { cn } from "@/lib/utils";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+// import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Download, Loader, Printer, SearchX } from "lucide-react";
 import RekapPenyaluranBe from "@/components/FeatureComponents/CetakDistribusi/RekapPenyaluranBe";
 import { id } from "date-fns/locale";
+import dynamic from "next/dynamic";
+
+const PDFDownloadLink = dynamic(
+  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
+  {
+    ssr: false,
+    loading: () => <p>Loading...</p>,
+  },
+);
 
 type valuesFilter = {
   agentName: string;
@@ -53,10 +61,8 @@ type LpgDistribution = {
 
 export default function DownloadComponent({
   dataBpeDeliveryAgent,
-  defaultData,
 }: {
   dataBpeDeliveryAgent: bpeNumberData[];
-  defaultData: any[];
 }) {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any[]>([]);
@@ -67,7 +73,10 @@ export default function DownloadComponent({
     defaultValues: {
       agentName: "",
       deliveryNumber: "",
-      range: null,
+      range: {
+        from: null,
+        to: null,
+      },
     },
   });
 
@@ -107,7 +116,14 @@ export default function DownloadComponent({
 
   // Reset form and fetch all data
   function handleReset() {
-    form.reset();
+    form.reset({
+      agentName: "",
+      deliveryNumber: "",
+      range: {
+        from: null,
+        to: null,
+      },
+    });
     // onSubmit(form.getValues());
   }
 
@@ -186,25 +202,19 @@ export default function DownloadComponent({
                               )}
                             >
                               <CalendarIcon />⁠
-                              {field.value?.from ? (
-                                field.value?.to ? (
-                                  <>
-                                    {format(field.value.from, "PPP", {
-                                      locale: id,
-                                    })}{" "}
-                                    -{" "}
-                                    {format(field.value.to, "PPP", {
-                                      locale: id,
-                                    })}
-                                  </>
-                                ) : (
-                                  format(field.value.from, "PPP", {
+                              {field.value?.from && field.value?.to
+                                ? `${format(field.value.from, "dd MMMM yyyy", {
                                     locale: id,
-                                  })
-                                )
-                              ) : (
-                                <span>Pilih Tanggal</span>
-                              )}
+                                  })} - ${format(
+                                    field.value.to,
+                                    "dd MMMM yyyy",
+                                    { locale: id }
+                                  )}`
+                                : field.value?.from
+                                ? `${format(field.value.from, "dd MMMM yyyy", {
+                                    locale: id,
+                                  })}`
+                                : "Semua Tanggal"}
                               ⁠
                             </Button>
                           </FormControl>
@@ -273,52 +283,6 @@ export default function DownloadComponent({
             <span className="truncate">Unduh Rekap</span>
           </Button>
         </PDFDownloadLink>
-        {/* )} */}
-        {/* {data ? (
-          <div>
-            <div className="mb-4 p-4 border rounded-lg">
-              {data.map((item, index) => (
-                <ul key={index}>
-                  <li>Tanggal nya:{item.date}</li>
-                  <li>
-                    {item.records.map((record: any, index: string) => (
-                      <ul key={index}>
-                        <li>ID: {record.id}</li>
-                        <li>BPE Number: {record.bpeNumber}</li>
-                        <li>Agent Name: {record.agentName}</li>
-                        <li>GI Date: {record.giDate}</li>
-                        <li>License Plate: {record.licensePlate}</li>
-                        <li>Delivery Number: {record.deliveryNumber}</li>
-                        <li>Allocated Qty: {record.allocatedQty}</li>
-                        <li>Distribution Qty: {record.distributionQty}</li>
-                        <li>Volume: {record.volume}</li>
-                        <li>Driver Name: {record.driverName}</li>
-                        <li>Bocor: {record.bocor === null ? "No" : "Yes"}</li>
-                        <li>
-                          Isi Kurang: {record.isiKurang === null ? "No" : "Yes"}
-                        </li>
-                      </ul>
-                    ))}
-                  </li>
-                  <li>`⁠Total elpiji: ${item.quantity.totalElpiji}`</li>
-                  <li>
-                   `Total allocated qty: ${item.quantity.totalAllocatedQty}``
-                  </li>
-                  <li>
-                    `Total distribution qty: ${item.quantity.totalDistributionQty}`
-                  </li>
-                  <li>`Total lo: ${item.quantity.totalLo}`</li>
-                  <li>Total pending: ${item.quantity.totalPending}`</li>
-                  <li>
-                  `Total fakultatif: ${item.quantity.totalFakultatif}`
-                  </li>
-                </ul>
-              ))}
-            </div>
-          </div>
-        ) : (
-          <p>No data available.</p>
-        )} */}
       </div>
     </div>
   );
