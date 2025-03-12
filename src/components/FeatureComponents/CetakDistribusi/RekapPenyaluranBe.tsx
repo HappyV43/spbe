@@ -1,5 +1,3 @@
-"use client";
-import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { format } from "date-fns";
 import { formatNumberQty } from "@/utils/page";
@@ -112,7 +110,9 @@ const RekapPenyaluranBe = ({ data, isAgentFiltered }: any) => {
                 <Text style={{ marginTop: 5 }}>
                   Penyaluran Tanggal:{" "}
                   <Text style={{ fontFamily: "Times-Bold" }}>
-                    {format(new Date(item.date), "EEEE, dd MMMM yyyy", { locale: id })}
+                    {format(new Date(item.date), "EEEE, dd MMMM yyyy", {
+                      locale: id,
+                    })}
                   </Text>
                 </Text>
 
