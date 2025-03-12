@@ -3,6 +3,7 @@ import React from "react";
 import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { format, parse } from "date-fns";
 import { formatNumberQty } from "@/utils/page";
+import { id } from "date-fns/locale";
 
 const styles = StyleSheet.create({
   page: {
@@ -112,7 +113,7 @@ const RekapPenyaluranBe = ({ data, isAgentFiltered }: any) => {
                 <Text style={{ marginTop: 5 }}>
                   Penyaluran Tanggal:{" "}
                   <Text style={{ fontFamily: "Times-Bold" }}>
-                    {format(item.date, "EEEE, dd MMMM yyyy")}
+                    {format(new Date(item.date), "EEEE, dd MMMM yyyy", { locale: id })}
                   </Text>
                 </Text>
 
