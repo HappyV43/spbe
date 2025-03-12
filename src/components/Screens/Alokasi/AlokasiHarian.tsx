@@ -264,7 +264,7 @@ const AlokasiHarian = ({
                       </FormItem>
                     )}
                   />
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="deliveryNumber"
                     render={({ field }) => (
@@ -283,7 +283,7 @@ const AlokasiHarian = ({
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
                   <FormField
                     control={form.control}
                     name="range"
