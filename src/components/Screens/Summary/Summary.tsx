@@ -43,7 +43,7 @@ type SummaryProps = {
   defaultdata: Prisma.PromiseReturnType<typeof getSummaryToday>;
   weekly: Prisma.PromiseReturnType<typeof getWeeklySummaryDefault>;
   annually: any;
-  allData: Prisma.PromiseReturnType<typeof allDataDefault>;
+  allData: any;
 };
 
 const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
@@ -93,49 +93,49 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
     qty: item.totalMonthlyElpiji,
   }));
 
-  useEffect(() => {
-    loadDataSummary();
-  }, []);
+  // useEffect(() => {
+  //   loadDataSummary();
+  // }, []);
 
-  const loadDataSummary = async () => {
-    try {
-      const [summaryData, weekly, annually] = await Promise.all([
-        getSummaryToday(),
-        getWeeklySummaryDefault(),
-        getAnnualSummaryData(),
-        allDataDefault(),
-      ]);
+  // const loadDataSummary = async () => {
+  //   try {
+  //     const [summaryData, weekly, annually] = await Promise.all([
+  //       getSummaryToday(),
+  //       getWeeklySummaryDefault(),
+  //       getAnnualSummaryData(),
+  //       allDataDefault(),
+  //     ]);
 
-      // console.log({ summaryData, weekly, annually, allData });
+  //     // console.log({ summaryData, weekly, annually, allData });
 
-      // setSummaryData(summaryData);
-      // setAllDataSummary(allData);
-      // setWeeklySummary(weekly);
-      // setAnnualSummary(annually);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    }
-  };
+  //     // setSummaryData(summaryData);
+  //     // setAllDataSummary(allData);
+  //     // setWeeklySummary(weekly);
+  //     // setAnnualSummary(annually);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [summaryData, weekly, yearly, allData] = await Promise.all([
-          getSummaryToday(),
-          getWeeklySummaryDefault(),
-          getAnnualSummaryData(),
-          allDataDefault(),
-        ]);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [summaryData, weekly, yearly, allData] = await Promise.all([
+  //         getSummaryToday(),
+  //         getWeeklySummaryDefault(),
+  //         getAnnualSummaryData(),
+  //         allDataDefault(),
+  //       ]);
 
-        // Handle the retrieved data here
-        console.log({ summaryData, weekly, yearly, allData });
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
+  //       // Handle the retrieved data here
+  //       console.log({ summaryData, weekly, yearly, allData });
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const fetchSummary = async (
     tgl: { from: Date | null; to: Date | null } | null
@@ -165,11 +165,12 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
 
       const data = await response.json();
       console.log("Response from API route:", data);
+      console.log(data.dailySummary._count);
 
       const allData = {
         allSummary: {
           _count: {
-            _all: data?.dailySummary?._count?._all ?? 0,
+            _all: data?.dailySummary?._count.allocatedQty ?? 0,
           },
           _sum: {
             allocatedQty: data?.dailySummary?._sum?.allocatedQty ?? 0,
@@ -177,7 +178,7 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
         },
         allDistributionSummary: {
           _count: {
-            _all: data?.distributionSummary?._count?._all ?? 0,
+            _all: data?.distributionSummary?._count.distributionQty ?? 0,
           },
           _sum: {
             distributionQty:
@@ -186,7 +187,7 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
         },
         allMonthlyData: {
           _count: {
-            _all: data?.monthlyData?._count?._all ?? 0,
+            _all: data?.monthlyData?._count.totalElpiji ?? 0,
           },
           _sum: {
             totalElpiji: data?.monthlyData?._sum?.totalElpiji ?? 0,
@@ -198,7 +199,6 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
         average: data?.average ?? 0,
       };
 
-      // console.log(allData);
       setAllDataSummary(allData);
     } catch (error) {
       console.error("Error sending date range:", error);
@@ -243,8 +243,8 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
               icon={<CalendarCheck className="h-10 w-10 text-white" />}
               title={`ALOKASI HARIAN`}
               value={`${
-                summaryData?.dailySummary._sum.allocatedQty
-                  ? (summaryData?.dailySummary._sum.allocatedQty).toLocaleString(
+                summaryData?.dailySummaryPlanned._sum.allocatedQty
+                  ? (summaryData?.dailySummaryPlanned._sum.allocatedQty).toLocaleString(
                       "id-ID"
                     )
                   : 0
@@ -381,9 +381,9 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
               icon={
                 <CalendarCheck className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
               }
-              title={`TOTAL ALOKASI HARIAN (${allDataSummary.allSummary._count._all.toLocaleString(
-                "id-ID"
-              )})`}
+              title={`TOTAL ALOKASI HARIAN (${
+                allDataSummary?.allSummary?._count?._all?.toLocaleString("id-ID") || 0
+              })`}
               value={`${(
                 allDataSummary.allSummary._sum.allocatedQty ?? 0
               ).toLocaleString("id-ID")} / `}
