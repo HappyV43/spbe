@@ -117,13 +117,10 @@ export const getAllocationDefault = async () => {
 };
 
 export const getFilterDataAllocation = cache(async () => {
-  return await prisma.allocations.findMany({
+  return await prisma.agents.findMany({
     select: {
-      status: true,
-      deliveryNumber: true,
       agentName: true,
     },
-    distinct: ["agentName"],
     orderBy: { agentName: "asc" },
   });
 });
