@@ -10,42 +10,49 @@ export async function POST(req: NextRequest) {
 
     const { from, to } = body;
 
-    const fromDate = from ? new Date(from) : null;
+    let fromDate = from ? new Date(from) : null;
     let toDate = to ? new Date(to) : null;
 
-    if (!fromDate && !toDate) {
-      // Kalau dari dan ke sama-sama null, ambil semua data
-      console.log("Ambil semua data tanpa filter tanggal");
-    } else if (fromDate && !toDate) {
-      // Kalau cuma ada fromDate, set toDate ke akhir hari itu
-      toDate = new Date(fromDate);
-      toDate.setHours(23, 59, 59, 999);
-    } else {
-      // Kalau ada kedua tanggal, set jam dari toDate ke akhir hari
-      fromDate?.setHours(0, 0, 0, 0);
-      toDate?.setHours(23, 59, 59, 999);
+    if (fromDate) {
+      fromDate.setUTCDate(fromDate.getUTCDate() + 1);
+      fromDate.setUTCHours(0, 0, 0, 0);
     }
 
-    console.log(fromDate, toDate);
+    if (toDate) {
+      toDate.setUTCDate(toDate.getUTCDate() + 1);
+      toDate.setUTCHours(23, 59, 59, 999);
+    } else if (fromDate && !toDate) {
+      // Kalau hanya ada fromDate, set toDate ke akhir hari yang sama
+      toDate = new Date(fromDate);
+      toDate.setUTCHours(23, 59, 59, 999);
+    }
 
-    const [dailySummary, distributionSummary, monthlyData, uniqueDate] =
+    const dateFilter = fromDate && toDate ? { gte: fromDate, lte: toDate } : {};
+
+    const [dailySummary, dailySummaryGiDate, distributionSummary, monthlyData, uniqueDate] =
       await prisma.$transaction([
         prisma.allocations.aggregate({
           _sum: { allocatedQty: true },
           _count: { allocatedQty: true },
-          where: fromDate && toDate ? { giDate: { gte: fromDate, lte: toDate } } : {},
+          where: { plannedGiDate: dateFilter },
           orderBy: { plannedGiDate: "asc" },
+        }),
+        prisma.allocations.aggregate({
+          _sum: { allocatedQty: true },
+          _count: { allocatedQty: true },
+          where: { giDate: dateFilter },
+          orderBy: { giDate: "asc" },
         }),
         prisma.lpgDistributions.aggregate({
           _sum: { distributionQty: true },
           _count: { distributionQty: true },
-          where: fromDate && toDate ? { giDate: { gte: fromDate, lte: toDate } } : {},
+          where: { giDate: dateFilter },
           orderBy: { giDate: "asc" },
         }),
         prisma.monthlyAllocations.aggregate({
           _sum: { totalElpiji: true },
           _count: { totalElpiji: true },
-          where: fromDate && toDate ? { date: { gte: fromDate, lte: toDate } } : {},
+          where: { date: dateFilter },
           orderBy: { date: "asc" },
         }),
         prisma.lpgDistributions.findMany({
@@ -53,14 +60,14 @@ export async function POST(req: NextRequest) {
           select: {
             giDate: true,
           },
-          where: fromDate && toDate ? { giDate: { gte: fromDate, lte: toDate } } : {},
+          where: { giDate: dateFilter },
           orderBy: {
             giDate: "asc",
           },
         }),
       ]);
 
-    console.log(monthlyData);
+    console.log(dailySummary);
 
     const totalProps = uniqueDate.reduce(
       (a, obj) => a + Object.keys(obj).length,
@@ -68,22 +75,23 @@ export async function POST(req: NextRequest) {
     );
 
     const dailyAllo = dailySummary._sum?.allocatedQty;
+    const dailyAlloGiDate = dailySummaryGiDate._sum?.allocatedQty;
     const dailyDistri = distributionSummary._sum?.distributionQty;
     const dailyMonthly = monthlyData._sum?.totalElpiji;
 
     const pending =
-      (dailyAllo ?? 0) > (dailyDistri ?? 0)
-        ? (dailyAllo ?? 0) - (dailyDistri ?? 0)
+      (dailyAlloGiDate ?? 0) > (dailyDistri ?? 0)
+        ? (dailyAlloGiDate ?? 0) - (dailyDistri ?? 0)
         : 0;
 
     const fakultatif =
-      (dailyAllo ?? 0) > (dailyMonthly ?? 0)
-        ? (dailyAllo ?? 0) - (dailyMonthly ?? 0)
+      (dailyAlloGiDate ?? 0) > (dailyMonthly ?? 0)
+        ? (dailyAlloGiDate ?? 0) - (dailyMonthly ?? 0)
         : 0;
 
     const tidakTembus =
-      (dailyMonthly ?? 0) > (dailyAllo ?? 0)
-        ? (dailyMonthly ?? 0 ?? 0) - (dailyAllo ?? 0)
+      (dailyMonthly ?? 0) > (dailyAlloGiDate ?? 0)
+        ? (dailyMonthly ?? 0 ?? 0) - (dailyAlloGiDate ?? 0)
         : 0;
 
     const average = ((dailyAllo ?? 0) / (totalProps || 1)).toFixed(2);

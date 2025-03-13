@@ -43,7 +43,7 @@ export function DatePickerWithRange({
   };
 
   return (
-    <div className={cn("grid gap-2", (className = "my-2"))}>
+    <div className={cn("grid gap-2", className)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -68,15 +68,13 @@ export function DatePickerWithRange({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full sm:w-auto p-0 mx-8" align="start">
+        <PopoverContent className="w-auto p-0 md:mx-8" align="start">
           <Calendar
             initialFocus
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            disabled={(date) =>
-              date > new Date() || date < new Date("2000-01-01")
-            }
+            disabled={(date) => date < new Date("2000-01-01")}
             onSelect={handleDateChange}
             numberOfMonths={2}
             locale={id}

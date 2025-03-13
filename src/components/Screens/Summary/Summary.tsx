@@ -8,20 +8,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChartConfig } from "@/components/ui/chart";
-import { endOfWeek, format, startOfWeek } from "date-fns";
+import { format } from "date-fns";
 import React, { useEffect, useRef, useState } from "react";
-import {
-  calcSummary,
-  calculateDiff,
-  calculateSummaryQty,
-  formatNumberQty,
-  getAnnualTotalQty,
-  getTodayTotalQty,
-  getWeeklyTotalQty,
-  normalizeDateFrom,
-  normalizeDateTo,
-} from "@/utils/page";
 import { id } from "date-fns/locale";
 import {
   CalendarCheck,
@@ -30,115 +18,50 @@ import {
   ChartSpline,
   Clock4,
   Download,
+  Loader2,
   PackagePlus,
   ScrollText,
-  SearchX,
+  Search,
   X,
 } from "lucide-react";
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import SummaryItems from "@/components/FeatureComponents/SummaryItems";
 import html2canvas from "html2canvas";
 
-import { getSummary } from "@/app/actions/alokasi.action";
-import { AllocationData, DataConfig } from "@/lib/types";
 import { Prisma } from "../../../../generated/prisma_client";
 import {
   allDataDefault,
+  getAnnualSummaryData,
   getSummaryToday,
   getWeeklySummaryDefault,
-  getYearlySummaryData,
 } from "@/app/actions/summary.action";
+import { downloadAnnuallyChart, downloadWeeklyChart } from "@/utils/page";
 
 // 🟢 Ambil otomatis tipe return dari getSummaryToday
 type SummaryProps = {
   defaultdata: Prisma.PromiseReturnType<typeof getSummaryToday>;
   weekly: Prisma.PromiseReturnType<typeof getWeeklySummaryDefault>;
-  yearly: any;
-  allData: Prisma.PromiseReturnType<typeof allDataDefault>;
+  annually: any;
+  allData: any;
 };
 
-const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
+const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
   const [summaryData, setSummaryData] = useState(defaultdata);
   const [allDataSummary, setAllDataSummary] = useState(allData);
   const [weeklySummary, setWeeklySummary] = useState(weekly);
-  const [yearlySummary, setYearlySummary] = useState(yearly);
+  const [annualSummary, setAnnualSummary] = useState(annually);
 
-  const [data, setData] = useState<AllocationData[]>([]);
-  const [monthly, setMonthly] = useState<DataConfig[]>([]);
-  // Summary Chart
-  const [monthlyAllocation, setMonthlyAllocation] = useState<DataConfig[]>([]);
-  const [dailyAllocation, setDailyAllocation] = useState<DataConfig[]>([]);
-  const [dailyDistribution, setDailyDistribution] = useState<DataConfig[]>([]);
+  const weeklyChartRef = useRef(null);
+  const annuallyChartRef = useRef(null);
 
   // Filtering Data
-  const [isFiltered, setIsFiltered] = useState<Boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
   const [dateFilter, setDateFilter] = useState<{
     from: Date | null;
     to: Date | null;
   } | null>();
-
-  // const [filteredDaily, setFilteredDaily] = useState<AllocationData[]>([]);
-  // const [filteredMonthly, setFilteredMonthly] = useState<DataConfig[]>([]);
-  // const [filteredDistribution, setFilteredDistribution] = useState<
-  //   AllocationData[]
-  // >([]);
-
-  // const totalDailyQty = calculateSummaryQty(filteredDaily, "allocatedQty");
-  // const totalMonthlyQty = calculateSummaryQty(filteredMonthly, "qty");
-  // const totalDistributionlyQty = calculateSummaryQty(
-  //   filteredDistribution,
-  //   "lpgDistribution.distributionQty"
-  // );
-
-  const filterByDate = (itemDate: Date, day?: string) => {
-    const matchesDate = dateFilter?.from
-      ? dateFilter?.to
-        ? normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
-          normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.to)
-        : normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
-          normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.from)
-      : day
-      ? normalizeDateFrom(new Date()) === normalizeDateTo(new Date())
-      : true;
-    return matchesDate;
-  };
-
-  // Initial load
-  // useEffect(() => {
-  //   loadAllData();
-  // }, []);
-
-  const clearFilters = () => {
-    setDateFilter(null);
-  };
-
-  // const loadAllData = async () => {
-  //   const { data, monthly } = await getSummary();
-  //   setData(data);
-  //   setMonthly(monthly);
-
-  //   const monthlyData = monthly.map((item: any) => ({
-  //     date: item.date,
-  //     qty: item.qty,
-  //   }));
-
-  //   const dailyData = data.map((item: any) => ({
-  //     date: item.plannedGiDate,
-  //     qty: item.allocatedQty,
-  //   }));
-
-  //   const distributionData = data
-  //     .filter((item: any) => item.lpgDistribution !== null)
-  //     .map((item: any) => ({
-  //       date: item.lpgDistribution.giDate,
-  //       qty: item.lpgDistribution.distributionQty ?? 0,
-  //     }));
-
-  //   setDailyAllocation(dailyData);
-  //   setMonthlyAllocation(monthlyData);
-  //   setDailyDistribution(distributionData);
-  // };
 
   const allocationData = weeklySummary.weeklySummary.map((item) => ({
     date: new Date(item.date).toLocaleDateString("id-ID"), // Format jadi YYYY-MM-DD
@@ -155,164 +78,146 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
     qty: item.totalElpiji,
   }));
 
-  const allocationDataYearly = yearlySummary.map((item: any) => ({
+  const allocationDataAnually = annualSummary.map((item: any) => ({
     date: item.month,
     qty: item.totalAllocatedQty,
   }));
 
-  const distributionDataYearly = yearlySummary.map((item: any) => ({
+  const distributionDataAnually = annualSummary.map((item: any) => ({
     date: item.month,
     qty: item.totalDistributionQty,
   }));
 
-  const totalElpijiDataYearly = yearlySummary.map((item: any) => ({
+  const totalElpijiDataAnually = annualSummary.map((item: any) => ({
     date: item.month,
     qty: item.totalMonthlyElpiji,
   }));
 
-  // Configure data format and apply initial transformations
   // useEffect(() => {
-  //   const monthlyData = monthly.map((item: any) => ({
-  //     date: item.date,
-  //     qty: item.totalElpiji,
-  //   }));
+  //   loadDataSummary();
+  // }, []);
 
-  //   const dailyData = data.map((item: any) => ({
-  //     date: item.plannedGiDate,
-  //     qty: item.allocatedQty,
-  //   }));
-
-  //   const distributionData = data
-  //     .filter((item: any) => item.lpgDistribution !== null)
-  //     .map((item: any) => ({
-  //       date: item.lpgDistribution.giDate,
-  //       qty: item.lpgDistribution.distributionQty ?? 0,
-  //     }));
-
-  //   setDailyAllocation(dailyData);
-  //   setMonthlyAllocation(monthlyData);
-  //   setDailyDistribution(distributionData);
-  // }, [data, monthly]);
-
-  // Apply filters when date filter changes
-  // useEffect(() => {
-  //   const filteredDailyData = data.filter((item: AllocationData) =>
-  //     item.lpgDistribution?.giDate
-  //       ? filterByDate(item.lpgDistribution.giDate)
-  //       : false
-  //   );
-
-  //   const filteredMonthlyData = monthly.filter((item) =>
-  //     filterByDate(item.date)
-  //   );
-
-  //   const filteredDistributionData = data
-  //     .filter((item) => item.lpgDistribution !== null)
-  //     .filter((item) =>
-  //       item.lpgDistribution?.giDate
-  //         ? filterByDate(item.lpgDistribution.giDate)
-  //         : false
-  //     );
-
-  //   setFilteredDaily(filteredDailyData);
-  //   setFilteredMonthly(filteredMonthlyData);
-  //   setFilteredDistribution(filteredDistributionData);
-  // }, [data, monthly, dateFilter]);
-
-  // const downloadPDF = async () => {
+  // const loadDataSummary = async () => {
   //   try {
-  //     const doc = new jsPDF("portrait", "mm", "a4");
-  //     const pageHeight = doc.internal.pageSize.height; // Tinggi halaman A4 dalam mm
-  //     const margin = 10; // Margin halaman
-  //     let currentHeight = margin; // Posisi vertikal awal
+  //     const [summaryData, weekly, annually] = await Promise.all([
+  //       getSummaryToday(),
+  //       getWeeklySummaryDefault(),
+  //       getAnnualSummaryData(),
+  //       allDataDefault(),
+  //     ]);
 
-  //     // Ambil elemen pertama (Chart Minggu Ini)
-  //     const firstChart = document.querySelector("#chart-weekly");
-  //     if (firstChart) {
-  //       const canvas = await html2canvas(firstChart as HTMLElement);
-  //       const imgData = canvas.toDataURL("image/png");
-  //       const imgHeight = (canvas.height * 210) / canvas.width; // Sesuaikan lebar ke 210mm (A4 width)
+  //     // console.log({ summaryData, weekly, annually, allData });
 
-  //       // Tambahkan ke PDF
-  //       if (currentHeight + imgHeight > pageHeight - margin) {
-  //         doc.addPage(); // Tambahkan halaman baru jika konten melampaui batas
-  //         currentHeight = margin;
-  //       }
-  //       doc.addImage(imgData, "PNG", margin, currentHeight, 190, imgHeight);
-  //       currentHeight += imgHeight + 10; // Tambahkan margin antar elemen
-  //     }
-
-  //     // Ambil elemen kedua (Chart Tahun Ini)
-  //     const secondChart = document.querySelector("#chart-annual");
-  //     if (secondChart) {
-  //       const canvas = await html2canvas(secondChart as HTMLElement);
-  //       const imgData = canvas.toDataURL("image/png");
-  //       const imgHeight = (canvas.height * 210) / canvas.width;
-
-  //       // Tambahkan ke PDF
-  //       if (currentHeight + imgHeight > pageHeight - margin) {
-  //         doc.addPage();
-  //         currentHeight = margin;
-  //       }
-  //       doc.addImage(imgData, "PNG", margin, currentHeight, 190, imgHeight);
-  //     }
-
-  //     // Simpan PDF
-  //     doc.save("summary-charts.pdf");
+  //     // setSummaryData(summaryData);
+  //     // setAllDataSummary(allData);
+  //     // setWeeklySummary(weekly);
+  //     // setAnnualSummary(annually);
   //   } catch (error) {
-  //     console.error("Terjadi kesalahan saat mengunduh PDF:", error);
+  //     console.error("Error fetching data:", error);
   //   }
   // };
 
-  const weeklyChartRef = useRef(null);
-  const yearlyChartRef = useRef(null);
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [summaryData, weekly, yearly, allData] = await Promise.all([
+  //         getSummaryToday(),
+  //         getWeeklySummaryDefault(),
+  //         getAnnualSummaryData(),
+  //         allDataDefault(),
+  //       ]);
 
-  const downloadWeeklyChart = async () => {
+  //       // Handle the retrieved data here
+  //       console.log({ summaryData, weekly, yearly, allData });
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  const fetchSummary = async (
+    tgl: { from: Date | null; to: Date | null } | null
+  ) => {
+    if (!tgl) return;
+
+    setDateFilter(tgl);
+    setIsFiltered(true);
+    setLoading(true);
+    // console.log("Selected Date Range:", tgl);
+
     try {
-      const chart = weeklyChartRef.current;
-      if (chart) {
-        const canvas = await html2canvas(chart);
-        const imgData = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.href = imgData;
-        link.download = "weekly_chart.png";
-        link.click();
+      const response = await fetch("/api/filter-summary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: tgl.from,
+          to: tgl.to,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
       }
+
+      const data = await response.json();
+      console.log("Response from API route:", data);
+      console.log(data.dailySummary._count);
+
+      const allData = {
+        allSummary: {
+          _count: {
+            _all: data?.dailySummary?._count.allocatedQty ?? 0,
+          },
+          _sum: {
+            allocatedQty: data?.dailySummary?._sum?.allocatedQty ?? 0,
+          },
+        },
+        allDistributionSummary: {
+          _count: {
+            _all: data?.distributionSummary?._count.distributionQty ?? 0,
+          },
+          _sum: {
+            distributionQty:
+              data?.distributionSummary?._sum?.distributionQty ?? 0,
+          },
+        },
+        allMonthlyData: {
+          _count: {
+            _all: data?.monthlyData?._count.totalElpiji ?? 0,
+          },
+          _sum: {
+            totalElpiji: data?.monthlyData?._sum?.totalElpiji ?? 0,
+          },
+        },
+        pending: data?.pending ?? 0,
+        fakultatif: data?.fakultatif ?? 0,
+        tidakTembus: data?.tidakTembus ?? 0,
+        average: data?.average ?? 0,
+      };
+
+      setAllDataSummary(allData);
     } catch (error) {
-      console.error("Terjadi kesalahan saat mengunduh chart mingguan:", error);
+      console.error("Error sending date range:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const downloadYearlyChart = async () => {
-    try {
-      const chart = yearlyChartRef.current;
-      if (chart) {
-        const canvas = await html2canvas(chart);
-        const imgData = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
-        link.href = imgData;
-        link.download = "yearly_chart.png";
-        link.click();
-      }
-    } catch (error) {
-      console.error("Terjadi kesalahan saat mengunduh chart tahunan:", error);
+  const handleSearch = () => {
+    if (dateFilter) {
+      fetchSummary(dateFilter);
     }
   };
 
-  const chartConfig = {
-    monthlyQty: {
-      label: "Bulanan",
-      color: "hsl(var(--chart-1))",
-    },
-    dailyQty: {
-      label: "Harian",
-      color: "hsl(var(--chart-2))",
-    },
-    distributionQty: {
-      label: "Penyaluran LPG",
-      color: "hsl(var(--chart-3))",
-    },
-  } satisfies ChartConfig;
+  const handleReset = () => {
+    setDateFilter(null);
+    setIsFiltered(false);
+    setAllDataSummary(allData);
+  };
 
   return (
     <div className="mx-5">
@@ -334,20 +239,12 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
             </span>
           </h1>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between">
-            {/* <SummaryItems
-              icon={<CalendarCheck className="h-10 w-10 text-white" />}
-              title={`ALOKASI HARIAN`}
-              value={`${formatNumberQty(getTodayTotalQty(dailyAllocation))} / `}
-              additionalInfo={`${formatNumberQty(
-                getTodayTotalQty(dailyAllocation) * 3
-              )} Kg`}
-            /> */}
             <SummaryItems
               icon={<CalendarCheck className="h-10 w-10 text-white" />}
               title={`ALOKASI HARIAN`}
               value={`${
-                summaryData?.dailySummary._sum.allocatedQty
-                  ? (summaryData?.dailySummary._sum.allocatedQty).toLocaleString(
+                summaryData?.dailySummaryPlanned._sum.allocatedQty
+                  ? (summaryData?.dailySummaryPlanned._sum.allocatedQty).toLocaleString(
                       "id-ID"
                     )
                   : 0
@@ -361,17 +258,6 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               } Kg`}
             />
 
-            {/* <SummaryItems
-              icon={<CalendarDays className="h-10 w-10 text-white" />}
-              title={`ALOKASI BULANAN`}
-              value={`${formatNumberQty(
-                getTodayTotalQty(monthlyAllocation)
-              )} / `}
-              additionalInfo={`${formatNumberQty(
-                getTodayTotalQty(monthlyAllocation) * 3
-              )} Kg`}
-            /> */}
-
             <SummaryItems
               icon={<CalendarDays className="h-10 w-10 text-white" />}
               title={`ALOKASI BULANAN`}
@@ -382,17 +268,6 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
                 "id-ID"
               )} Kg`}
             />
-
-            {/* <SummaryItems
-              icon={<ScrollText className="h-10 w-10 text-white" />}
-              title={`PENYALURAN LPG`}
-              value={`${formatNumberQty(
-                getTodayTotalQty(dailyDistribution)
-              )} / `}
-              additionalInfo={`${formatNumberQty(
-                getTodayTotalQty(dailyDistribution) * 3
-              )} Kg`}
-            /> */}
 
             <SummaryItems
               icon={<ScrollText className="h-10 w-10 text-white" />}
@@ -413,60 +288,27 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               } Kg`}
             />
 
-            {/* <SummaryItems
-              icon={<Clock4 className="h-10 w-10 text-white" />}
-              title={"PENDING HARIAN"}
-              value={`${formatNumberQty(
-                calcSummary(dailyAllocation, dailyDistribution)
-              )} / `}
-              additionalInfo={`${formatNumberQty(
-                calcSummary(dailyAllocation, dailyDistribution) * 3
-              )} Kg`}
-            /> */}
-
             <SummaryItems
               icon={<Clock4 className="h-10 w-10 text-white" />}
-              title={"PENDING HARIAN BETA"}
+              title={"PENDING HARIAN"}
               value={`${summaryData?.pending.toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 (summaryData?.pending ?? 0) * 3
               ).toLocaleString("id-ID")} Kg`}
             />
 
-            {/* <SummaryItems
-              icon={<PackagePlus className="h-10 w-10 text-white" />}
-              title={"FAKULTATIF"}
-              value={`${formatNumberQty(
-                calcSummary(dailyAllocation, monthlyAllocation)
-              )} / `}
-              additionalInfo={`${formatNumberQty(
-                calcSummary(dailyAllocation, monthlyAllocation) * 3
-              )} Kg`}
-            /> */}
-
             <SummaryItems
               icon={<PackagePlus className="h-10 w-10 text-white" />}
-              title={"TOTAL FAKULTATIF BETA"}
+              title={"TOTAL FAKULTATIF"}
               value={`${summaryData?.fakultatif.toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 (summaryData?.fakultatif ?? 0) * 3
               ).toLocaleString("id-ID")} Kg`}
             />
 
-            {/* <SummaryItems
-              icon={<CalendarX2 className="h-10 w-10 text-white" />}
-              title={"ALOKASI TIDAK DITEBUS"}
-              value={`${formatNumberQty(
-                calcSummary(monthlyAllocation, dailyAllocation)
-              )} / `}
-              additionalInfo={`${formatNumberQty(
-                calcSummary(monthlyAllocation, dailyAllocation) * 3
-              )} Kg`}
-            /> */}
-
             <SummaryItems
               icon={<CalendarX2 className="h-10 w-10 text-white" />}
-              title={"TOTAL ALOKASI TIDAK DITEBUS BETA"}
+              title={"TOTAL ALOKASI TIDAK DITEBUS"}
               value={`${summaryData?.tidakTembus.toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 (summaryData?.tidakTembus ?? 0) * 3
@@ -476,138 +318,85 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
         </Card>
 
         {/* FILTER DATA */}
-        <Card className="px-6 py-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200 mb-5">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 my-4">
-            <h1 className="text-2xl font-semibold mb-4">
+        <Card className="p-4 sm:p-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h1 className="text-xl sm:text-2xl font-semibold">
               Ringkasan
-              <span className="text-sm m-3 font-semibold text-gray-500 mb-1">
-                {
-                  dateFilter?.from && dateFilter?.to
-                    ? `${format(dateFilter.from, "(dd MMMM yyyy)", {
-                        locale: id,
-                      })} - ${format(dateFilter.to, "(dd MMMM yyyy)", {
-                        locale: id,
-                      })}`
-                    : dateFilter?.from
-                    ? `${format(dateFilter.from, "(dd MMMM yyyy)", {
-                        locale: id,
-                      })}`
-                    : "(Semua Tanggal)"
-                  // : format(new Date(), "dd MMMM yyyy", { locale: id })
-                }
+              <span className="text-xs sm:text-sm ml-2 font-semibold text-gray-500">
+                {dateFilter?.from && dateFilter?.to
+                  ? `${format(dateFilter.from, "dd MMMM yyyy", {
+                      locale: id,
+                    })} - ${format(dateFilter.to, "dd MMMM yyyy", {
+                      locale: id,
+                    })}`
+                  : "Semua Tanggal"}
               </span>
             </h1>
-            <div className="flex flex-row items-center sm:gap-4 ml-auto self-center w-full sm:w-auto">
-              <div className="w-full sm:w-auto flex-1">
-                <DatePickerWithRange
-                  value={dateFilter}
-                  onDateChange={(txt) => {
-                    setDateFilter(txt);
-                    setIsFiltered(true);
-
-                    console.log("Selected Date Range:", txt);
-
-                    fetch("/api/filter-summary", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        from: txt?.from,
-                        to: txt?.to,
-                      }),
-                    })
-                      .then((res) => res.json())
-                      .then((data) => {
-                        console.log("Response from API route:", data);
-                        const allData = {
-                          allSummary: {
-                            _count: {
-                              _all: data.dailySummary._count?.allocatedQty ?? 0,
-                            },
-                            _sum: {
-                              allocatedQty:
-                                data.dailySummary._sum?.allocatedQty ?? 0,
-                            },
-                          },
-                          allDistributionSummary: {
-                            _count: {
-                              _all:
-                                data.distributionSummary._count
-                                  ?.distributionQty ?? 0,
-                            },
-                            _sum: {
-                              distributionQty:
-                                data.distributionSummary._sum
-                                  ?.distributionQty ?? 0,
-                            },
-                          },
-                          allMonthlyData: {
-                            _count: {
-                              _all: data.monthlyData._count?.totalElpiji ?? 0,
-                            },
-                            _sum: {
-                              totalElpiji:
-                                data.monthlyData._sum?.totalElpiji ?? 0,
-                            },
-                          },
-                          pending: data.pending,
-                          fakultatif: data.fakultatif,
-                          tidakTembus: data.tidakTembus,
-                          average: data.average,
-                        };
-                        setAllDataSummary(allData);
-                      })
-                      .catch((error) => {
-                        console.error("Error sending date range:", error);
-                      });
-                  }}
-                  placeholder={
-                    dateFilter?.from && dateFilter?.to
-                      ? `${format(dateFilter.from, "dd MMMM yyyy", {
-                          locale: id,
-                        })} - ${format(dateFilter.to, "dd MMMM yyyy", {
-                          locale: id,
-                        })}`
-                      : "Semua Tanggal"
-                  }
-                  className="w-full sm:w-auto"
-                />
-              </div>
-
-              {isFiltered && (
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center w-full sm:w-auto">
+              <DatePickerWithRange
+                value={dateFilter}
+                onDateChange={(txt) => setDateFilter(txt)}
+                placeholder={
+                  dateFilter?.from && dateFilter?.to
+                    ? `${format(dateFilter.from, "dd MMMM yyyy", {
+                        locale: id,
+                      })} - ${format(dateFilter.to, "dd MMMM yyyy", {
+                        locale: id,
+                      })}`
+                    : "Semua Tanggal"
+                }
+                className="w-full"
+              />
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button
+                  onClick={handleSearch}
+                  disabled={loading}
+                  className="flex-1 sm:flex-none"
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Search className="h-4 w-4 mr-2" />
+                  )}
+                  Cari
+                </Button>
                 <Button
                   variant="destructive"
-                  onClick={() => {
-                    setIsFiltered(false);
-                    clearFilters();
-                    setAllDataSummary(allData);
-                  }}
-                  className="flex items-center justify-center flex-2"
+                  onClick={handleReset}
+                  className="flex sm:flex-none"
                 >
-                  <X className="h-5 w-5 cursor-pointer" />
-                  {/* <span className="truncate">Reset</span> */}
+                  <X className="h-4 w-4 " />
                 </Button>
-              )}
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4">
+            {/* {loading ? (
+              <div className="col-span-full flex justify-center items-center h-40 sm:h-64">
+                <Loader2 className="h-12 w-12 sm:h-16 sm:w-16 animate-spin text-gray-500" />
+              </div>
+            ) : (
+              <> */}
             <SummaryItems
-              icon={<CalendarCheck className="h-10 w-10 text-white" />}
-              title={`TOTAL ALOKASI HARIAN (${allDataSummary.allSummary._count._all.toLocaleString(
-                "id-ID"
-              )})`}
+              icon={
+                <CalendarCheck className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title={`TOTAL ALOKASI HARIAN (${
+                allDataSummary?.allSummary?._count?._all?.toLocaleString("id-ID") || 0
+              })`}
               value={`${(
                 allDataSummary.allSummary._sum.allocatedQty ?? 0
               ).toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 (allDataSummary.allSummary._sum.allocatedQty ?? 0) * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
+              cs="p-4"
             />
             <SummaryItems
-              icon={<CalendarDays className="h-10 w-10 text-white" />}
-              title={`TOTAL ALOKASI BULANAN(${allDataSummary.allMonthlyData._count._all.toLocaleString(
+              icon={
+                <CalendarDays className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title={`TOTAL ALOKASI BULANAN (${allDataSummary.allMonthlyData._count._all.toLocaleString(
                 "id-ID"
               )})`}
               value={`${(
@@ -616,11 +405,12 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               additionalInfo={`${(
                 (allDataSummary.allMonthlyData._sum.totalElpiji ?? 0) * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
+              cs="p-4"
             />
-
             <SummaryItems
-              icon={<ScrollText className="h-10 w-10 text-white" />}
+              icon={
+                <ScrollText className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
               title={`TOTAL PENYALURAN LPG (${allDataSummary.allDistributionSummary._count._all.toLocaleString(
                 "id-ID"
               )})`}
@@ -631,50 +421,54 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
                 (allDataSummary.allDistributionSummary._sum.distributionQty ??
                   0) * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
+              cs="p-4"
             />
-
             <SummaryItems
-              icon={<Clock4 className="h-10 w-10 text-white" />}
-              title={"TOTAL PENDING HARIAN"}
+              icon={<Clock4 className="h-8 w-8 sm:h-10 sm:w-10 text-white" />}
+              title="TOTAL PENDING HARIAN"
               value={`${allDataSummary.pending.toLocaleString("id-ID")} / `}
               additionalInfo={`${(allDataSummary.pending * 3).toLocaleString(
                 "id-ID"
               )} Kg`}
-              cs={"p-4"}
+              cs="p-4"
             />
-
             <SummaryItems
-              icon={<PackagePlus className="h-10 w-10 text-white" />}
-              title={"TOTAL FAKULTATIF"}
+              icon={
+                <PackagePlus className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title="TOTAL FAKULTATIF"
               value={`${allDataSummary.fakultatif.toLocaleString("id-ID")} / `}
               additionalInfo={`${(allDataSummary.fakultatif * 3).toLocaleString(
                 "id-ID"
               )} Kg`}
-              cs={"p-4"}
+              cs="p-4"
             />
-
             <SummaryItems
-              icon={<CalendarX2 className="h-10 w-10 text-white" />}
-              title={"TOTAL ALOKASI TIDAK DITEBUS"}
+              icon={
+                <CalendarX2 className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title="TOTAL ALOKASI TIDAK DITEBUS"
               value={`${allDataSummary.tidakTembus.toLocaleString("id-ID")} / `}
               additionalInfo={`${(
                 allDataSummary.tidakTembus * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
+              cs="p-4"
             />
-
             <SummaryItems
-              icon={<ChartSpline className="h-10 w-10 text-white" />}
-              title={"RATA-RATA DISTRIBUSI"}
+              icon={
+                <ChartSpline className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title="RATA-RATA DISTRIBUSI"
               value={`${Number(allDataSummary.average).toLocaleString(
                 "id-ID"
               )} / `}
               additionalInfo={`${(
                 Number(allDataSummary.average) * 3
               ).toLocaleString("id-ID")} Kg`}
-              cs={"p-4"}
+              cs="p-4"
             />
+            {/* </>
+            )} */}
           </div>
         </Card>
       </div>
@@ -686,14 +480,18 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
             <h1 className="text-2xl font-semibold">Chart Jumlah Tabung</h1>
             <div className="flex flex-wrap gap-2 justify-center md:justify-end">
               <Button
-                onClick={downloadWeeklyChart}
+                onClick={() => {
+                  downloadWeeklyChart(weeklyChartRef);
+                }}
                 className="w-full md:w-auto flex items-center justify-center"
               >
                 <Download className="h-5 w-5 mr-2" />
                 <span className="truncate">Chart Mingguan</span>
               </Button>
               <Button
-                onClick={downloadYearlyChart}
+                onClick={() => {
+                  downloadAnnuallyChart(annuallyChartRef);
+                }}
                 className="w-full md:w-auto flex items-center justify-center"
               >
                 <Download className="h-5 w-5 mr-2" />
@@ -723,19 +521,12 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
                 title="Tabung Elpiji"
                 timeFrame="weekly"
               />
-              {/* <ChartComponent
-                data={getWeeklyTotalQty(dailyAllocation)}
-                data2={getWeeklyTotalQty(monthlyAllocation)}
-                data3={getWeeklyTotalQty(dailyDistribution)}
-                title="Tabung Elpiji"
-                timeFrame="weekly"
-              /> */}
             </CardContent>
             <CardContent className="flex-1 pb-0 pl-2"></CardContent>
           </Card>
         </div>
         <div className="mb-6"></div>
-        <div ref={yearlyChartRef} id="chart-annual">
+        <div ref={annuallyChartRef} id="chart-annual">
           <Card className="flex flex-col w-full h-[550px] pb-3 shadow-lg rounded-2xl bg-white ">
             <CardHeader className="pb-0">
               <CardTitle>Tahun ini</CardTitle>
@@ -744,17 +535,10 @@ const Summary = ({ defaultdata, weekly, yearly, allData }: SummaryProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0 pl-2">
-              {/* <ChartComponent
-                data={getAnnualTotalQty(dailyAllocation)}
-                data2={getAnnualTotalQty(monthlyAllocation)}
-                data3={getAnnualTotalQty(dailyDistribution)}
-                title="Tabung Elpiji"
-                timeFrame="monthly"
-              /> */}
               <ChartComponent
-                data={allocationDataYearly}
-                data2={totalElpijiDataYearly}
-                data3={distributionDataYearly}
+                data={allocationDataAnually}
+                data2={totalElpijiDataAnually}
+                data3={distributionDataAnually}
                 title="Tabung Elpiji"
                 timeFrame="monthly"
               />
