@@ -8,335 +8,526 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ChartConfig } from "@/components/ui/chart";
-import { endOfWeek, format, startOfWeek } from "date-fns";
-import React, { useEffect, useState } from "react";
-import {
-  calcSummary,
-  calculateDiff,
-  calculateSummaryQty,
-  formatNumberQty,
-  getAnnualTotalQty,
-  getTodayTotalQty,
-  getWeeklyTotalQty,
-  normalizeDateFrom,
-  normalizeDateTo,
-} from "@/utils/page";
+import { format } from "date-fns";
+import React, { useEffect, useRef, useState } from "react";
 import { id } from "date-fns/locale";
-import { CalendarCheck, CalendarDays, CalendarX2, Clock4, PackagePlus, ScrollText, SearchX } from "lucide-react";
+import {
+  CalendarCheck,
+  CalendarDays,
+  CalendarX2,
+  ChartSpline,
+  Clock4,
+  Download,
+  Loader2,
+  PackagePlus,
+  ScrollText,
+  Search,
+  X,
+} from "lucide-react";
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
 import { Button } from "@/components/ui/button";
 import SummaryItems from "@/components/FeatureComponents/SummaryItems";
+import html2canvas from "html2canvas";
 
-interface AllocationData {
-  plannedGiDate: Date | null;
-  allocatedQty?: number;
-  lpgDistribution: {
-    giDate: Date;
-    distributionQty: number;
-  } | null;
-}
+import { Prisma } from "../../../../generated/prisma_client";
+import {
+  allDataDefault,
+  getAnnualSummaryData,
+  getSummaryToday,
+  getWeeklySummaryDefault,
+} from "@/app/actions/summary.action";
+import { downloadAnnuallyChart, downloadWeeklyChart } from "@/utils/page";
 
-interface SummaryProps {
-  monthly: DataConfig[];
-  data: AllocationData[];
-}
+// 🟢 Ambil otomatis tipe return dari getSummaryToday
+type SummaryProps = {
+  defaultdata: Prisma.PromiseReturnType<typeof getSummaryToday>;
+  weekly: Prisma.PromiseReturnType<typeof getWeeklySummaryDefault>;
+  annually: any;
+  allData: any;
+};
 
-interface DataConfig {
-  date: Date;
-  qty?: number;
-}
+const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
+  const [summaryData, setSummaryData] = useState(defaultdata);
+  const [allDataSummary, setAllDataSummary] = useState(allData);
+  const [weeklySummary, setWeeklySummary] = useState(weekly);
+  const [annualSummary, setAnnualSummary] = useState(annually);
 
-const Summary = ({ data, monthly }: SummaryProps) => {
-  // Summary Chart
-  const [monthlyAllocation, setMonthlyAllocation] = useState<DataConfig[]>([]);
-  const [dailyAllocation, setDailyAllocation] = useState<DataConfig[]>([]);
-  const [dailyDistribution, setDailyDistribution] = useState<DataConfig[]>([]);
-  
-  // Filtering Data 
-  const [dateFilter, setDateFilter] = useState<any>(null);
-  const [filteredDaily, setFilteredDaily] = useState<AllocationData[]>([]);
-  const [filteredMonthly, setFilteredMonthly] = useState<DataConfig[]>([]);
-  const [filteredDistribution, setFilteredDistribution] = useState<AllocationData[]>([]);
-  
-  const totalDailyQty = calculateSummaryQty(filteredDaily, "allocatedQty");
-  const totalMonthlyQty = calculateSummaryQty(filteredMonthly, "totalElpiji");
-  const totalDistributionlyQty = calculateSummaryQty(filteredDistribution, "lpgDistribution.distributionQty");
+  const weeklyChartRef = useRef(null);
+  const annuallyChartRef = useRef(null);
 
-  const filterByDate = (itemDate: Date, day?:string) => {
-    const matchesDate = dateFilter?.from
-      ? dateFilter?.to
-        ? normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
-          normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.to)
-        : normalizeDateFrom(itemDate) >= normalizeDateFrom(dateFilter.from) &&
-          normalizeDateTo(itemDate) <= normalizeDateTo(dateFilter.from)
-      : day
-    ? normalizeDateFrom(new Date()) === normalizeDateTo(new Date())
-    : true;
-    return matchesDate; 
+  // Filtering Data
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
+  const [dateFilter, setDateFilter] = useState<{
+    from: Date | null;
+    to: Date | null;
+  } | null>();
+
+  const allocationData = weeklySummary.weeklySummary.map((item) => ({
+    date: new Date(item.date).toLocaleDateString("id-ID"), // Format jadi YYYY-MM-DD
+    qty: item.dailySummary,
+  }));
+
+  const distributionData = weeklySummary.weeklySummary.map((item) => ({
+    date: new Date(item.date).toLocaleDateString("id-ID"),
+    qty: item.distributionSummary,
+  }));
+
+  const totalElpijiData = weeklySummary.weeklySummary.map((item) => ({
+    date: new Date(item.date).toLocaleDateString("id-ID"),
+    qty: item.totalElpiji,
+  }));
+
+  const allocationDataAnually = annualSummary.map((item: any) => ({
+    date: item.month,
+    qty: item.totalAllocatedQty,
+  }));
+
+  const distributionDataAnually = annualSummary.map((item: any) => ({
+    date: item.month,
+    qty: item.totalDistributionQty,
+  }));
+
+  const totalElpijiDataAnually = annualSummary.map((item: any) => ({
+    date: item.month,
+    qty: item.totalMonthlyElpiji,
+  }));
+
+  // useEffect(() => {
+  //   loadDataSummary();
+  // }, []);
+
+  // const loadDataSummary = async () => {
+  //   try {
+  //     const [summaryData, weekly, annually] = await Promise.all([
+  //       getSummaryToday(),
+  //       getWeeklySummaryDefault(),
+  //       getAnnualSummaryData(),
+  //       allDataDefault(),
+  //     ]);
+
+  //     // console.log({ summaryData, weekly, annually, allData });
+
+  //     // setSummaryData(summaryData);
+  //     // setAllDataSummary(allData);
+  //     // setWeeklySummary(weekly);
+  //     // setAnnualSummary(annually);
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const [summaryData, weekly, yearly, allData] = await Promise.all([
+  //         getSummaryToday(),
+  //         getWeeklySummaryDefault(),
+  //         getAnnualSummaryData(),
+  //         allDataDefault(),
+  //       ]);
+
+  //       // Handle the retrieved data here
+  //       console.log({ summaryData, weekly, yearly, allData });
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  const fetchSummary = async (
+    tgl: { from: Date | null; to: Date | null } | null
+  ) => {
+    if (!tgl) return;
+
+    setDateFilter(tgl);
+    setIsFiltered(true);
+    setLoading(true);
+    // console.log("Selected Date Range:", tgl);
+
+    try {
+      const response = await fetch("/api/filter-summary", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: tgl.from,
+          to: tgl.to,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API responded with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Response from API route:", data);
+      console.log(data.dailySummary._count);
+
+      const allData = {
+        allSummary: {
+          _count: {
+            _all: data?.dailySummary?._count.allocatedQty ?? 0,
+          },
+          _sum: {
+            allocatedQty: data?.dailySummary?._sum?.allocatedQty ?? 0,
+          },
+        },
+        allDistributionSummary: {
+          _count: {
+            _all: data?.distributionSummary?._count.distributionQty ?? 0,
+          },
+          _sum: {
+            distributionQty:
+              data?.distributionSummary?._sum?.distributionQty ?? 0,
+          },
+        },
+        allMonthlyData: {
+          _count: {
+            _all: data?.monthlyData?._count.totalElpiji ?? 0,
+          },
+          _sum: {
+            totalElpiji: data?.monthlyData?._sum?.totalElpiji ?? 0,
+          },
+        },
+        pending: data?.pending ?? 0,
+        fakultatif: data?.fakultatif ?? 0,
+        tidakTembus: data?.tidakTembus ?? 0,
+        average: data?.average ?? 0,
+      };
+
+      setAllDataSummary(allData);
+    } catch (error) {
+      console.error("Error sending date range:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Config all data to date and qty only
-  useEffect(() => {
-    const monthlyData = monthly.map((item: any) => ({
-      date: item.date,
-      qty: item.totalElpiji,
-    }));
+  const handleSearch = () => {
+    if (dateFilter) {
+      fetchSummary(dateFilter);
+    }
+  };
 
-    const dailyData = data.map((item: any) => ({
-      date: item.plannedGiDate,
-      qty: item.allocatedQty,
-    }));
-    
-    const distributionData = data
-      .filter((item: any) => item.lpgDistribution !== null) 
-      .map((item: any) => ({
-        date: item.lpgDistribution.giDate,
-        qty: item.lpgDistribution.distributionQty ?? 0, 
-      }));
-
-    // const filteredTodayDaily = dailyData.filter((item: { date: any; }) => filterByDate(item.date,"today"));
-    // const filteredTodayMonthly = monthlyData.filter((item: { date: any; }) => filterByDate(item.date, "today"));
-    // const filteredTodayDistribution = distributionData.filter((item: { date: any; }) => filterByDate(item.date, "today"));
-
-    setDailyAllocation(dailyData);
-    setMonthlyAllocation(monthlyData);
-    setDailyDistribution(distributionData);
-  }, [data, monthly]);
-
-  useEffect(() => {
-    // const fromDate = dateFilter?.from ? normalizeDateFrom(dateFilter.from) : null;
-    // const toDate = dateFilter?.to ? normalizeDateTo(dateFilter.to) : null;
-
-    // Apply filters
-    const filteredDailyData = data.filter((item: { plannedGiDate: any; }) => filterByDate(item.plannedGiDate));
-    // const filteredMonthlyData = monthly.filter((item) => filterByDate(item.date));
-    // const filteredDistributionData = data
-    //   .filter((item: { lpgDistribution: null; }) => item.lpgDistribution !== null)
-    //   .filter((item: { lpgDistribution: { giDate: any; }; }) => filterByDate(item.lpgDistribution.giDate));
-    
-    const filteredMonthlyData = monthly.filter((item) =>
-      filterByDate(item.date)
-    );
-
-    const filteredDistributionData = data
-      .filter((item) => item.lpgDistribution !== null)
-      .filter((item) =>
-        item.lpgDistribution?.giDate
-          ? filterByDate(item.lpgDistribution.giDate)
-          : false
-      );
-
-    setFilteredDaily(filteredDailyData);
-    setFilteredMonthly(filteredMonthlyData);
-    setFilteredDistribution(filteredDistributionData);
-  }, [data, monthly, dateFilter]);
-  
-  const handleClearSearch = () => {
+  const handleReset = () => {
     setDateFilter(null);
+    setIsFiltered(false);
+    setAllDataSummary(allData);
   };
-
-  const chartConfig = {
-    monthlyQty: {
-      label: "Bulanan",
-      color: "hsl(var(--chart-1))",
-    },
-    dailyQty: {
-      label: "Harian",
-      color: "hsl(var(--chart-2))",
-    },
-    distributionQty: {
-      label: "Penyaluran LPG",
-      color: "hsl(var(--chart-3))",
-    },
-  } satisfies ChartConfig;
 
   return (
-    <div className="py-6 mx-6">
+    <div className="mx-5">
       <div className="mb-4">
-        <div className="flex flex-col md:flex-row items-start md:items-center gap-4 my-4">
+        <div className="flex md:flex-row items-start md:items-center gap-4 my-4">
           <div className="pl-2">
-            <h1 className="text-xl md:text-2xl font-bold">Ringkasan Eksekutif</h1>
+            <h1 className="text-xl md:text-2xl font-bold">
+              Ringkasan Eksekutif
+            </h1>
           </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 ml-auto self-center w-full sm:w-auto">
-            <div className="w-full sm:w-auto">
-              <DatePickerWithRange
-                value={dateFilter}
-                onDateChange={setDateFilter}
-                placeholder={
-                  dateFilter?.from && dateFilter?.to
-                    ? `${format(dateFilter.from, "dd MMMM yyyy", { locale: id })} - ${format(
-                        dateFilter.to,
-                        "dd MMMM yyyy",
-                        { locale: id }
-                      )}`
-                    : "Semua Tanggal"
-                }
-                className="w-full sm:w-auto"
-              />
-            </div>
-
-            <Button
-              variant="default"
-              onClick={handleClearSearch}
-              className="w-full sm:w-auto flex items-center justify-center"
-            >
-              <SearchX className="h-5 w-5 mr-2 cursor-pointer" />
-              <span className="truncate">Bersihkan Pencarian</span>
-            </Button>
-          </div>
-      </div>
+        </div>
 
         {/* TODAY */}
         <Card className="px-6 py-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200">
-          <h1 className="text-2xl font-semibold mb-1 ">Wawasan Hari Ini
+          <h1 className="text-2xl font-semibold mb-1 ">
+            Wawasan Hari Ini
             <span className="text-sm m-3 font-semibold text-gray-500 mb-1">
               ({format(new Date(), "dd MMMM yyyy")})
             </span>
           </h1>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between px-2">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between">
             <SummaryItems
               icon={<CalendarCheck className="h-10 w-10 text-white" />}
               title={`ALOKASI HARIAN`}
-              value={`${formatNumberQty(getTodayTotalQty(dailyAllocation))} / `}
-              additionalInfo={`${formatNumberQty(getTodayTotalQty(dailyAllocation) * 3)} Kg`}
+              value={`${
+                summaryData?.dailySummaryPlanned._sum.allocatedQty
+                  ? (summaryData?.dailySummaryPlanned._sum.allocatedQty).toLocaleString(
+                      "id-ID"
+                    )
+                  : 0
+              } / `}
+              additionalInfo={`${
+                summaryData?.dailySummary._sum.allocatedQty
+                  ? (
+                      summaryData?.dailySummary._sum.allocatedQty * 3
+                    ).toLocaleString("id-ID")
+                  : "0"
+              } Kg`}
             />
-            
+
             <SummaryItems
               icon={<CalendarDays className="h-10 w-10 text-white" />}
               title={`ALOKASI BULANAN`}
-              value={`${formatNumberQty(getTodayTotalQty(monthlyAllocation))} / `}
-              additionalInfo={`${formatNumberQty(getTodayTotalQty(monthlyAllocation) * 3)} Kg`}
+              value={`${summaryData?.safeMonthlyData.totalElpiji.toLocaleString(
+                "id-ID"
+              )} / `}
+              additionalInfo={`${summaryData?.safeMonthlyData.volume.toLocaleString(
+                "id-ID"
+              )} Kg`}
             />
-              
+
             <SummaryItems
               icon={<ScrollText className="h-10 w-10 text-white" />}
               title={`PENYALURAN LPG`}
-              value={`${formatNumberQty(getTodayTotalQty(dailyDistribution))} / `}
-              additionalInfo={`${formatNumberQty(getTodayTotalQty(dailyDistribution) * 3)} Kg`}
+              value={`${
+                summaryData?.distributionSummary._sum.distributionQty
+                  ? (summaryData?.distributionSummary._sum.distributionQty).toLocaleString(
+                      "id-ID"
+                    )
+                  : 0
+              } / `}
+              additionalInfo={`${
+                summaryData?.distributionSummary._sum.distributionQty
+                  ? (
+                      summaryData?.distributionSummary._sum.distributionQty * 3
+                    ).toLocaleString("id-ID")
+                  : "0"
+              } Kg`}
             />
-            
+
             <SummaryItems
               icon={<Clock4 className="h-10 w-10 text-white" />}
               title={"PENDING HARIAN"}
-              value={`${formatNumberQty(calcSummary(dailyAllocation, dailyDistribution))} / `}
-              additionalInfo={`${formatNumberQty(calcSummary(dailyAllocation, dailyDistribution) * 3)} Kg`}
-            />
-            
-            <SummaryItems
-              icon={<PackagePlus className="h-10 w-10 text-white" />}
-              title={"FAKULTATIF"}
-              value={`${formatNumberQty(calcSummary(dailyAllocation, monthlyAllocation))} / `}
-              additionalInfo={`${formatNumberQty(calcSummary(dailyAllocation, monthlyAllocation) * 3)} Kg`}
+              value={`${summaryData?.pending.toLocaleString("id-ID")} / `}
+              additionalInfo={`${(
+                (summaryData?.pending ?? 0) * 3
+              ).toLocaleString("id-ID")} Kg`}
             />
 
-            <SummaryItems
-              icon={<CalendarX2 className="h-10 w-10 text-white" />}
-              title={"ALOKASI TIDAK DITEBUS"}
-              value={`${formatNumberQty(calcSummary(monthlyAllocation, dailyAllocation))} / `}
-              additionalInfo={`${formatNumberQty(calcSummary(monthlyAllocation, dailyAllocation) * 3)} Kg`}
-            />
-          </div>
-        </Card>
-
-        {/* FILTER DATA */}
-        <Card className="px-6 py-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200 mb-5">
-          <h1 className="text-2xl font-semibold mb-4">Ringkasan
-          <span className="text-sm m-3 font-semibold text-gray-500 mb-1">
-            {
-              dateFilter?.from && dateFilter?.to
-                ? `${format(dateFilter.from, "(dd MMMM yyyy)", { locale: id })} - ${format(
-                    dateFilter.to,
-                    "(dd MMMM yyyy)",
-                    { locale: id }
-                  )}`
-                : dateFilter?.from
-                ?`${format(dateFilter.from, "(dd MMMM yyyy)", { locale: id })}`
-                :"(Semua Tanggal)"
-                // : format(new Date(), "dd MMMM yyyy", { locale: id })
-            }
-            </span>
-          </h1>
-          <p></p>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:grid-cols-3 justify-between px-2">
-          <SummaryItems
-              icon={<CalendarCheck className="h-10 w-10 text-white" />}
-              title={`TOTAL ALOKASI HARIAN (${formatNumberQty(filteredDaily.length)})`}
-              value={`${formatNumberQty(totalDailyQty)} / `}
-              additionalInfo={`${formatNumberQty(totalDailyQty * 3)} Kg`}
-              cs={"p-4"}
-            />
-            
-            <SummaryItems
-              icon={<CalendarDays className="h-10 w-10 text-white" />}
-              title={`TOTAL ALOKASI BULANAN (${formatNumberQty(filteredMonthly.length)})`}
-              value={`${formatNumberQty(totalMonthlyQty)} / `}
-              additionalInfo={`${formatNumberQty(totalMonthlyQty * 3)} Kg`}
-              cs={"p-4"}
-            />
-            
-            <SummaryItems
-              icon={<ScrollText className="h-10 w-10 text-white" />}
-              title={`TOTAL PENYALURAN LPG (${formatNumberQty(filteredDistribution.length)})`}
-              value={`${formatNumberQty(totalDistributionlyQty)} / `}
-              additionalInfo={`${formatNumberQty(totalDistributionlyQty * 3)} Kg`}
-              cs={"p-4"}
-            />
-            
-            <SummaryItems
-              icon={<Clock4 className="h-10 w-10 text-white" />}
-              title={"TOTAL PENDING HARIAN"}
-              value={`${formatNumberQty(calculateDiff(totalDailyQty, totalDistributionlyQty))} / `}
-              additionalInfo={`${formatNumberQty(calculateDiff(totalDailyQty, totalDistributionlyQty) * 3)} Kg`}
-              cs={"p-4"}
-            />
-            
             <SummaryItems
               icon={<PackagePlus className="h-10 w-10 text-white" />}
               title={"TOTAL FAKULTATIF"}
-              value={`${formatNumberQty(calculateDiff(totalDailyQty, totalMonthlyQty))} / `}
-              additionalInfo={`${formatNumberQty(calculateDiff(totalDailyQty, totalMonthlyQty) * 3)} Kg`}
-              cs={"p-4"}
+              value={`${summaryData?.fakultatif.toLocaleString("id-ID")} / `}
+              additionalInfo={`${(
+                (summaryData?.fakultatif ?? 0) * 3
+              ).toLocaleString("id-ID")} Kg`}
             />
 
             <SummaryItems
               icon={<CalendarX2 className="h-10 w-10 text-white" />}
               title={"TOTAL ALOKASI TIDAK DITEBUS"}
-              value={`${formatNumberQty(calculateDiff(totalMonthlyQty, totalDailyQty))} / `}
-              additionalInfo={`${formatNumberQty(calculateDiff(totalMonthlyQty, totalDailyQty) * 3)} Kg`}
-              cs={"p-4"}
+              value={`${summaryData?.tidakTembus.toLocaleString("id-ID")} / `}
+              additionalInfo={`${(
+                (summaryData?.tidakTembus ?? 0) * 3
+              ).toLocaleString("id-ID")} Kg`}
             />
+          </div>
+        </Card>
+
+        {/* FILTER DATA */}
+        <Card className="p-4 sm:p-6 my-5 shadow-lg rounded-2xl bg-white border border-gray-200">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <h1 className="text-xl sm:text-2xl font-semibold">
+              Ringkasan
+              <span className="text-xs sm:text-sm ml-2 font-semibold text-gray-500">
+                {dateFilter?.from && dateFilter?.to
+                  ? `${format(dateFilter.from, "dd MMMM yyyy", {
+                      locale: id,
+                    })} - ${format(dateFilter.to, "dd MMMM yyyy", {
+                      locale: id,
+                    })}`
+                  : "Semua Tanggal"}
+              </span>
+            </h1>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center w-full sm:w-auto">
+              <DatePickerWithRange
+                value={dateFilter}
+                onDateChange={(txt) => setDateFilter(txt)}
+                placeholder={
+                  dateFilter?.from && dateFilter?.to
+                    ? `${format(dateFilter.from, "dd MMMM yyyy", {
+                        locale: id,
+                      })} - ${format(dateFilter.to, "dd MMMM yyyy", {
+                        locale: id,
+                      })}`
+                    : "Semua Tanggal"
+                }
+                className="w-full"
+              />
+              <div className="flex gap-2 w-full sm:w-auto">
+                <Button
+                  onClick={handleSearch}
+                  disabled={loading}
+                  className="flex-1 sm:flex-none"
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Search className="h-4 w-4 mr-2" />
+                  )}
+                  Cari
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleReset}
+                  className="flex sm:flex-none"
+                >
+                  <X className="h-4 w-4 " />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4">
+            {/* {loading ? (
+              <div className="col-span-full flex justify-center items-center h-40 sm:h-64">
+                <Loader2 className="h-12 w-12 sm:h-16 sm:w-16 animate-spin text-gray-500" />
+              </div>
+            ) : (
+              <> */}
+            <SummaryItems
+              icon={
+                <CalendarCheck className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title={`TOTAL ALOKASI HARIAN (${
+                allDataSummary?.allSummary?._count?._all?.toLocaleString("id-ID") || 0
+              })`}
+              value={`${(
+                allDataSummary.allSummary._sum.allocatedQty ?? 0
+              ).toLocaleString("id-ID")} / `}
+              additionalInfo={`${(
+                (allDataSummary.allSummary._sum.allocatedQty ?? 0) * 3
+              ).toLocaleString("id-ID")} Kg`}
+              cs="p-4"
+            />
+            <SummaryItems
+              icon={
+                <CalendarDays className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title={`TOTAL ALOKASI BULANAN (${allDataSummary.allMonthlyData._count._all.toLocaleString(
+                "id-ID"
+              )})`}
+              value={`${(
+                allDataSummary.allMonthlyData._sum.totalElpiji ?? 0
+              ).toLocaleString("id-ID")} / `}
+              additionalInfo={`${(
+                (allDataSummary.allMonthlyData._sum.totalElpiji ?? 0) * 3
+              ).toLocaleString("id-ID")} Kg`}
+              cs="p-4"
+            />
+            <SummaryItems
+              icon={
+                <ScrollText className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title={`TOTAL PENYALURAN LPG (${allDataSummary.allDistributionSummary._count._all.toLocaleString(
+                "id-ID"
+              )})`}
+              value={`${(
+                allDataSummary.allDistributionSummary._sum.distributionQty ?? 0
+              ).toLocaleString("id-ID")} / `}
+              additionalInfo={`${(
+                (allDataSummary.allDistributionSummary._sum.distributionQty ??
+                  0) * 3
+              ).toLocaleString("id-ID")} Kg`}
+              cs="p-4"
+            />
+            <SummaryItems
+              icon={<Clock4 className="h-8 w-8 sm:h-10 sm:w-10 text-white" />}
+              title="TOTAL PENDING HARIAN"
+              value={`${allDataSummary.pending.toLocaleString("id-ID")} / `}
+              additionalInfo={`${(allDataSummary.pending * 3).toLocaleString(
+                "id-ID"
+              )} Kg`}
+              cs="p-4"
+            />
+            <SummaryItems
+              icon={
+                <PackagePlus className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title="TOTAL FAKULTATIF"
+              value={`${allDataSummary.fakultatif.toLocaleString("id-ID")} / `}
+              additionalInfo={`${(allDataSummary.fakultatif * 3).toLocaleString(
+                "id-ID"
+              )} Kg`}
+              cs="p-4"
+            />
+            <SummaryItems
+              icon={
+                <CalendarX2 className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title="TOTAL ALOKASI TIDAK DITEBUS"
+              value={`${allDataSummary.tidakTembus.toLocaleString("id-ID")} / `}
+              additionalInfo={`${(
+                allDataSummary.tidakTembus * 3
+              ).toLocaleString("id-ID")} Kg`}
+              cs="p-4"
+            />
+            <SummaryItems
+              icon={
+                <ChartSpline className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
+              }
+              title="RATA-RATA DISTRIBUSI"
+              value={`${Number(allDataSummary.average).toLocaleString(
+                "id-ID"
+              )} / `}
+              additionalInfo={`${(
+                Number(allDataSummary.average) * 3
+              ).toLocaleString("id-ID")} Kg`}
+              cs="p-4"
+            />
+            {/* </>
+            )} */}
           </div>
         </Card>
       </div>
 
-      <div className="mb-16"></div>
-        <div className="my-5">
-          <div className="pl-2 mt-5">
-            <h1 className="text-2xl font-semibold mb-4 mx-3">Chart Jumlah Tabung</h1>
+      <div className="mb-16" />
+      <div className="my-5">
+        <div className="pl-2 mt-5">
+          <div className="md:flex items-center justify-between mx-1 mb-4">
+            <h1 className="text-2xl font-semibold">Chart Jumlah Tabung</h1>
+            <div className="flex flex-wrap gap-2 justify-center md:justify-end">
+              <Button
+                onClick={() => {
+                  downloadWeeklyChart(weeklyChartRef);
+                }}
+                className="w-full md:w-auto flex items-center justify-center"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                <span className="truncate">Chart Mingguan</span>
+              </Button>
+              <Button
+                onClick={() => {
+                  downloadAnnuallyChart(annuallyChartRef);
+                }}
+                className="w-full md:w-auto flex items-center justify-center"
+              >
+                <Download className="h-5 w-5 mr-2" />
+                <span className="truncate">Chart Tahunan</span>
+              </Button>
+            </div>
           </div>
-          <Card className="flex flex-col w-full h-[520px] pb-3 shadow-lg rounded-2xl bg-white ">
+        </div>
+
+        <div ref={weeklyChartRef} id="chart-weekly">
+          <Card className="flex flex-col w-full h-[550px] pb-3 shadow-lg rounded-2xl bg-white ">
             <CardHeader className="pb-0">
               <CardTitle>Minggu ini</CardTitle>
               <CardDescription>
-                {format(startOfWeek(new Date(), { weekStartsOn: 0 }), "dd MMMM yyyy", { locale: id })} - 
-                {format(endOfWeek(new Date(), { weekStartsOn: 0 }), "dd MMMM yyyy", { locale: id })}
+                {format(weeklySummary.startDate, "dd MMMM yyyy", {
+                  locale: id,
+                })}{" "}
+                - {""}
+                {format(weeklySummary.endDate, "dd MMMM yyyy", { locale: id })}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex-1 pb-0 pl-2">
               <ChartComponent
-                data={getWeeklyTotalQty(dailyAllocation)}
-                data2={getWeeklyTotalQty(monthlyAllocation)}
-                data3={getWeeklyTotalQty(dailyDistribution)}
-                config={chartConfig}
+                data={allocationData}
+                data2={totalElpijiData}
+                data3={distributionData}
                 title="Tabung Elpiji"
                 timeFrame="weekly"
               />
             </CardContent>
+            <CardContent className="flex-1 pb-0 pl-2"></CardContent>
           </Card>
-          <div className="mb-6"></div>
-          <Card className="flex flex-col w-full h-[520px] pb-3 shadow-lg rounded-2xl bg-white ">
+        </div>
+        <div className="mb-6"></div>
+        <div ref={annuallyChartRef} id="chart-annual">
+          <Card className="flex flex-col w-full h-[550px] pb-3 shadow-lg rounded-2xl bg-white ">
             <CardHeader className="pb-0">
               <CardTitle>Tahun ini</CardTitle>
               <CardDescription>
@@ -345,15 +536,15 @@ const Summary = ({ data, monthly }: SummaryProps) => {
             </CardHeader>
             <CardContent className="flex-1 pb-0 pl-2">
               <ChartComponent
-                data={getAnnualTotalQty(dailyAllocation)}
-                data2={getAnnualTotalQty(monthlyAllocation)}
-                data3={getAnnualTotalQty(dailyDistribution)}
-                config={chartConfig}
+                data={allocationDataAnually}
+                data2={totalElpijiDataAnually}
+                data3={distributionDataAnually}
                 title="Tabung Elpiji"
                 timeFrame="monthly"
               />
             </CardContent>
           </Card>
+        </div>
       </div>
     </div>
   );

@@ -1,332 +1,391 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ColumnDef } from "@tanstack/react-table";
+import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import ComboBoxNelsen from "@/components/FeatureComponents/ComboBoxNelsen";
+import {
+  adminLpgDistributionColumns,
+  lpgDistributionColumns,
+} from "@/lib/Column";
+import Pagination from "@/components/FeatureComponents/Pagination";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { Calendar } from "@/components/ui/calendar";
+import { format, set } from "date-fns";
+import InfoCard from "@/components/InfoCard";
 import {
   CalendarCheck,
   Database,
   Handshake,
+  Loader2,
   Plus,
-  Printer,
+  Search,
   SearchX,
+  Upload,
   Weight,
+  X,
 } from "lucide-react";
-import {
-  calculateTotalAgen,
-  calculateTotalQty,
-  formatNumberQty,
-  normalizeDateFrom,
-  normalizeDateTo,
-} from "@/utils/page";
-import { format } from "date-fns";
-import { getMonthlyAllocation, getSummary } from "@/app/actions/alokasi.action";
-import { ChartConfig } from "@/components/ui/chart";
-import RekapPenyaluran from "@/components/FeatureComponents/CetakDistribusi/RekapPenyaluran";
-import ComboBox from "@/components/FeatureComponents/ComboBox";
-import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
-import { Card } from "@/components/ui/card";
+import { DataTableBackEnd } from "@/components/FeatureComponents/DataTableBackEnd";
 import { DataTable } from "@/components/ui/data-table";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-import { Label } from "@radix-ui/react-label";
-import { Button } from "@/components/ui/button";
-import type { User } from "@prisma/client";
 import { id } from "date-fns/locale";
-import { LpgDistributions } from "@/lib/types";
+import { User } from "../../../../generated/prisma_client";
+import Link from "next/link";
 
-interface DistributionProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  data2?: TData[];
-  user: User;
-}
-
-const today = {
-  from: new Date(),
-  to: new Date(),
+type valuesFilter = {
+  agentName: string;
+  deliveryNumber: string;
+  range: any;
 };
 
-const PenyaluranElpiji = <TData extends LpgDistributions, TValue>({
-  columns,
-  data,
+type bpeNumberData = {
+  agentName: string;
+};
+
+export default function PenyaluranElpiji({
   user,
-}: DistributionProps<TData, TValue>) => {
-  const [notrans, setnotrans] = useState("");
-  const [isAgentFiltered, setIsAgentFiltered] = useState(false);
-  const [agentName, setAgentName] = useState("");
-  const [doNumber, setDoNumber] = useState("");
-  const [dateFilter, setDateFilter] = useState<any>("today");
-  const [filteredData, setFilteredData] = useState<TData[]>(data);
-  const [filtered, setFiltered] = useState<Boolean>(false);
-  const [allocationDaily, setAllocationDaily] = useState<any[]>([]);
-  const [allocationMonthly, setAllocationMonthly] = useState<any[]>([]);
+  dataBpeDeliveryAgent,
+  defaultData,
+}: {
+  user: User;
+  dataBpeDeliveryAgent: bpeNumberData[];
+  defaultData: any[];
+}) {
+  const uniqueAgents = [
+    ...new Set(defaultData.map((allocation: any) => allocation.agentName)),
+  ];
 
-  const notransOptions = Array.from(
-    new Set(data.map((item) => item.bpeNumber))
-  ).map((bpeNumber) => ({
-    label: bpeNumber,
-    value: bpeNumber,
-  }));
+  const totalQty = useMemo(
+    () =>
+      defaultData.reduce(
+        (sum: any, allocation: any) => sum + Number(allocation.allocatedQty),
+        0
+      ),
+    [defaultData]
+  );
 
-  const agentNameOptions = Array.from(
-    new Set(data.map((item) => item.agentName))
-  ).map((agentName) => ({
-    label: agentName,
-    value: agentName,
-  }));
+  const totalBeratQty = useMemo(() => totalQty * 3, [totalQty]);
 
-  const doNumberOptions = Array.from(
-    new Set(data.map((item) => item.deliveryNumber))
-  ).map((deliveryNumber) => ({
-    label: deliveryNumber,
-    value: deliveryNumber,
-  }));
+  const formattedTotalQty = totalQty.toLocaleString("id-ID");
+  const formattedTotalBeratQty = totalBeratQty.toLocaleString("id-ID");
 
-  useEffect(() => {
-    const filtered = data.filter((item) => {
-      const matchesNoTrans = notrans ? item.bpeNumber === notrans : true;
-      const matchesAgentName = agentName ? item.agentName === agentName : true;
-      const matchesDoNumber = doNumber
-        ? item.deliveryNumber === doNumber
-        : true;
+  const [loading, setLoading] = useState(false);
+  const [isFiltered, setIsFiltered] = useState(true);
+  const [paginationLoading, setPaginationLoading] = useState(false);
+  const [tableData, setTableData] = useState(defaultData);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    pageSize: 15,
+    total: 0,
+    totalPages: defaultData.length > 15 ? 2 : 1,
+  });
+  const [data, setData] = useState({
+    totalTabung: formattedTotalQty,
+    totalBeratTabung: formattedTotalBeratQty,
+    totalAgen: uniqueAgents.length,
+    totalAlokasiHarian: defaultData.length,
+  });
 
-      const matchesDate = dateFilter?.from
-        ? dateFilter?.to
-          ? // For Range Dates
-            item.giDate >= normalizeDateFrom(dateFilter.from) &&
-            item.giDate <= normalizeDateTo(dateFilter.to)
-          : // For Single Dates
-            item.giDate >= normalizeDateFrom(dateFilter.from) &&
-            item.giDate <= normalizeDateTo(dateFilter.from)
-        : dateFilter === "today"
-        ? normalizeDateFrom(item.giDate) === normalizeDateTo(new Date())
-        : true;
+  const form = useForm<valuesFilter>({
+    defaultValues: {
+      agentName: "",
+      range: {
+        from: new Date(),
+        to: null,
+      },
+    },
+  });
 
-      return (
-        matchesNoTrans && matchesAgentName && matchesDate && matchesDoNumber
-      );
+  async function fetchData(values: valuesFilter, pageNumber: number) {
+    setIsFiltered(true);
+    setPaginationLoading(true);
+    try {
+      const { from, to } = values.range || {};
+      const response = await fetch("/api/penyaluran-elpiji", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...values,
+          range: {
+            from: from ? format(new Date(from), "yyyy-MM-dd") : null,
+            to: to ? format(new Date(to), "yyyy-MM-dd") : null,
+          },
+          page: pageNumber,
+          pageSize: pagination.pageSize,
+        }),
+      });
+      const result = await response.json();
+      setData({
+        totalTabung: result.cardInfo.totalQty.toLocaleString("id-ID"),
+        totalBeratTabung: result.cardInfo.totalBeratQty.toLocaleString("id-ID"),
+        totalAgen: result.cardInfo.totalAgenCount,
+        totalAlokasiHarian: result.cardInfo.totalDistribusi,
+      });
+      setTableData(result.data);
+      setPagination((prev) => ({
+        ...prev,
+        page: pageNumber,
+        total: result.pagination.total,
+        totalPages: result.pagination.totalPages,
+      }));
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setPaginationLoading(false);
+    }
+  }
+
+  // Fungsi untuk submit dengan loading
+  async function onSubmit(values: valuesFilter) {
+    setLoading(true);
+    await fetchData(values, 1);
+    setLoading(false);
+  }
+
+  function handlePageChange(newPage: number) {
+    fetchData(form.getValues(), newPage);
+  }
+
+  // Reset form and fetch all data
+  function handleReset() {
+    form.reset({
+      agentName: "",
+      deliveryNumber: "",
+      range: {
+        from: null,
+        to: null,
+      },
     });
 
-    setFilteredData(filtered);
-  }, [notrans, agentName, doNumber, dateFilter, data]);
-
-  useEffect(() => {
-    setIsAgentFiltered(!!agentName);
-  }, [agentName]);
-
-  const getMonthly = async () => {
-    const data = await getMonthlyAllocation();
-    const monthlyData = data.map((item) => ({
-      giDate: item.date,
-      allocatedQty: item.totalElpiji,
-    }));
-    setAllocationMonthly(monthlyData);
-  };
-
-  const getAllocattion = async () => {
-    const { data } = await getSummary();
-    const dailyData = data.map((item: any) => ({
-      giDate: item.plannedGiDate,
-      qty: item.allocatedQty,
-    }));
-    setAllocationDaily(dailyData);
-  };
-
-  useEffect(() => {
-    getMonthly();
-    getAllocattion();
-    setFiltered(true);
-    setDateFilter(today);
-  }, []);
-
-  const handleClearSearch = () => {
-    setAgentName("");
-    setDoNumber("");
-    setnotrans("");
-    setDateFilter(null);
-    setFilteredData(data);
-    setFiltered(false);
-  };
+    // fetchData(
+    //   {
+    //     agentName: "",
+    //     deliveryNumber: "",
+    //     range: {
+    //       from: null,
+    //       to: null,
+    //     },
+    //   },
+    //   1
+    // );
+    setIsFiltered(false);
+  }
 
   return (
-    <div className="w-full">
-      <div className=" items-center py-4 mx-4">
+    <div className="mx-5">
+      <div className="mb-4">
         <div className="pt-4 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 mb-4">
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <CalendarCheck className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL TABUNG
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {formatNumberQty(
-                    calculateTotalQty(filteredData, "distributionQty")
-                  )}
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Weight className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL BERAT TABUNG
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {formatNumberQty(
-                    calculateTotalQty(filteredData, "distributionQty") * 3
-                  )}{" "}
-                  <span className="text-xl text-gray-600"> Kg</span>
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Handshake className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL AGEN
-                </h1>
-                <p className="text-3xl font-extrabold">
-                  {calculateTotalAgen(filteredData)}
-                </p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Database className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">
-                  TOTAL DISTRIBUSI LPG
-                </h1>
-                <p className="text-3xl font-extrabold">{filteredData.length}</p>
-              </div>
-            </div>
-          </Card>
+          <InfoCard
+            icon={<CalendarCheck className="h-10 w-10 text-white" />}
+            title="TOTAL TABUNG"
+            value={data.totalTabung}
+          />
+          <InfoCard
+            icon={<Weight className="h-10 w-10 text-white" />}
+            title="TOTAL BERAT TABUNG"
+            value={data.totalBeratTabung}
+            unit="Kg"
+          />
+          <InfoCard
+            icon={<Handshake className="h-10 w-10 text-white" />}
+            title="TOTAL AGEN"
+            value={data.totalAgen}
+          />
+          <InfoCard
+            icon={<Database className="h-10 w-10 text-white" />}
+            title="TOTAL DISTRIBUSI LPG"
+            value={data.totalAlokasiHarian}
+          />
         </div>
         <Card className="px-6 py-6 my-3 shadow-lg rounded-2xl bg-white border border-gray-200">
           <div className="px-4 text-center">
-            <h1 className="text-lg font-semibold py-2 pb-4">
-              Filter Penyaluran Elpiji
-            </h1>
+            <h1 className="text-lg font-semibold py-2 pb-4">Filter Rekap</h1>
           </div>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 mb-4">
-            <div>
-              <Label htmlFor="notrans-search" className="text-lg">
-                Nomer Transaksi
-              </Label>
-              <ComboBox
-                data={notransOptions}
-                value={notrans}
-                setValue={setnotrans}
-                placeholder="Semua nomor BPE"
-              />
-            </div>
-            <div>
-              <Label htmlFor="agent-search" className="text-lg">
-                Name Agen
-              </Label>
-              <ComboBox
-                data={agentNameOptions}
-                value={agentName}
-                setValue={setAgentName}
-                placeholder="Semua agen"
-              />
-            </div>
-            <div>
-              <Label htmlFor="do-search" className="text-lg">
-                Nomer DO
-              </Label>
-              <ComboBox
-                data={doNumberOptions}
-                value={doNumber}
-                setValue={setDoNumber}
-                placeholder="Semua number DO"
-              />
-            </div>
-            <div>
-              <Label htmlFor="date-search" className="text-lg">
-                Tanggal
-              </Label>
-              <DatePickerWithRange
-                value={dateFilter}
-                onDateChange={setDateFilter}
-                placeholder={
-                  filtered
-                    ? `${format(new Date(), "dd MMMM yyyy", { locale: id })}`
-                    : "Semua Tanggal"
-                }
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2">
-            {user.role === "ADMIN" && (
-              <div className="flex flex-col sm:flex-row sm:space-x-2 w-full sm:w-auto space-y-2 sm:space-y-0">
-                <Button
-                  variant="default"
-                  className="w-full sm:w-auto flex items-center justify-center"
-                  asChild
-                >
-                  <Link href="penyaluran-elpiji/form">
-                    <Plus className="h-4 w-4 mr-2 cursor-pointer" />
-                    <span className="truncate">New Penyaluran Elpiji</span>
-                  </Link>
-                </Button>
-
-                <Button
-                  variant="default"
-                  className="w-full sm:w-auto flex items-center justify-center"
-                  asChild
-                >
-                  <PDFDownloadLink
-                    className="text-center"
-                    document={
-                      <RekapPenyaluran
-                        data={filteredData != null ? filteredData : data}
-                        data2={allocationMonthly}
-                        data3={allocationDaily}
-                        isAgentFiltered={isAgentFiltered}
-                      />
-                    }
-                    fileName={`Rekap Penyaluran Elpiji.pdf`}
-                  >
-                    <Printer className="h-4 w-4 text-green-500 cursor-pointer mr-2" />
-                    <span className="truncate">Cetak Rekap</span>
-                  </PDFDownloadLink>
-                </Button>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols- mb-4">
+                <FormField
+                  control={form.control}
+                  name="agentName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg">Nama Agen</FormLabel>
+                      <FormControl>
+                        <ComboBoxNelsen
+                          placeholder="Pilih Nama Agen"
+                          data={dataBpeDeliveryAgent}
+                          selectedValue={field.value}
+                          onSelect={field.onChange}
+                          valueKey="agentName"
+                          displayKey="agentName"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* <FormField
+                  control={form.control}
+                  name="deliveryNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg">Nomor DO</FormLabel>
+                      <FormControl>
+                        <ComboBoxNelsen
+                          placeholder="Pilih Nomor DO"
+                          data={dataBpeDeliveryAgent}
+                          selectedValue={field.value}
+                          onSelect={field.onChange}
+                          valueKey="deliveryNumber"
+                          displayKey="deliveryNumber"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+                <FormField
+                  control={form.control}
+                  name="range"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="block text-lg">Tanggal</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full justify-start text-left font-normal my-2",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon />
+                            {field.value?.from ? (
+                              field.value?.to ? (
+                                <>
+                                  {format(field.value.from, "PPP", {
+                                    locale: id,
+                                  })}{" "}
+                                  -{" "}
+                                  {format(field.value.to, "PPP", {
+                                    locale: id,
+                                  })}
+                                </>
+                              ) : (
+                                format(field.value.from, "PPP", {
+                                  locale: id,
+                                })
+                              )
+                            ) : (
+                              <span>Pilih Tanggal</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            initialFocus
+                            mode="range"
+                            selected={field.value}
+                            onSelect={(newDate) => {
+                              if (newDate == null) {
+                                field.onChange(null);
+                              } else {
+                                field.onChange(newDate);
+                              }
+                            }}
+                            disabled={(date) =>
+                              date > new Date() || date < new Date("2000-01-01")
+                            }
+                            numberOfMonths={2}
+                            locale={id}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            )}
 
-            {/* Bersihkan Pencarian Button */}
-            <div className="w-full sm:w-auto">
-              <Button
-                variant="default"
-                className="w-full sm:w-auto flex items-center justify-center"
-                onClick={handleClearSearch}
-              >
-                <SearchX className="h-4 w-4 mr-2 cursor-pointer" />
-                <span className="truncate">Bersihkan Pencarian</span>
-              </Button>
-            </div>
-          </div>
+              <div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0 sm:space-x-2">
+                {user.role === "ADMIN" && (
+                  <div className="w-full sm:w-auto">
+                    <Button
+                      variant="default"
+                      className="w-full sm:w-auto flex items-center justify-center"
+                      asChild
+                    >
+                      <Link href="penyaluran-elpiji/form">
+                        <Plus className="h-4 w-4 mr-2 cursor-pointer" />
+                        <span className="truncate">New Penyaluran Elpiji</span>
+                      </Link>
+                    </Button>
+                  </div>
+                )}
+                <div className="flex w-full sm:w-auto md:justify-end sm:justify-end">
+                  <Button
+                    type="submit"
+                    className="flex w-full sm:w-auto items-center mr-2"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : (
+                      <Search className="h-4 w-4 mr-2" />
+                    )}
+                    Cari
+                  </Button>
+                  {/* {isFiltered && ( */}
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    className="flex items-center justify-center"
+                    onClick={() => {
+                      handleReset();
+                      setIsFiltered(false);
+                    }}
+                  >
+                    <X className="h-4 w-4 cursor-pointer" />
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </Form>
         </Card>
-        <DataTable columns={columns} data={filteredData} />
+        <div>
+          <DataTableBackEnd
+            columns={
+              user.role === "ADMIN"
+                ? adminLpgDistributionColumns
+                : lpgDistributionColumns
+            }
+            data={tableData}
+            onPageChange={handlePageChange}
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+          />
+          {/* <Pagination
+            currentPage={pagination.page}
+            totalPages={pagination.totalPages}
+            onPageChange={handlePageChange}
+            loading={paginationLoading}
+          /> */}
+        </div>
       </div>
     </div>
   );
-};
-
-export default PenyaluranElpiji;
+}

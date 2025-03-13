@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "RawData" ALTER COLUMN "bpe" DROP NOT NULL;

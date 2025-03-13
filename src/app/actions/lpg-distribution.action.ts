@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { getErrorMessage } from "./error.action";
 import { getCurrentSession } from "./auth.actions";
 import { format } from "date-fns";
+import { cache } from "react";
 
 export const searchDeliveryNumber = async (query: string) => {
   try {
@@ -65,6 +66,7 @@ export const postLpgData = async (formData: FormData) => {
   const administrasi = formData.get("administrasi")?.toString() || "";
   const gateKeeper = formData.get("gateKeeper")?.toString() || "";
 
+  waktuPengambilan.setUTCHours(0, 0, 0, 0);
   if (
     !nomorTransaksi ||
     !nomorDo ||
@@ -138,7 +140,7 @@ export const postLpgData = async (formData: FormData) => {
   }
 };
 
-export const getAllLpg = async () => {
+export const getAllLpg = async (): Promise<LpgDistributions[]> => {
   try {
     const data = await prisma.lpgDistributions.findMany({
       where: {
@@ -157,6 +159,7 @@ export const UpdateLpgData = async (formData: FormData) => {
   const id = formData.get("id") as string; // ambil ID
   const platKendaraan = formData.get("platKendaraan") as string;
   const namaSopir = formData.get("namaSopir") as string;
+  const giDate = new Date(formData.get("giDate") as string);
   const jumlahTabungBocor = parseInt(
     formData.get("jumlahTabungBocor") as string
   );
@@ -177,6 +180,7 @@ export const UpdateLpgData = async (formData: FormData) => {
         id: parseInt(id),
       },
       data: {
+        giDate: giDate,
         licensePlate: platKendaraan,
         driverName: namaSopir,
         bocor: jumlahTabungBocor,
@@ -243,4 +247,44 @@ export const getNextNumber = async () => {
     console.error("Error getting next number:", error);
     throw error;
   }
+};
+
+export const getFilterData = cache(async () => {
+  return await prisma.agents.findMany({
+    select: {
+      agentName: true,
+    },
+    orderBy: { agentName: "asc" },
+  });
+});
+
+export const getLpgDataDefault = async () => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  return await prisma.lpgDistributions.findMany({
+    where: {
+      giDate: {
+        gte: today,
+      },
+    },
+    select: {
+      id: true,
+      bpeNumber: true,
+      giDate: true,
+      agentName: true,
+      licensePlate: true,
+      deliveryNumber: true,
+      allocatedQty: true,
+      distributionQty: true,
+      volume: true,
+      administrasi: true,
+      superVisor: true,
+      gateKeeper: true,
+      driverName: true,
+      bocor: true,
+      isiKurang: true,
+      updatedAt: true,
+    },
+  });
 };

@@ -23,8 +23,9 @@ import { SignInValues } from "@/lib/types";
 import { signIn } from "@/app/actions/auth.actions";
 import { useState } from "react";
 import { Eye, EyeOff, Loader } from "lucide-react";
-import { ToggleMode } from "@/components/ToggleMode";
 import { toast } from "@/hooks/use-toast";
+import Image from "next/image";
+import { ToggleMode } from "@/components/ToggleMode";
 
 export function LoginForm() {
   const router = useRouter();
@@ -38,33 +39,41 @@ export function LoginForm() {
   });
 
   async function onSubmit(values: SignInValues) {
-    setIsLoading(true); 
+    setIsLoading(true);
     const result = await signIn(values);
     if (result.error) {
-      setIsLoading(false); 
+      setIsLoading(false);
       toast({
         variant: "destructive",
         title: result.error,
+        duration: 3000,
       });
       router.push("/auth/login");
     } else {
-      setIsLoading(false); 
       router.push("/summary");
       toast({
         title: "Login has been successfully",
+        duration: 3000,
       });
+      setIsLoading(false);
     }
   }
 
   return (
     <Card className="w-screen max-w-lg rounded-lg shadow-lg">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-2xl font-semibold flex justify-between">
-          Welcome back!
-          {/* <ToggleMode /> */}
-        </CardTitle>
+      <CardHeader className="pb-4 flex">
+        <div className="flex items-start justify-between">
+          <CardTitle className="text-2xl font-semibold">
+            Selamat Datang Kembali!
+          </CardTitle>
+          <div className="w-20 h-20 bg-primary/10 flex items-center justify-center rounded">
+            <div className="text-primary text-xl font-bold">
+              <Image src="/icon.svg" width={100} height={100} alt="Icon" />
+            </div>
+          </div>
+        </div>
         <CardDescription className="text-gray-500">
-          Sign in to your account to continue.
+          Masuk ke akun Anda untuk melanjutkan.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -82,7 +91,7 @@ export function LoginForm() {
                   <FormControl>
                     <Input
                       type="text"
-                      placeholder="Enter your Username..."
+                      placeholder="Masukan username..."
                       {...field}
                       className="focus:border-primary focus:ring-primary"
                     />
@@ -104,7 +113,7 @@ export function LoginForm() {
                       <div className="relative">
                         <Input
                           type={showPassword ? "text" : "password"}
-                          placeholder="Enter your password..."
+                          placeholder="Masukan password..."
                           {...field}
                           className="focus:border-primary focus:ring-primary w-full"
                           onChange={(e) => {

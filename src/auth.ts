@@ -2,7 +2,7 @@ import {
   encodeBase32LowerCaseNoPadding,
   encodeHexLowerCase,
 } from "@oslojs/encoding";
-import type { User, Session } from "@prisma/client";
+import type { User, Session } from "../generated/prisma_client";
 import { sha256 } from "@oslojs/crypto/sha2";
 import prisma from "./lib/db";
 import { redirect } from "next/navigation";

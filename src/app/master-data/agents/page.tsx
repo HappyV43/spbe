@@ -16,13 +16,13 @@ const AgentsPage = async () => {
     redirect("/auth/login");
   }
   return (
-    <ContentLayout home="master-data" mainpage="agen">
+    // <ContentLayout home="master-data" mainpage="agen">
       <Agents
         columns={user.role === "ADMIN" ? adminAgentColumns : agentColumns}
         data={data}
         user={user}
       />
-    </ContentLayout>
+    // </ContentLayout>
   );
 };
 

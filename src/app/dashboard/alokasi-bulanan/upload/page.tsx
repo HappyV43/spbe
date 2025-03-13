@@ -15,12 +15,13 @@ const AlokasiPage = async () => {
   }
 
   return (
-    <ContentLayout
-      home={"dashboard"}
-      mainpage={"alokasi-bulanan"}
-      childpage={"upload"}
-      children={<UploadAlokasiBulanan user={user} />}
-    />
+    // <ContentLayout
+    //   home={"dashboard"}
+    //   mainpage={"alokasi-bulanan"}
+    //   childpage={"upload"}
+    //   children={
+      <UploadAlokasiBulanan user={user} />
+    // }/>
   );
 };
 

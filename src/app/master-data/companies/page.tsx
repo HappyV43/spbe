@@ -17,13 +17,13 @@ const CompanyPage = async () => {
   }
 
   return (
-    <ContentLayout
-      home={"master-data"}
-      mainpage={"perusahaan"}
-      children={
+    // <ContentLayout
+    //   home={"master-data"}
+    //   mainpage={"perusahaan"}
+    //   children={
         <Companies columns={companiesColumns} data={data} user={user} />
-      }
-    />
+    //   }
+    // />
   );
 };
 

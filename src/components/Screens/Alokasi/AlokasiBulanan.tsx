@@ -3,59 +3,97 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "../../ui/button";
 import { DataTable } from "../../ui/data-table";
 import Link from "next/link";
-import { CalendarCheck, Database, SearchX, Upload, Weight } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import {
+  CalendarCheck,
+  Database,
+  Loader2,
+  SearchX,
+  Upload,
+  Weight,
+  X,
+} from "lucide-react";
 import MonthPicker from "@/components/FeatureComponents/MonthPicker";
 import { useEffect, useState } from "react";
 import { format, isSameMonth } from "date-fns";
-import { formatNumberQty, calculateTotalQty, calculateMontlyQty } from "@/utils/page";
+import {
+  formatNumberQty,
+  calculateTotalQty,
+  calculateMontlyQty,
+} from "@/utils/page";
 import { id } from "date-fns/locale";
 import { MonthlyAllocation } from "@/lib/types";
+import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
+import InfoCard from "@/components/InfoCard";
+import { User } from "../../../../generated/prisma_client";
 
 interface AlokasiBulananProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  user: {
-    id: string;
-    username: string;
-    role: string;
-  };
+  user: User;
 }
 
-const AlokasiBulanan = <
-  TData extends MonthlyAllocation,
-  TValue
->({
+const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
   columns,
-  data,
   user,
 }: AlokasiBulananProps<TData, TValue>) => {
+  const [rawData, setRawData] = useState<TData[]>([]);
   const [currentMonth, setCurrentMonth] = useState<Date | null>(new Date());
-  const [filteredData, setFilteredData] = useState<TData[]>(data);
+  const [filteredData, setFilteredData] = useState<TData[]>([]);
+  const [isFiltered, setIsFiltered] = useState<Boolean>(false);
+  const [loading, setLoading] = useState(true);
 
-  // Apply month filter to the data
   useEffect(() => {
     if (currentMonth) {
-      const filtered = data.filter((item) => {
-        return (
-          item.date &&
-          isSameMonth(new Date(item.date), currentMonth) 
-        );
-      });
+      const filtered = rawData.filter((item) =>
+        item.date ? isSameMonth(new Date(item.date), currentMonth) : false
+      );
+      setLoading(false);
+
+      setIsFiltered(true);
       setFilteredData(filtered);
     } else {
-      setFilteredData(data); 
+      setLoading(false);
+      setIsFiltered(false);
+      setFilteredData(rawData);
     }
-  }, [currentMonth, data]);
+  }, [currentMonth, rawData]);
 
   const handleClearSearch = () => {
-    setCurrentMonth(null);
+    setCurrentMonth(new Date());
+    setIsFiltered(false);
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = (await getMonthlyAllocation()) as TData[];
+      setRawData(data);
+      // console.log(data);
+    };
+    fetchData();
+  }, []);
+
   return (
-    <div className="w-full">
-      <div className="items-center py-4 mx-4">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center my-3 space-y-2 md:space-y-0 md:space-x-2">
+    <div className="mx-5">
+      <div className="mb-4">
+        {/* Summary Cards */}
+        <div className="pt-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3 mb-4">
+          <InfoCard
+            icon={<CalendarCheck className="h-10 w-10 text-white" />}
+            title="TOTAL TABUNG"
+            value={formatNumberQty(calculateMontlyQty(filteredData))}
+          />
+          <InfoCard
+            icon={<Weight className="h-10 w-10 text-white" />}
+            title="TOTAL BERAT TABUNG"
+            value={formatNumberQty(calculateMontlyQty(filteredData) * 3)}
+            unit="Kg"
+          />
+          <InfoCard
+            icon={<Database className="h-10 w-10 text-white" />}
+            title="TOTAL AGEN"
+            value={filteredData.length}
+          />
+        </div>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0 md:space-x-2">
           {user.role === "ADMIN" && (
             <Button variant="default" asChild className="w-full md:w-auto">
               <Link href="alokasi-bulanan/upload" className="flex items-center">
@@ -65,56 +103,39 @@ const AlokasiBulanan = <
             </Button>
           )}
 
-          {/* MonthPicker with Responsive Behavior */}
-          <div className="w-full md:w-auto">
-            <MonthPicker
-              currentMonth={currentMonth!}
-              onMonthChange={(newMonth) => setCurrentMonth(newMonth)}
-              placeholder={
-                currentMonth
-                  ? format(currentMonth, "MMMM yyyy", { locale: id })
-                  : "Semua Bulan"
-              }
-            />
+          <div className="w-full md:w-auto flex md:items-center gap-2 items-center">
+            {loading ? (
+              <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-md shadow-sm animate-fade-in">
+                <Loader2
+                  className="animate-spin h-5 w-5 text-gray-500"
+                  strokeWidth={2.5}
+                />
+                <span className="text-sm text-gray-700 font-medium">
+                  Mengambil Data...
+                </span>
+              </div>
+            ) : (
+              <MonthPicker
+                currentMonth={currentMonth!}
+                onMonthChange={setCurrentMonth}
+                placeholder={
+                  currentMonth
+                    ? format(currentMonth, "MMMM yyyy", { locale: id })
+                    : "Semua Bulan"
+                }
+                className="flex-1"
+              />
+            )}
+            {/* {isFiltered && (
+              <Button
+                variant={"destructive"}
+                onClick={handleClearSearch}
+                className="flex-2"
+              >
+                <X />
+              </Button>
+            )} */}
           </div>
-        </div>
-
-        
-        {/* Summary Cards */}
-        <div className="pt-2 grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3 mb-4">
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <CalendarCheck className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL TABUNG</h1>
-                <p className="text-3xl font-extrabold">{formatNumberQty(calculateMontlyQty(filteredData))}</p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Weight className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL BERAT TABUNG</h1>
-                <p className="text-3xl font-extrabold">{formatNumberQty(calculateMontlyQty(filteredData)*3)} <span className="text-xl text-gray-600">Kg</span></p>
-              </div>
-            </div>
-          </Card>
-          <Card className="px-6 py-6 my-1 shadow-lg rounded-2xl bg-white border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="bg-black rounded-xl p-2">
-                <Database className="h-10 w-10 text-white" />
-              </div>
-              <div>
-                <h1 className="text-sm font-semibold text-gray-400 mb-1">TOTAL ALOKASI BULANAN</h1>
-                <p className="text-3xl font-extrabold">{filteredData.length}</p>
-              </div>
-            </div>
-          </Card>
         </div>
         <DataTable columns={columns} data={filteredData} />
       </div>

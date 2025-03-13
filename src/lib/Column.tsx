@@ -8,29 +8,90 @@ import {
   LpgDistributions,
   MonthlyAllocation,
 } from "@/lib/types";
-import { PackageOpen, Printer, ShoppingBag, SquarePlus } from "lucide-react";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import { SquarePlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import EditFormAgents from "../components/FeatureComponents/CRUD/EditFormAgents";
 import EditFormLpg from "@/components/FeatureComponents/CRUD/EditFormLpg";
-import CetakPenyaluran from "@/components/FeatureComponents/CetakDistribusi/CetakPenyaluran";
 import { formatDateTime } from "@/utils/page";
-import { getCurrentSession } from "@/app/actions/auth.actions";
-import CetakPlastikWrap from "@/components/FeatureComponents/CetakDistribusi/CetakPlastikWrap";
-import { formatDate } from "date-fns";
 import ConfirmCetak from "@/components/FeatureComponents/CetakDistribusi/ConfirmCetak";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 export const lpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
+  {
+    accessorKey: "bpeNumber",
+    header: "Nomor BPE",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "giDate",
+    header: "Tanggal",
+    cell: ({ row }) => {
+      const date = row.original.giDate ? new Date(row.original.giDate) : null;
+      return (
+        <div className="flex-[1]">
+          {date
+            ? `${date.toLocaleDateString("id-ID", {
+                weekday: "long",
+                day: "2-digit",
+                month: "long",
+                year: "numeric",
+              })}`
+            : "-"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "agentName",
+    header: "Nama Agen",
+  },
+  {
+    accessorKey: "licensePlate",
+    header: "Nomor Plat",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "deliveryNumber",
+    header: "Nomor DO",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "allocatedQty",
+    header: "Jumlah Alokasi",
+  },
+  {
+    accessorKey: "distributionQty",
+    header: "Jumlah Tabung",
+  },
+  {
+    accessorKey: "volume",
+    header: "Volume Tabung",
+    enableSorting: false,
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Diperbarui",
+    sortingFn: "datetime",
+    sortDescFirst: true,
+    cell: ({ row }) => {
+      const date = row.original.updatedAt;
+      return <div>{formatDateTime(date)}</div>;
+    },
+  },
+];
+
+export const adminLpgDistributionColumns: ColumnDef<LpgDistributions>[] = [
   {
     header: "Tindakan",
     enableSorting: false,
     cell: ({ row }) => {
       return (
         <div className="flex space-x-1">
-          <ConfirmCetak row={row.original} type={"print"}/>
+          <ConfirmCetak row={row.original} type={"print"} />
           <EditFormLpg row={row.original} />
-          <ConfirmCetak row={row.original} type={"wrap"}/>
+          <ConfirmCetak row={row.original} type={"wrap"} />
         </div>
       );
     },
@@ -143,17 +204,15 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     cell: ({ row }) => {
       const date = row.original.plannedGiDate
         ? new Date(row.original.plannedGiDate)
-        : null;
+        : new Date(row.original.plannedGiDate);
       return (
         <div className="flex-[1]">
-          {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
-            : "-"}
+          {`${date.toLocaleDateString("id-ID", {
+            weekday: "long",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+          })}`}
         </div>
       );
     },
@@ -161,21 +220,21 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "giDate",
     header: "GI Date",
-    cell: ({ row }) => {
-      const date = row.original.giDate ? new Date(row.original.giDate) : null;
-      return (
-        <div className="flex-[1]">
-          {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
-            : "-"}
-        </div>
-      );
-    },
+    // cell: ({ row }) => {
+    //   const date = row.original.giDate ? new Date(row.original.giDate) : null;
+    //   return (
+    //     <div className="flex-[1]">
+    //       {date
+    //         ? `${date.toLocaleDateString("id-ID", {
+    //             weekday: "long",
+    //             day: "2-digit",
+    //             month: "long",
+    //             year: "numeric",
+    //           })}`
+    //         : "-"}
+    //     </div>
+    //   );
+    // },
   },
   {
     accessorKey: "bpeNumber",
@@ -183,12 +242,13 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
     enableSorting: false,
     cell: ({ row }) => {
       const bpe = row.original.bpeNumber;
-      return <>{bpe ? bpe : "-"}</>;
+      return <>{bpe ? bpe : bpe}</>;
     },
   },
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
@@ -203,6 +263,37 @@ export const allocationColumns: ColumnDef<Allocation>[] = [
 ];
 
 export const adminAllocationColumns: ColumnDef<Allocation>[] = [
+  {
+    header: "Tindakan",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const bpeNumber = row.original.bpeNumber;
+      const status = row.original.status;
+      const giDate = row.original.giDate;
+
+      return (
+        <Button
+          variant="outline"
+          disabled={
+            status === "Approved" && bpeNumber !== null && giDate !== null
+          }
+        >
+          <Link
+            href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+            //BUAT ALOKASI HARIAN BE
+            // href={`../penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
+            className={
+              status === "Approved" && bpeNumber !== null && giDate !== null
+                ? "cursor-not-allowed"
+                : ""
+            }
+          >
+            <SquarePlus className="h-4 w-4" />
+          </Link>
+        </Button>
+      );
+    },
+  },
   {
     accessorKey: "status",
     header: "Status",
@@ -245,39 +336,23 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "plannedGiDate",
     header: "Planned GI Date",
-    cell: ({ row }) => {
-      const date = row.original.plannedGiDate
-        ? new Date(row.original.plannedGiDate)
-        : null;
-      return (
-        <div className="flex-[1]">
-          {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
-            : "-"}
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="flex-[1]">
+        {format(new Date(row.original.plannedGiDate), "EEEE, d MMMM yyyy", {
+          locale: id,
+        })}
+      </div>
+    ),
   },
   {
     accessorKey: "giDate",
     header: "GI Date",
     cell: ({ row }) => {
       const date = row.original.giDate ? new Date(row.original.giDate) : null;
+
       return (
         <div className="flex-[1]">
-          {date
-            ? `${date.toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}`
-            : "-"}
+          {date ? format(date, "EEEE, d MMMM yyyy", { locale: id }) : "-"}
         </div>
       );
     },
@@ -294,34 +369,14 @@ export const adminAllocationColumns: ColumnDef<Allocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
     },
   },
-  {
-    header: "Tindakan",
-    enableHiding: false,
-    cell: ({ row }) => {
-      const bpeNumber = row.original.bpeNumber;
-      const status = row.original.status;
-      const giDate = row.original.giDate;
 
-      return (
-        <Button variant="outline" disabled={status === "Approved" && bpeNumber !== null && giDate !== null}>
-          <Link
-            href={`penyaluran-elpiji/form?query=${row.original.deliveryNumber}`}
-            className={
-              status === "Approved" && bpeNumber !== null && giDate !== null ? "cursor-not-allowed" : ""
-            }
-          >
-            <SquarePlus className="h-4 w-4" />
-          </Link>
-        </Button>
-      );
-    },
-  },
   // {
   //   accessorKey: "createdAt",
   //   header: "Created At",
@@ -335,9 +390,11 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
     header: "Tanggal",
     sortDescFirst: false,
     cell: ({ row }) => {
-      const date = row.original.date
+      const date = row.original.date;
       return (
-        <div>{formatDateTime(date)}</div>
+        <div className="flex-[1]">
+          {date ? format(date, "EEEE, d MMMM yyyy", { locale: id }) : "-"}
+        </div>
       );
     },
   },
@@ -362,7 +419,7 @@ export const monthlyAllocationColumns: ColumnDef<MonthlyAllocation>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
@@ -380,7 +437,6 @@ export const agentColumns: ColumnDef<Agents>[] = [
     accessorKey: "address",
     header: "Alamat",
     enableSorting: false,
-
   },
   {
     accessorKey: "city",
@@ -414,7 +470,7 @@ export const agentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
@@ -471,7 +527,7 @@ export const adminAgentColumns: ColumnDef<Agents>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
       return <div>{formatDateTime(date)}</div>;
@@ -507,7 +563,7 @@ export const companiesColumns: ColumnDef<Companies>[] = [
   {
     accessorKey: "updatedAt",
     header: "Diperbarui",
-    enableSorting: false,
+    enableSorting: true,
     size: 1,
     cell: ({ row }) => {
       const date = row.original.updatedAt;
