@@ -302,7 +302,13 @@ export default function RekapanScreen({
                             initialFocus
                             mode="range"
                             selected={field.value}
-                            onSelect={field.onChange}
+                            onSelect={(newDate) => {
+                              if (newDate == null) {
+                                field.onChange(null);
+                              } else {
+                                field.onChange(newDate);
+                              }
+                            }}
                             disabled={(date) =>
                               date > new Date() || date < new Date("2000-01-01")
                             }
