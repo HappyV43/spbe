@@ -255,6 +255,7 @@ export const getFilterData = cache(async () => {
       agentName: true,
     },
     distinct: ["agentName"],
+    orderBy: { agentName: "asc" },
   });
 });
 

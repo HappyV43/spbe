@@ -30,8 +30,8 @@ import {
   CalendarCheck,
   Database,
   Handshake,
+  Loader2,
   Search,
-  SearchX,
   Upload,
   Weight,
   X,
@@ -362,8 +362,12 @@ const AlokasiHarian = ({
                       className="flex w-full sm:w-auto items-center mr-2"
                       disabled={loading}
                     >
-                      <Search className="h-4 w-4 cursor-pointer" />
-                      {loading ? "Loading..." : "Cari"}
+                      {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <Search className="h-4 w-4 mr-2" />
+                      )}
+                      Cari
                     </Button>
                     {/* {isFiltered && ( */}
                     <Button

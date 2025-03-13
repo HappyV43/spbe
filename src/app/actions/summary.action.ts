@@ -189,7 +189,7 @@ export const getWeeklySummaryDefault = async () => {
   return { weeklySummary, startDate, endDate };
 };
 
-export const getYearlySummaryData = async () => {
+export const getAnnualSummaryData = async () => {
   const now = new Date();
   const year = now.getFullYear();
   const startOfYear = new Date(year, 0, 1);
@@ -328,7 +328,7 @@ export const allDataDefault = async () => {
 
   const tidakTembus =
     (dailyMonthly ?? 0) > (dailyAllo ?? 0)
-      ? (dailyMonthly ?? 0 ?? 0) - (dailyAllo ?? 0)
+      ? (dailyMonthly ?? 0) - (dailyAllo ?? 0)
       : 0;
 
   // console.log(allDistributionSummary._count?._all);

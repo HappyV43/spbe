@@ -93,10 +93,10 @@ export const getAllocationDefault = async () => {
           },
         },
         {
-          status:{
-            equals: "Pending"
-          }
-        }
+          status: {
+            equals: "Pending",
+          },
+        },
       ],
     },
     orderBy: { bpeNumber: "desc" },
@@ -123,6 +123,7 @@ export const getFilterDataAllocation = cache(async () => {
       deliveryNumber: true,
       agentName: true,
     },
-    distinct: ["agentName", "status"],
+    distinct: ["agentName"],
+    orderBy: { agentName: "asc" },
   });
 });
