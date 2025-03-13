@@ -54,7 +54,6 @@ type valuesFilter = {
 
 type bpeNumberData = {
   agentName: string;
-  deliveryNumber: string;
 };
 
 export default function PenyaluranElpiji({
@@ -104,7 +103,6 @@ export default function PenyaluranElpiji({
   const form = useForm<valuesFilter>({
     defaultValues: {
       agentName: "",
-      deliveryNumber: "",
       range: {
         from: new Date(),
         to: null,

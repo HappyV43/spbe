@@ -43,7 +43,6 @@ type valuesFilter = {
 
 type bpeNumberData = {
   agentName: string;
-  deliveryNumber: string;
 };
 
 type LpgDistribution = {

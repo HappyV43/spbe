@@ -47,9 +47,7 @@ type valuesFilter = {
 };
 
 type dataBpeDeliveryAgent = {
-  status: string;
   agentName: string;
-  deliveryNumber: string;
 };
 
 const AlokasiHarian = ({
