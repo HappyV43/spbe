@@ -41,6 +41,12 @@ export async function POST(req: NextRequest) {
           lte: lastDayOfMonth,
         },
       },
+      select:{
+        date: true,
+        totalElpiji: true,
+        volume: true,
+        updatedAt: true,
+      },
       orderBy: {
         date: "asc",
       },
