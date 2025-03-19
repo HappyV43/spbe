@@ -86,10 +86,7 @@ export async function POST(req: NextRequest) {
       }),
       prisma.monthlyAllocations.findMany({
         where: {
-          date: {
-            gte: startOfMonth(new Date()),
-            lte: endOfMonth(new Date()),
-          },
+          date: dateFilter,
         },
         select: {
           date: true,
