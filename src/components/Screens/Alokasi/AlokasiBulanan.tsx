@@ -95,6 +95,7 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
           title: "Gagal",
           description: `HTTP error! Status: ${response.status}`,
           variant: "destructive",
+          duration: 3000,
         });
         return;
       }
