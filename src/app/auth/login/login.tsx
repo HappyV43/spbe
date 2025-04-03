@@ -46,14 +46,14 @@ export function LoginForm() {
       toast({
         variant: "destructive",
         title: result.error,
-        duration: 3000,
+        // duration: 3000,
       });
       router.push("/auth/login");
     } else {
       router.push("/summary");
       toast({
         title: "Login berhasil",
-        duration: 3000,
+        // duration: 3000,
       });
       setIsLoading(false);
     }
