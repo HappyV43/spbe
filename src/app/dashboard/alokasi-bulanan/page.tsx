@@ -11,26 +11,23 @@ export const metadata = {
 };
 
 const AlokasiBulananPage = async () => {
-  const [sessionData, data] = await Promise.all([
-    getCurrentSession(),
-    getDefaultMonthlyData(),
-  ]);
-
+  const sessionData = await getCurrentSession();
   const { session, user } = sessionData;
 
-  if (!session && !user) {
+  if (!session || !user) {
     redirect("/auth/login");
   }
+  const data = await getDefaultMonthlyData(user.id);
   return (
     //   <ContentLayout
     //     home={"dashboard"}
     //     mainpage={"alokasi-bulanan"}
     //     children={
-        <AlokasiBulanan
-          columns={monthlyAllocationColumns}
-          user={user}
-          data={data}
-        />
+    <AlokasiBulanan
+      columns={monthlyAllocationColumns}
+      user={user}
+      data={data}
+    />
     //   }
     // />
   );
