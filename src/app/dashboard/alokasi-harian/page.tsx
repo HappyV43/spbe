@@ -11,15 +11,16 @@ export const metadata = {
 };
 
 const AlokasiPage = async () => {
-  const [dataBpeDeliveryAgent, sessionData, defaultData] = await Promise.all([
-    getFilterDataAllocation(),
-    getCurrentSession(),
-    getAllocationDefault(),
-  ]);
-  const { user, session } = sessionData;
-  if (!session && !user) {
+  const sessionData = await getCurrentSession();
+  const { session, user } = sessionData;
+
+  if (!session || !user) {
     redirect("/auth/login");
   }
+  const [dataBpeDeliveryAgent, defaultData] = await Promise.all([
+    getFilterDataAllocation(user.id),
+    getAllocationDefault(user.id),
+  ]);
   return (
     <AlokasiHarian
       user={user}

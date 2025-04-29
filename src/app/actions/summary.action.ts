@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import { startOfMonth, endOfMonth, eachMonthOfInterval } from "date-fns";
 
-export const getSummaryToday = async () => {
+export const getSummaryToday = async (user: string) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -16,26 +16,46 @@ export const getSummaryToday = async () => {
         _sum: { allocatedQty: true },
         _count: { _all: true },
         where: {
-          giDate: { gte: today, lt: tomorrow },
+          AND: [
+            {
+              giDate: { gte: today, lt: tomorrow },
+            },
+            { createdBy: user },
+          ],
         },
       }),
       prisma.allocations.aggregate({
         _sum: { allocatedQty: true },
         _count: { _all: true },
         where: {
-          plannedGiDate: { gte: today, lt: tomorrow },
+          AND: [
+            {
+              plannedGiDate: { gte: today, lt: tomorrow },
+            },
+            { createdBy: user },
+          ],
         },
       }),
       prisma.lpgDistributions.aggregate({
         _sum: { distributionQty: true },
         _count: { _all: true },
         where: {
-          giDate: { gte: today, lt: tomorrow },
+          AND: [
+            {
+              giDate: { gte: today, lt: tomorrow },
+            },
+            { createdBy: user },
+          ],
         },
       }),
       prisma.monthlyAllocations.findMany({
         where: {
-          date: { gte: today, lt: tomorrow },
+          AND: [
+            {
+              date: { gte: today, lt: tomorrow },
+            },
+            { createdBy: user },
+          ],
         },
         select: { totalElpiji: true, volume: true },
       }),
@@ -72,7 +92,7 @@ export const getSummaryToday = async () => {
   };
 };
 
-export const getWeeklySummaryDefault = async () => {
+export const getWeeklySummaryDefault = async (user: string) => {
   const today = new Date();
   const startMonth = startOfMonth(today);
   const endMonth = endOfMonth(today);
@@ -135,7 +155,14 @@ export const getWeeklySummaryDefault = async () => {
         by: ["plannedGiDate"],
         _sum: { allocatedQty: true },
         where: {
-          plannedGiDate: { gte: startDate, lte: endDate },
+          AND: [
+            {
+              plannedGiDate: { gte: startDate, lte: endDate },
+            },
+            {
+              createdBy: user,
+            },
+          ],
         },
         orderBy: { plannedGiDate: "asc" },
       }),
@@ -143,13 +170,27 @@ export const getWeeklySummaryDefault = async () => {
         by: ["giDate"],
         _sum: { distributionQty: true },
         where: {
-          giDate: { gte: startDate, lte: endDate },
+          AND: [
+            {
+              giDate: { gte: startDate, lte: endDate },
+            },
+            {
+              createdBy: user,
+            },
+          ],
         },
         orderBy: { giDate: "asc" },
       }),
       prisma.monthlyAllocations.findMany({
         where: {
-          date: { gte: startDate, lt: endDate },
+          AND: [
+            {
+              date: { gte: startDate, lte: endDate },
+            },
+            {
+              createdBy: user,
+            },
+          ],
         },
         select: { totalElpiji: true, date: true },
         orderBy: { date: "asc" },
@@ -195,7 +236,7 @@ export const getWeeklySummaryDefault = async () => {
   return { weeklySummary, startDate, endDate };
 };
 
-export const getAnnualSummaryData = async () => {
+export const getAnnualSummaryData = async (user: string) => {
   const now = new Date();
   const year = now.getFullYear();
   const startOfYear = new Date(year, 0, 1);
@@ -218,17 +259,45 @@ export const getAnnualSummaryData = async () => {
           prisma.allocations.groupBy({
             by: ["giDate"],
             _sum: { allocatedQty: true },
-            where: { giDate: { gte: startDate, lte: endDate } },
+
+            where: {
+              AND: [
+                {
+                  giDate: { gte: startDate, lte: endDate },
+                },
+                {
+                  createdBy: user,
+                },
+              ],
+            },
             orderBy: { giDate: "asc" },
           }),
           prisma.lpgDistributions.groupBy({
             by: ["giDate"],
             _sum: { distributionQty: true },
-            where: { giDate: { gte: startDate, lte: endDate } },
+            where: {
+              AND: [
+                {
+                  giDate: { gte: startDate, lte: endDate },
+                },
+                {
+                  createdBy: user,
+                },
+              ],
+            },
             orderBy: { giDate: "asc" },
           }),
           prisma.monthlyAllocations.findMany({
-            where: { date: { gte: startDate, lt: endDate } },
+            where: {
+              AND: [
+                {
+                  date: { gte: startDate, lte: endDate },
+                },
+                {
+                  createdBy: user,
+                },
+              ],
+            },
             select: { totalElpiji: true, date: true },
           }),
         ]);
@@ -287,23 +356,35 @@ export const getAnnualSummaryData = async () => {
 
 // Dengan ini, datanya jadi lebih ringkas, langsung teragregasi per bulan, dan kalau nggak ada data, nilainya jadi 0. 🚀
 
-export const allDataDefault = async () => {
+export const allDataDefault = async (user: string) => {
   const [allSummary, allDistributionSummary, allMonthlyData, uniqueDate] =
     await prisma.$transaction([
       prisma.allocations.aggregate({
         _sum: { allocatedQty: true },
         _count: { _all: true },
+        where: {
+          createdBy: user,
+        },
       }),
       prisma.lpgDistributions.aggregate({
         _sum: { distributionQty: true },
         _count: { _all: true },
+        where: {
+          createdBy: user,
+        },
       }),
       prisma.monthlyAllocations.aggregate({
         _sum: { totalElpiji: true },
         _count: { _all: true },
+        where: {
+          createdBy: user,
+        },
       }),
       prisma.lpgDistributions.findMany({
         distinct: ["giDate"], // Ambil tanggal unik
+        where: {
+          createdBy: user,
+        },
         select: {
           giDate: true, // Cuma ambil tanggalnya aja
         },

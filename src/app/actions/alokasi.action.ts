@@ -80,7 +80,7 @@ export async function getSummaryQty() {
   });
 }
 
-export const getAllocationDefault = async () => {
+export const getAllocationDefault = async (user: string) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -96,6 +96,9 @@ export const getAllocationDefault = async () => {
           status: {
             equals: "Pending",
           },
+        },
+        {
+          createdBy: user,
         },
       ],
     },
@@ -116,10 +119,13 @@ export const getAllocationDefault = async () => {
   });
 };
 
-export const getFilterDataAllocation = cache(async () => {
+export const getFilterDataAllocation = cache(async (user: string) => {
   return await prisma.agents.findMany({
     select: {
       agentName: true,
+    },
+    where: {
+      createdBy: user,
     },
     orderBy: { agentName: "asc" },
   });

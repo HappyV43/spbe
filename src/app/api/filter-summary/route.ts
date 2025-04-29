@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     }
     const body = await req.json();
 
-    const { from, to } = body;
+    const { from, to, id } = body;
 
     let fromDate = from ? new Date(from) : null;
     let toDate = to ? new Date(to) : null;
@@ -39,25 +39,33 @@ export async function POST(req: NextRequest) {
       prisma.allocations.aggregate({
         _sum: { allocatedQty: true },
         _count: { allocatedQty: true },
-        where: { plannedGiDate: dateFilter },
+        where: {
+          AND: [{ plannedGiDate: dateFilter }, { createdBy: id }],
+        },
         orderBy: { plannedGiDate: "asc" },
       }),
       prisma.allocations.aggregate({
         _sum: { allocatedQty: true },
         _count: { allocatedQty: true },
-        where: { giDate: dateFilter },
+        where: {
+          AND: [{ giDate: dateFilter }, { createdBy: id }],
+        },
         orderBy: { giDate: "asc" },
       }),
       prisma.lpgDistributions.aggregate({
         _sum: { distributionQty: true },
         _count: { distributionQty: true },
-        where: { giDate: dateFilter },
+        where: {
+          AND: [{ giDate: dateFilter }, { createdBy: id }],
+        },
         orderBy: { giDate: "asc" },
       }),
       prisma.monthlyAllocations.aggregate({
         _sum: { totalElpiji: true },
         _count: { totalElpiji: true },
-        where: { date: dateFilter },
+        where: {
+          AND: [{ date: dateFilter }, { createdBy: id }],
+        },
         orderBy: { date: "asc" },
       }),
       prisma.lpgDistributions.findMany({
@@ -65,7 +73,9 @@ export async function POST(req: NextRequest) {
         select: {
           giDate: true,
         },
-        where: { giDate: dateFilter },
+        where: {
+          AND: [{ giDate: dateFilter }, { createdBy: id }],
+        },
         orderBy: {
           giDate: "asc",
         },

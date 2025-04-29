@@ -27,7 +27,6 @@ import {
 import { DatePickerWithRange } from "@/components/FeatureComponents/DateRange";
 import { Button } from "@/components/ui/button";
 import SummaryItems from "@/components/FeatureComponents/SummaryItems";
-import html2canvas from "html2canvas";
 
 import { Prisma } from "../../../../generated/prisma_client";
 import {
@@ -37,20 +36,38 @@ import {
   getWeeklySummaryDefault,
 } from "@/app/actions/summary.action";
 import { downloadAnnuallyChart, downloadWeeklyChart } from "@/utils/page";
+import { getCurrentSession } from "@/app/actions/auth.actions";
 
+type User = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  username: string;
+  password: string;
+  role: string;
+  companiesId: number | null;
+};
 // 🟢 Ambil otomatis tipe return dari getSummaryToday
 type SummaryProps = {
   defaultdata: Prisma.PromiseReturnType<typeof getSummaryToday>;
   weekly: Prisma.PromiseReturnType<typeof getWeeklySummaryDefault>;
   annually: any;
   allData: any;
+  user: User;
 };
 
-const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
+const Summary = ({
+  defaultdata,
+  weekly,
+  annually,
+  allData,
+  user,
+}: SummaryProps) => {
   const [summaryData, setSummaryData] = useState(defaultdata);
   const [allDataSummary, setAllDataSummary] = useState(allData);
   const [weeklySummary, setWeeklySummary] = useState(weekly);
   const [annualSummary, setAnnualSummary] = useState(annually);
+  const [userId, setUserId] = useState(user);
 
   const weeklyChartRef = useRef(null);
   const annuallyChartRef = useRef(null);
@@ -154,6 +171,7 @@ const Summary = ({ defaultdata, weekly, annually, allData }: SummaryProps) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          id: userId.id,
           from: tgl.from,
           to: tgl.to,
         }),

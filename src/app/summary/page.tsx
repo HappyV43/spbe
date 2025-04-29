@@ -13,19 +13,19 @@ export const metadata = {
 };
 
 const SummaryPage = async () => {
-  const [sessionData, summaryData, weekly, annually, allData] =
-    await Promise.all([
-      getCurrentSession(),
-      getSummaryToday(),
-      getWeeklySummaryDefault(),
-      getAnnualSummaryData(),
-      allDataDefault(),
-    ]);
-
+  const sessionData = await getCurrentSession();
   const { session, user } = sessionData;
-  if (!session && !user) {
+
+  if (!session || !user) {
     redirect("/auth/login");
   }
+
+  const [summaryData, weekly, annually, allData] = await Promise.all([
+    getSummaryToday(user.id),
+    getWeeklySummaryDefault(user.id),
+    getAnnualSummaryData(user.id),
+    allDataDefault(user.id),
+  ]);
 
   return (
     // <ContentLayout
@@ -37,6 +37,7 @@ const SummaryPage = async () => {
         weekly={weekly}
         annually={annually}
         allData={allData}
+        user={user}
       />
     </>
 

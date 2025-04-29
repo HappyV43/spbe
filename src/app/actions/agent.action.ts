@@ -7,7 +7,6 @@ import { getCompaniesAll } from "./companies.action";
 import { redirect } from "next/navigation";
 import { getCurrentSession } from "./auth.actions";
 import { cache } from "react";
-import { error } from "console";
 
 export const getAgentsAll = cache(async () => {
   const companiesData = await getCompaniesAll();

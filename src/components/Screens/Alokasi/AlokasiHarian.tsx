@@ -81,6 +81,7 @@ const AlokasiHarian = ({
   const [loading, setLoading] = useState(false);
   const [paginationLoading, setPaginationLoading] = useState(false);
   const [tableData, setTableData] = useState(defaultdata);
+  const [userId, setUserId] = useState(user.id);
   const [pagination, setPagination] = useState({
     page: 1,
     pageSize: 15,
@@ -120,6 +121,7 @@ const AlokasiHarian = ({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: userId,
           ...values,
           range: {
             from: from ? format(new Date(from), "yyyy-MM-dd") : null,
