@@ -11,16 +11,15 @@ export const metadata = {
 };
 
 const PenyaluranElpijiPage = async () => {
-  const [dataBpeDeliveryAgent, sessionData, defaultData] = await Promise.all([
-    getFilterData(),
-    getCurrentSession(),
-    getLpgDataDefault(),
-  ]);
-
-  const { user, session } = sessionData;
+  const { user, session } = await getCurrentSession();
   if (!session && !user) {
     redirect("/auth/login");
   }
+  const [dataBpeDeliveryAgent, defaultData] = await Promise.all([
+    getFilterData(user.id),
+    getLpgDataDefault(user.id),
+  ]);
+
   return (
     <>
       <PenyaluranElpiji

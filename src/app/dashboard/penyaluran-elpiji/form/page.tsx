@@ -19,13 +19,13 @@ const FormLpgPage = async ({
     query?: string;
   };
 }) => {
-  const query = searchParams?.query || "";
-  const data = await searchDeliveryNumber(query);
-  const bpe = await getNextNumber();
   const { session, user } = await getCurrentSession();
   if (!session && !user) {
     redirect("/auth/login");
   }
+  const query = searchParams?.query || "";
+  const data = await searchDeliveryNumber(query, user.id);
+  const bpe = await getNextNumber(user.id);
 
   return (
     // <ContentLayout
@@ -33,7 +33,7 @@ const FormLpgPage = async ({
     //   mainpage={"penyaluran-elpiji"}
     //   childpage={"form"}
     //   children={
-        <DistributionForm data={data} bpe={bpe} user={user} />
+    <DistributionForm data={data} bpe={bpe} user={user} />
     //   }
     // />
   );

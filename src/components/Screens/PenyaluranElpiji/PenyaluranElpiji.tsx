@@ -84,6 +84,7 @@ export default function PenyaluranElpiji({
   const formattedTotalBeratQty = totalBeratQty.toLocaleString("id-ID");
 
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState(user.id);
   const [isFiltered, setIsFiltered] = useState(true);
   const [paginationLoading, setPaginationLoading] = useState(false);
   const [tableData, setTableData] = useState(defaultData);
@@ -119,6 +120,7 @@ export default function PenyaluranElpiji({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          id: userId,
           ...values,
           range: {
             from: from ? format(new Date(from), "yyyy-MM-dd") : null,
@@ -129,6 +131,7 @@ export default function PenyaluranElpiji({
         }),
       });
       const result = await response.json();
+      console.log(result);
       setData({
         totalTabung: result.cardInfo.totalQty.toLocaleString("id-ID"),
         totalBeratTabung: result.cardInfo.totalBeratQty.toLocaleString("id-ID"),

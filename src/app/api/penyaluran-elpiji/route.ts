@@ -4,7 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { agentName, deliveryNumber, range, page = 1, pageSize = 15 } = body;
+    const {
+      id,
+      agentName,
+      deliveryNumber,
+      range,
+      page = 1,
+      pageSize = 15,
+    } = body;
 
     const whereConditions: any = {};
 
@@ -48,6 +55,9 @@ export async function POST(req: NextRequest) {
         lte: new Date(end.setHours(23, 59, 59, 999)), // Set waktu akhir hari
       };
     }
+
+    whereConditions.createdBy = id;
+    console.log("Filtering by createdBy:", id);
 
     const skip = (page - 1) * pageSize;
     const take = pageSize;

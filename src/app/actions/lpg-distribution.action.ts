@@ -8,7 +8,7 @@ import { getCurrentSession } from "./auth.actions";
 import { format } from "date-fns";
 import { cache } from "react";
 
-export const searchDeliveryNumber = async (query: string) => {
+export const searchDeliveryNumber = async (query: string, user: string) => {
   try {
     if (!query) return [];
     const getAllocationData = await prisma.allocations.findMany({
@@ -23,6 +23,9 @@ export const searchDeliveryNumber = async (query: string) => {
             deliveryNumber: {
               equals: query,
             },
+          },
+          {
+            createdBy: user,
           },
         ],
       },
@@ -214,7 +217,7 @@ export const deleteLpgData = async (id: number) => {
   }
 };
 
-export const getNextNumber = async () => {
+export const getNextNumber = async (user: string) => {
   try {
     const date = new Date();
     const mm = String(date.getMonth() + 1).padStart(2, "0");
@@ -225,6 +228,7 @@ export const getNextNumber = async () => {
       where: {
         status: { in: ["Pending", "Approved"] },
         bpeNumber: { startsWith: prefix },
+        createdBy: user,
       },
       select: { bpeNumber: true },
       orderBy: { bpeNumber: "desc" },
@@ -249,24 +253,34 @@ export const getNextNumber = async () => {
   }
 };
 
-export const getFilterData = cache(async () => {
+export const getFilterData = cache(async (user: string) => {
   return await prisma.agents.findMany({
     select: {
       agentName: true,
+    },
+    where: {
+      createdBy: user,
     },
     orderBy: { agentName: "asc" },
   });
 });
 
-export const getLpgDataDefault = async () => {
+export const getLpgDataDefault = async (user: string) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   return await prisma.lpgDistributions.findMany({
     where: {
-      giDate: {
-        gte: today,
-      },
+      AND: [
+        {
+          giDate: {
+            gte: today,
+          },
+        },
+        {
+          createdBy: user,
+        },
+      ],
     },
     select: {
       id: true,
