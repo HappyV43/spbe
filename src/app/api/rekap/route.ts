@@ -5,8 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { agentName, deliveryNumber, range } = body;
-
+    const { id, agentName, deliveryNumber, range } = body;
     const whereConditions: any = {};
     let fromDate = range.from ? new Date(range.from) : null;
     let toDate = range.to ? new Date(range.to) : null;
@@ -50,11 +49,29 @@ export async function POST(req: NextRequest) {
       toDate = new Date(fromDate);
       toDate.setUTCHours(23, 59, 59, 999);
     }
-
     const dateFilter = fromDate && toDate ? { gte: fromDate, lte: toDate } : {};
 
+    const companyData = await prisma.companies.findMany({
+      where: {
+        createdBy: id,
+      },
+      select: {
+        companyName: true,
+        address: true,
+        telephone: true,
+      },
+    });
     const filteredData = await prisma.lpgDistributions.findMany({
-      where: { giDate: dateFilter },
+      where: {
+        AND: [
+          {
+            giDate: dateFilter,
+          },
+          {
+            createdBy: id,
+          },
+        ],
+      },
       orderBy: { bpeNumber: "desc" },
       select: {
         id: true,
@@ -75,7 +92,14 @@ export async function POST(req: NextRequest) {
     const [allocationData, monthlyData] = await prisma.$transaction([
       prisma.allocations.findMany({
         where: {
-          plannedGiDate: dateFilter,
+          AND: [
+            {
+              plannedGiDate: dateFilter,
+            },
+            {
+              createdBy: id,
+            },
+          ],
         },
         select: {
           id: true,
@@ -86,7 +110,14 @@ export async function POST(req: NextRequest) {
       }),
       prisma.monthlyAllocations.findMany({
         where: {
-          date: dateFilter,
+          AND: [
+            {
+              date: dateFilter,
+            },
+            {
+              createdBy: id,
+            },
+          ],
         },
         select: {
           date: true,
@@ -137,6 +168,14 @@ export async function POST(req: NextRequest) {
         allocationMap.get(item.allocationId)?.plannedAllocationQty || 0,
     }));
 
+    const firstCompany = companyData[0];
+
+    const jsonObject = {
+      companyName: firstCompany.companyName,
+      address: firstCompany.address,
+      telephone: firstCompany.telephone,
+    };
+
     // Group data by date
     const groupedData = mergedData.reduce((acc: any, item) => {
       const dateKey = new Date(item.giDate).toISOString().split("T")[0];
@@ -177,10 +216,9 @@ export async function POST(req: NextRequest) {
       acc[dateKey].quantity.totalPending =
         acc[dateKey].quantity.totalAllocatedQty >
         acc[dateKey].quantity.totalDistributionQty
-          ?
-        acc[dateKey].quantity.totalAllocatedQty -
-        acc[dateKey].quantity.totalDistributionQty
-      : 0;
+          ? acc[dateKey].quantity.totalAllocatedQty -
+            acc[dateKey].quantity.totalDistributionQty
+          : 0;
 
       acc[dateKey].quantity.totalFakultatif =
         acc[dateKey].quantity.totalAllocatedQty >
@@ -198,7 +236,10 @@ export async function POST(req: NextRequest) {
       message: resultData.length
         ? "Data fetched successfully"
         : "No data found",
-      data: resultData,
+      result: {
+        data: resultData,
+        companyData: jsonObject,
+      },
     });
   } catch (error) {
     console.error("Error fetching data:", error);
