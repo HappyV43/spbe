@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react";
 import { FormSubmit } from "@/lib/types";
 
 const AgentForm = ({ companyName, user }: FormSubmit) => {
-  const [selectedCompanyId, setSelectedCompanyId] = useState(1);
+  const [selectedCompanyId, setSelectedCompanyId] = useState(0);
   const [phone, setPhone] = useState("");
   const [fax, setFax] = useState("");
   const [loading, setLoading] = useState(false);
@@ -30,7 +30,7 @@ const AgentForm = ({ companyName, user }: FormSubmit) => {
     const selectedCompany = companyName?.find(
       (company) => company.companyName === value
     );
-    setSelectedCompanyId(Number(selectedCompany?.id) || 1);
+    setSelectedCompanyId(Number(selectedCompany?.id));
   };
 
   const handleSubmitAgents = async (formData: FormData) => {

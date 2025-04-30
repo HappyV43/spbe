@@ -8,12 +8,23 @@ import { redirect } from "next/navigation";
 import { getCurrentSession } from "./auth.actions";
 import { cache } from "react";
 
-export const getAgentsAll = cache(async () => {
+export const getAgentsAll = cache(async (users: string, id: number) => {
   const companiesData = await getCompaniesAll();
   if (!companiesData) {
     redirect("/master-data/companies/form");
   }
-  return prisma.agents.findMany();
+  return prisma.agents.findMany({
+    where: {
+      AND: [
+        {
+          createdBy: users,
+        },
+        {
+          companyId: id,
+        },
+      ],
+    },
+  });
 });
 
 export const getAgentsName = cache(async () => {
@@ -54,7 +65,7 @@ export const postAgentData = async (formData: FormData) => {
       where: {
         agentName: agentName,
       },
-    })
+    });
     if (checkSameAgent) {
       return {
         error: "Nama agent sudah digunakan",
@@ -77,8 +88,6 @@ export const postAgentData = async (formData: FormData) => {
     revalidatePath("/data-master/agents");
     return { success: true, data: postData };
   } catch (error) {
-    const errorMessage = getErrorMessage(error);
-    console.error("Database Error: ", errorMessage);
     return {
       error: getErrorMessage(error),
     };
@@ -119,7 +128,6 @@ export const updateAgentData = async (formData: FormData) => {
         error: "Terdapat nama agent yang sama",
       };
     }
-
 
     // Update data agent
     const updatedAgent = await prisma.agents.update({

@@ -10,18 +10,19 @@ export const metadata = {
 };
 
 const AgentsPage = async () => {
-  const data = await getAgentsAll();
   const { user, session } = await getCurrentSession();
   if (!session && !user) {
     redirect("/auth/login");
   }
+  const data = await getAgentsAll(user.id, user.companiesId!);
+
   return (
     // <ContentLayout home="master-data" mainpage="agen">
-      <Agents
-        columns={user.role === "ADMIN" ? adminAgentColumns : agentColumns}
-        data={data}
-        user={user}
-      />
+    <Agents
+      columns={user.role === "ADMIN" ? adminAgentColumns : agentColumns}
+      data={data}
+      user={user}
+    />
     // </ContentLayout>
   );
 };
