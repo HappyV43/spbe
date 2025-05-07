@@ -11,16 +11,12 @@ export const getCompaniesAll = cache(async () => {
 });
 
 export const getCompaniesNameData = async () => {
-  try {
-    return await prisma.companies.findMany({
-      select: {
-        id: true,
-        companyName: true,
-      },
-    });
-  } catch (error) {
-    throw error;
-  }
+  return await prisma.companies.findMany({
+    select: {
+      id: true,
+      companyName: true,
+    },
+  });
 };
 
 export const postCompaniesData = async (formData: FormData) => {
@@ -104,4 +100,12 @@ export const deleteLpgData = async (id: number) => {
       error: getErrorMessage(error),
     };
   }
+};
+
+export const getCompaniesMetaData = async (id: string) => {
+  return await prisma.companies.findFirst({
+    where: {
+      createdBy: id,
+    },
+  });
 };
