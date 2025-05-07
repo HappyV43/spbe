@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { month } = body;
+    const { month, user } = body;
 
     const dateObj = new Date(month);
 
@@ -36,12 +36,19 @@ export async function POST(req: NextRequest) {
 
     const data = await prisma.monthlyAllocations.findMany({
       where: {
-        date: {
-          gte: dateObj,
-          lte: lastDayOfMonth,
-        },
+        AND: [
+          {
+            date: {
+              gte: dateObj,
+              lte: lastDayOfMonth,
+            },
+          },
+          {
+            createdBy: user,
+          },
+        ],
       },
-      select:{
+      select: {
         date: true,
         totalElpiji: true,
         volume: true,
@@ -51,7 +58,6 @@ export async function POST(req: NextRequest) {
         date: "asc",
       },
     });
-
 
     return NextResponse.json(
       { message: "Month received", month, data },

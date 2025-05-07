@@ -64,7 +64,10 @@ export const uploadBulkExcel = async (
 
         // Check if allocation with deliveryNumber exists
         const existingRecord = await prisma.allocations.findFirst({
-          where: { deliveryNumber: excel.deliveryNumber },
+          where: {
+            deliveryNumber: excel.deliveryNumber,
+            createdBy: excel.createdBy, // pastikan data per user tidak saling override
+          },
         });
 
         const allocationData = {
@@ -144,6 +147,7 @@ export const uploadBulkExcelMonthly = async (datas: MonthlyAllocation[]) => {
         const existingAllocation = await prisma.monthlyAllocations.findFirst({
           where: {
             date: excel.date,
+            createdBy: excel.createdBy,
           },
         });
 

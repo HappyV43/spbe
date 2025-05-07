@@ -43,6 +43,7 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
   const [filteredData, setFilteredData] = useState<TData[]>(data ?? []);
   const [isFiltered, setIsFiltered] = useState<Boolean>(false);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(user.id);
 
   // console.log(data)
 
@@ -81,13 +82,12 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
     setCurrentMonth(newMonth);
 
     const formattedMonth = format(newMonth, "yyyy-MM-dd");
-    console.log("Formatted Month for API:", formattedMonth);
 
     try {
       const response = await fetch("/api/alokasi-bulanan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ month: formattedMonth }),
+        body: JSON.stringify({ month: formattedMonth, user: userId }),
       });
 
       if (!response.ok) {
