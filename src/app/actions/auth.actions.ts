@@ -128,7 +128,7 @@ export const onlyRegister = async (values: SignInValues) => {
       data: {
         username: values.username,
         password: await new Argon2id().hash(values.password),
-        role: "USER",
+        role: values.role,
       },
     });
     return { success: true, data: user };

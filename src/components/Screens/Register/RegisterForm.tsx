@@ -17,6 +17,7 @@ import {
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { redirect, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import ComboBoxNelsen from "@/components/FeatureComponents/ComboBoxNelsen";
 
 const Register = ({ role }: { role?: string }) => {
   const router = useRouter();
@@ -27,9 +28,19 @@ const Register = ({ role }: { role?: string }) => {
       username: "",
       password: "",
       role: "",
+      company: "",
     },
   });
 
+  const roleOptions = [
+    { value: "ADMIN", label: "ADMIN" },
+    { value: "USER", label: "USER" },
+  ];
+
+  const companyOptions = [
+    { value: 1, label: "PT. Puri Kencana Merdeka Utama" },
+    { value: 2, label: "PT. Satya Mitra Gas" },
+  ];
   async function onSubmit(values: SignInValues) {
     setIsLoading(true);
     const res = await onlyRegister(values);
@@ -115,6 +126,52 @@ const Register = ({ role }: { role?: string }) => {
                             <Eye className="h-5 w-5" />
                           )}
                         </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg">Role</FormLabel>
+                    <FormControl>
+                      <div className="max-w-lg">
+                        <ComboBoxNelsen
+                          placeholder="Pilih Status"
+                          data={roleOptions}
+                          selectedValue={field.value}
+                          onSelect={field.onChange}
+                          valueKey="value"
+                          displayKey="label"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="company"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-lg">Company</FormLabel>
+                    <FormControl>
+                      <div className="max-w-lg">
+                        <ComboBoxNelsen
+                          placeholder="Pilih Company"
+                          data={companyOptions}
+                          selectedValue={field.value}
+                          onSelect={field.onChange}
+                          valueKey="value"
+                          displayKey="label"
+                        />
                       </div>
                     </FormControl>
                     <FormMessage />
