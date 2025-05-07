@@ -299,6 +299,7 @@ export const getLpgDataDefault = async (user: string) => {
       bocor: true,
       isiKurang: true,
       updatedAt: true,
+      createdBy: true,
     },
   });
 };

@@ -12,6 +12,7 @@ import { formatNumberQty, toNormalCase } from "@/utils/page";
 
 interface CetakPenyaluranProps {
   data: any;
+  companies: any
 }
 
 const formatTime = (timestamp: number): string => {
@@ -148,23 +149,22 @@ const styles = StyleSheet.create({
   },
 });
 
-const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
+const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data, companies }) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.document}>
         {/* Header Section */}
         <View style={styles.root}>
           <View style={styles.header}>
-            <Text style={styles.title}>PT. Puri Kencana Merdeka Utama</Text>
+            <Text style={styles.title}>{companies?.companyName}</Text>
             <Text style={styles.subHeader}>
               STASIUN PENGISIAN DAN PENGANGKUTAN BULK ELPIJI (SPPBE)
             </Text>
             <Text style={styles.subHeader}>
-              Kawasan Industri Candi Blok XI No. 8, JL Candi Raya Timur, Ngaliyan,
-              Semarang
+              {companies?.address}
             </Text>
             <Text style={styles.subHeader}>
-              Telp/Fax: 024-76633360 / 024-76633361
+              Telp/Fax: {companies?.telephone}
             </Text>
           </View>
           <Image
@@ -325,16 +325,15 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data }) => (
         {/* Header Section */}
         <View style={styles.root}>
           <View style={styles.header}>
-            <Text style={styles.title}>PT. Puri Kencana Merdeka Utama</Text>
+            <Text style={styles.title}>{companies?.companyName}</Text>
             <Text style={styles.subHeader}>
               STASIUN PENGISIAN DAN PENGANGKUTAN BULK ELPIJI (SPPBE)
             </Text>
             <Text style={styles.subHeader}>
-              Kawasan Industri Candi Blok XI No. 8, JL Candi Raya Timur, Ngaliyan,
-              Semarang
+              {companies?.address}
             </Text>
             <Text style={styles.subHeader}>
-              Telp/Fax: 024-76633360 / 024-76633361
+              Telp/Fax: {companies?.telephone}
             </Text>
           </View>
           <Image

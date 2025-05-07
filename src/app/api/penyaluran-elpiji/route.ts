@@ -114,6 +114,7 @@ export async function POST(req: NextRequest) {
         bocor: true,
         isiKurang: true,
         updatedAt: true,
+        createdBy: true,
       },
     });
 

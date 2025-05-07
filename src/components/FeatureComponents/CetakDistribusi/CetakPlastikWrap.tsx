@@ -12,6 +12,7 @@ import { formatNumberQty, toNormalCase } from "@/utils/page";
 
 interface CetakPlastikWrapProps {
   data: any;
+  companies: any;
 }
 
 const formatTime = (timestamp: number): string => {
@@ -70,9 +71,11 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   subHeader: {
+    display: "flex",
     fontSize: 10.5, // Menyesuaikan ukuran font untuk subheader
     lineHeight: 1.2,
     marginBottom: 3,
+    flexWrap: "wrap",
   },
   detailsRow: {
     flexDirection: "row",
@@ -148,23 +151,23 @@ const styles = StyleSheet.create({
   },
 });
 
-const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
+const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({
+  data,
+  companies,
+}) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.document}>
         {/* Header Section */}
         <View style={styles.root}>
           <View style={styles.header}>
-            <Text style={styles.title}>PT. Puri Kencana Merdeka Utama</Text>
+            <Text style={styles.title}>{companies?.companyName}</Text>
             <Text style={styles.subHeader}>
               STASIUN PENGISIAN DAN PENGANGKUTAN BULK ELPIJI (SPPBE)
             </Text>
+            <Text style={styles.subHeader}>{companies?.address}</Text>
             <Text style={styles.subHeader}>
-              Kawasan Industri Candi Blok XI No. 8, JL Candi Raya Timur, Ngaliyan,
-              Semarang
-            </Text>
-            <Text style={styles.subHeader}>
-              Telp/Fax: 024-76633360 / 024-76633361
+              Telp/Fax: {companies?.telephone}
             </Text>
           </View>
           <Image
@@ -214,9 +217,14 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
         {/* Table Section */}
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            <Text style={[styles.tableCellHeader, { flex: 1.5 }]}>No DO/LO</Text>
+            <Text style={[styles.tableCellHeader, { flex: 1.5 }]}>
+              No DO/LO
+            </Text>
             <Text
-              style={[styles.tableCellHeader, { flex: 0.5, textAlign: "center" }]}
+              style={[
+                styles.tableCellHeader,
+                { flex: 0.5, textAlign: "center" },
+              ]}
             >
               Refill
             </Text>
@@ -226,7 +234,10 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
               Plastik Wrap{"\n"}Terpasang
             </Text>
             <Text
-              style={[styles.tableCellHeader, { flex: 1.5, textAlign: "center" }]}
+              style={[
+                styles.tableCellHeader,
+                { flex: 1.5, textAlign: "center" },
+              ]}
             >
               Plastik Wrap{"\n"}Tidak Terpasang
             </Text>
@@ -235,7 +246,9 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
             <Text style={[styles.tableCell, { flex: 1.5, textAlign: "left" }]}>
               {data.deliveryNumber}
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               {formatNumberQty(data.allocatedQty)}
             </Text>
             <Text
@@ -250,13 +263,17 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
             <Text style={[styles.tableCell, { flex: 1.5, textAlign: "left" }]}>
               Tabung Bocor
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               0
             </Text>
             <Text style={[styles.tableCell, { flex: 1, textAlign: "center" }]}>
               0
             </Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}
+            >
               0
             </Text>
           </View>
@@ -264,22 +281,30 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
             <Text style={[styles.tableCell, { flex: 1.5, textAlign: "left" }]}>
               Isi Tabung Kurang
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               0
             </Text>
             <Text style={[styles.tableCell, { flex: 1, textAlign: "center" }]}>
               0
             </Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}
+            >
               0
             </Text>
           </View>
           {/* Total Row */}
           <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}
+            >
               Jumlah
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               {formatNumberQty(data.allocatedQty)}
             </Text>
             <Text
@@ -345,16 +370,13 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
         {/* Header Section */}
         <View style={styles.root}>
           <View style={styles.header}>
-            <Text style={styles.title}>PT. Puri Kencana Merdeka Utama</Text>
+            <Text style={styles.title}>{companies?.companyName}</Text>
             <Text style={styles.subHeader}>
               STASIUN PENGISIAN DAN PENGANGKUTAN BULK ELPIJI (SPPBE)
             </Text>
+            <Text style={styles.subHeader}>{companies?.address}</Text>
             <Text style={styles.subHeader}>
-              Kawasan Industri Candi Blok XI No. 8, JL Candi Raya Timur, Ngaliyan,
-              Semarang
-            </Text>
-            <Text style={styles.subHeader}>
-              Telp/Fax: 024-76633360 / 024-76633361
+              Telp/Fax: {companies?.telephone}
             </Text>
           </View>
           <Image
@@ -404,9 +426,14 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
         {/* Table Section */}
         <View style={styles.table}>
           <View style={styles.tableRow}>
-            <Text style={[styles.tableCellHeader, { flex: 1.5 }]}>No DO/LO</Text>
+            <Text style={[styles.tableCellHeader, { flex: 1.5 }]}>
+              No DO/LO
+            </Text>
             <Text
-              style={[styles.tableCellHeader, { flex: 0.5, textAlign: "center" }]}
+              style={[
+                styles.tableCellHeader,
+                { flex: 0.5, textAlign: "center" },
+              ]}
             >
               Refill
             </Text>
@@ -416,7 +443,10 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
               Plastik Wrap{"\n"}Terpasang
             </Text>
             <Text
-              style={[styles.tableCellHeader, { flex: 1.5, textAlign: "center" }]}
+              style={[
+                styles.tableCellHeader,
+                { flex: 1.5, textAlign: "center" },
+              ]}
             >
               Plastik Wrap{"\n"}Tidak Terpasang
             </Text>
@@ -425,7 +455,9 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
             <Text style={[styles.tableCell, { flex: 1.5, textAlign: "left" }]}>
               {data.deliveryNumber}
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               {formatNumberQty(data.allocatedQty)}
             </Text>
             <Text
@@ -440,13 +472,17 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
             <Text style={[styles.tableCell, { flex: 1.5, textAlign: "left" }]}>
               Tabung Bocor
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               0
             </Text>
             <Text style={[styles.tableCell, { flex: 1, textAlign: "center" }]}>
               0
             </Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}
+            >
               0
             </Text>
           </View>
@@ -454,22 +490,30 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({ data }) => (
             <Text style={[styles.tableCell, { flex: 1.5, textAlign: "left" }]}>
               Isi Tabung Kurang
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               0
             </Text>
             <Text style={[styles.tableCell, { flex: 1, textAlign: "center" }]}>
               0
             </Text>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}
+            >
               0
             </Text>
           </View>
           {/* Total Row */}
           <View style={styles.tableRow}>
-            <Text style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 1.5, textAlign: "center" }]}
+            >
               Jumlah
             </Text>
-            <Text style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}>
+            <Text
+              style={[styles.tableCell, { flex: 0.5, textAlign: "center" }]}
+            >
               {formatNumberQty(data.allocatedQty)}
             </Text>
             <Text
