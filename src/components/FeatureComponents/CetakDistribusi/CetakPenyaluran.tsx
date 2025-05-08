@@ -12,7 +12,7 @@ import { formatNumberQty, toNormalCase } from "@/utils/page";
 
 interface CetakPenyaluranProps {
   data: any;
-  companies: any
+  companies: any;
 }
 
 const formatTime = (timestamp: number): string => {
@@ -55,11 +55,20 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "flex-start",
   },
-  imageSize: {
+  imageSizePKMU: {
     position: "absolute",
     left: 415,
     width: 130,
     height: 130,
+    margin: 0,
+    padding: 0,
+    objectFit: "cover",
+  },
+  imageSizeSMG: {
+    position: "absolute",
+    left: 430,
+    width: 120,
+    height: 120,
     margin: 0,
     padding: 0,
     objectFit: "cover",
@@ -149,7 +158,10 @@ const styles = StyleSheet.create({
   },
 });
 
-const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data, companies }) => (
+const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({
+  data,
+  companies,
+}) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <View style={styles.document}>
@@ -160,18 +172,24 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data, companies }) =>
             <Text style={styles.subHeader}>
               STASIUN PENGISIAN DAN PENGANGKUTAN BULK ELPIJI (SPPBE)
             </Text>
-            <Text style={styles.subHeader}>
-              {companies?.address}
-            </Text>
+            <Text style={styles.subHeader}>{companies?.address}</Text>
             <Text style={styles.subHeader}>
               Telp/Fax: {companies?.telephone}
             </Text>
           </View>
-          <Image
-            style={styles.imageSize}
-            src="
+          {companies?.id === 1 ? (
+            <Image
+              style={styles.imageSizePKMU}
+              src="
             https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-          />
+            />
+          ) : (
+            <Image
+              style={styles.imageSizeSMG}
+              src="
+            https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
+            />
+          )}
         </View>
 
         {/* Details Section */}
@@ -329,18 +347,24 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({ data, companies }) =>
             <Text style={styles.subHeader}>
               STASIUN PENGISIAN DAN PENGANGKUTAN BULK ELPIJI (SPPBE)
             </Text>
-            <Text style={styles.subHeader}>
-              {companies?.address}
-            </Text>
+            <Text style={styles.subHeader}>{companies?.address}</Text>
             <Text style={styles.subHeader}>
               Telp/Fax: {companies?.telephone}
             </Text>
           </View>
-          <Image
-            style={styles.imageSize}
-            src="
-            https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-          />
+          {companies?.id === 1 ? (
+            <Image
+              style={styles.imageSizePKMU}
+              src="
+           https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
+            />
+          ) : (
+            <Image
+              style={styles.imageSizeSMG}
+              src="
+           https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
+            />
+          )}
         </View>
 
         {/* Details Section */}

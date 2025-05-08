@@ -55,11 +55,20 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "flex-start",
   },
-  imageSize: {
+  imageSizePKMU: {
     position: "absolute",
     left: 415,
     width: 130,
     height: 130,
+    margin: 0,
+    padding: 0,
+    objectFit: "cover",
+  },
+  imageSizeSMG: {
+    position: "absolute",
+    left: 430,
+    width: 120,
+    height: 120,
     margin: 0,
     padding: 0,
     objectFit: "cover",
@@ -170,11 +179,19 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({
               Telp/Fax: {companies?.telephone}
             </Text>
           </View>
-          <Image
-            style={styles.imageSize}
-            src="
-              https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-          />
+          {companies?.id === 1 ? (
+            <Image
+              style={styles.imageSizePKMU}
+              src="
+          https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
+            />
+          ) : (
+            <Image
+              style={styles.imageSizeSMG}
+              src="
+          https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
+            />
+          )}
         </View>
 
         {/* Details Section */}
@@ -379,11 +396,19 @@ const CetakPlastikWrap: React.FC<CetakPlastikWrapProps> = ({
               Telp/Fax: {companies?.telephone}
             </Text>
           </View>
-          <Image
-            style={styles.imageSize}
-            src="
-              https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-          />
+          {companies?.id === 1 ? (
+            <Image
+              style={styles.imageSizePKMU}
+              src="
+          https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
+            />
+          ) : (
+            <Image
+              style={styles.imageSizeSMG}
+              src="
+          https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
+            />
+          )}
         </View>
 
         {/* Details Section */}

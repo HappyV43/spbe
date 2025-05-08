@@ -38,7 +38,7 @@ const ConfirmCetak = ({ row, type }: any) => {
   const handlePrepareDownload = async () => {
     setLoading(true);
     const result = await getCompaniesMetaData(userId);
-    setCompanies(result);
+    setCompanies(result[0]);
     setLoading(false);
     setIsDataPrepared(true);
   };

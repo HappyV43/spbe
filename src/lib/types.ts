@@ -89,6 +89,7 @@ export type SignInValues = {
   password: string;
   role: string;
   company: any;
+  companyId: any;
 };
 
 export interface RawDataMap {
