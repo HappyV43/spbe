@@ -58,6 +58,10 @@ export const sidebarItems = {
           title: "Perusahaan",
           url: "/master-data/companies",
         },
+        {
+          title: "Register",
+          url: "/setting/register",
+        },
       ],
     },
   ],

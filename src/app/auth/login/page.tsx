@@ -1,9 +1,9 @@
 import React from "react";
 import { LoginForm } from "./login";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import SignUpForm from "./RegisterCard";
 import { checkUserDb, getCurrentSession } from "@/app/actions/auth.actions";
 import { redirect } from "next/navigation";
+import SignUpForm from "./signup";
 
 const Auth = async () => {
   const [user, test] = await Promise.all([checkUserDb(), getCurrentSession()]);

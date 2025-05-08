@@ -66,10 +66,19 @@ export function LoginForm() {
           <CardTitle className="text-2xl font-semibold">
             Selamat Datang Kembali!
           </CardTitle>
-          <div className="w-20 h-20 bg-primary/10 flex items-center justify-center rounded">
-            <div className="text-primary text-xl font-bold">
-              <Image src="/icon.svg" width={100} height={100} alt="Icon" />
-            </div>
+          <div className="w-20 h-20 flex items-center justify-center rounded flex flex-row pe-4">
+            <Image
+              src="/assets/logo/pkmu.svg"
+              width={60}
+              height={60}
+              alt="Icon PKMU"
+            />
+            <Image
+              src="/assets/logo/smg.svg"
+              width={70}
+              height={70}
+              alt="Icon SMG"
+            />
           </div>
         </div>
         <CardDescription className="text-gray-500">

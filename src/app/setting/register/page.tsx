@@ -14,7 +14,7 @@ const RegisterPage = async () => {
     //   home={"setting"}
     //   mainpage={"register"}
     //   children={
-        <Register role={role} />
+    <Register role={role} />
     //   }
     // />
   );

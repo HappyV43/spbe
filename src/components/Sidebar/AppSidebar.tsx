@@ -17,8 +17,12 @@ import { MainSidebar } from "./MainSidebar";
 import { SummarySidebar } from "./SummarySidebar";
 import { MasterSidebar } from "./MasterSidebar";
 import { sidebarItems } from "@/constants/sidebarItems.constant";
+import { User } from "../../../generated/prisma_client/default";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: any }) {
   const handleClick = async () => {
     const result = await logOut();
     if (result?.error) {
@@ -39,7 +43,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="flex justify-center items-center">
-        <Image src="/icon.svg" width={125} height={125} alt="Icon PKMU" />
+        {user?.companiesId == 1 ? (
+          <Image
+            src="/assets/logo/pkmu.svg"
+            width={130}
+            height={130}
+            alt="Icon PKMU"
+          />
+        ) : user?.companiesId == 2 ? (
+          <Image
+            src="/assets/logo/smg.svg"
+            width={150}
+            height={150}
+            alt="Icon SMG"
+          />
+        ) : null}
       </SidebarHeader>
       <SidebarContent>
         <SummarySidebar items={sidebarItems.summary} />

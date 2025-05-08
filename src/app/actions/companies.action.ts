@@ -102,10 +102,13 @@ export const deleteLpgData = async (id: number) => {
   }
 };
 
-export const getCompaniesMetaData = async (id: string) => {
-  return await prisma.companies.findFirst({
-    where: {
-      createdBy: id,
-    },
+export const getCompaniesMetaData = async (id?: string) => {
+  const metadata = await prisma.companies.findMany({
+    ...(id && {
+      where: {
+        createdBy: id,
+      },
+    }),
   });
+  return metadata;
 };

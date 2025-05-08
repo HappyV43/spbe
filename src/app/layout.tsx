@@ -21,7 +21,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "PKMU",
+  title: "SPBE",
+  icons: [{ rel: "icon", url: "/favicon.ico", type: "image/x-icon" }],
 };
 
 export default async function RootLayout({
@@ -31,7 +32,7 @@ export default async function RootLayout({
 }>) {
   const cookieStore = cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
-  // const dataUser = await getCurrentSession();
+  const dataUser = await getCurrentSession();
   // if (!dataUser?.session || !dataUser?.user) {
   //   redirect("/auth/login");
   // }
@@ -39,19 +40,19 @@ export default async function RootLayout({
   return (
     <html lang="en" className="light">
       <head>
-        <link
+        {/* <link
           rel="icon"
           href="/icon?<generated>"
           type="image/<generated>"
           sizes="<generated>"
-        />
+        /> */}
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
         <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar />
+          <AppSidebar user={dataUser.user} />
           <main className="w-full">
             <SidebarTrigger className="h-20 w-20" />
             {children}

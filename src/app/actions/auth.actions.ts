@@ -76,6 +76,7 @@ export const logOut = async () => {
 
 export const registerAction = async (values: SignInValues) => {
   try {
+    // console.log(values, "Payload Register");
     const existingUsers = await prisma.user.findMany();
 
     if (existingUsers.length === 0) {
@@ -83,6 +84,7 @@ export const registerAction = async (values: SignInValues) => {
         data: {
           username: values.username,
           password: await new Argon2id().hash(values.password),
+          companiesId: values.companyId,
           role: "ADMIN",
         },
       });
@@ -94,6 +96,7 @@ export const registerAction = async (values: SignInValues) => {
           username: values.username,
         },
       });
+
       if (existingUser) {
         return { error: "User already exists", success: false };
       }
@@ -102,6 +105,7 @@ export const registerAction = async (values: SignInValues) => {
         data: {
           username: values.username,
           password: await new Argon2id().hash(values.password),
+          companiesId: values.companyId,
           role: "USER",
         },
       });
@@ -129,6 +133,7 @@ export const onlyRegister = async (values: SignInValues) => {
         username: values.username,
         password: await new Argon2id().hash(values.password),
         role: values.role,
+        companiesId: Number(values.company),
       },
     });
     return { success: true, data: user };
@@ -154,6 +159,7 @@ export const getCurrentSession = cache(
         console.log("Session token validation failed or returned null");
       }
 
+      console.log(result.user, "User Session");
       return result;
     } catch (error) {
       console.error("Error during getCurrentSession:", error);
