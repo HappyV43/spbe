@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
-    id,
+    company_id,
     status,
     agentName,
     deliveryNumber,
@@ -60,7 +60,9 @@ export async function POST(req: NextRequest) {
       // ];
     }
 
-    whereConditions.createdBy = id;
+    whereConditions.creator = {
+      companiesId: company_id,
+    };
 
     if (agentName) {
       whereConditions.agentName = {

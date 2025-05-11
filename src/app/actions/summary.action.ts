@@ -3,7 +3,7 @@
 import prisma from "@/lib/db";
 import { startOfMonth, endOfMonth, eachMonthOfInterval } from "date-fns";
 
-export const getSummaryToday = async (user: string) => {
+export const getSummaryToday = async (company_id: number) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -20,7 +20,11 @@ export const getSummaryToday = async (user: string) => {
             {
               giDate: { gte: today, lt: tomorrow },
             },
-            { createdBy: user },
+            {           
+              creator:{
+                companiesId: company_id
+              } 
+            }
           ],
         },
       }),
@@ -32,7 +36,11 @@ export const getSummaryToday = async (user: string) => {
             {
               plannedGiDate: { gte: today, lt: tomorrow },
             },
-            { createdBy: user },
+            {           
+              creator:{
+                companiesId: company_id
+              } 
+            }
           ],
         },
       }),
@@ -44,7 +52,11 @@ export const getSummaryToday = async (user: string) => {
             {
               giDate: { gte: today, lt: tomorrow },
             },
-            { createdBy: user },
+            {           
+              creator:{
+                companiesId: company_id
+              } 
+            }
           ],
         },
       }),
@@ -54,7 +66,11 @@ export const getSummaryToday = async (user: string) => {
             {
               date: { gte: today, lt: tomorrow },
             },
-            { createdBy: user },
+            {           
+              creator:{
+                companiesId: company_id
+              } 
+            }
           ],
         },
         select: { totalElpiji: true, volume: true },
@@ -92,7 +108,7 @@ export const getSummaryToday = async (user: string) => {
   };
 };
 
-export const getWeeklySummaryDefault = async (user: string) => {
+export const getWeeklySummaryDefault = async (company_id: number) => {
   const today = new Date();
   const startMonth = startOfMonth(today);
   const endMonth = endOfMonth(today);
@@ -159,9 +175,11 @@ export const getWeeklySummaryDefault = async (user: string) => {
             {
               plannedGiDate: { gte: startDate, lte: endDate },
             },
-            {
-              createdBy: user,
-            },
+            {           
+              creator:{
+                companiesId: company_id
+              } 
+            }
           ],
         },
         orderBy: { plannedGiDate: "asc" },
@@ -174,9 +192,11 @@ export const getWeeklySummaryDefault = async (user: string) => {
             {
               giDate: { gte: startDate, lte: endDate },
             },
-            {
-              createdBy: user,
-            },
+            {           
+              creator:{
+                companiesId: company_id
+              } 
+            }
           ],
         },
         orderBy: { giDate: "asc" },
@@ -187,9 +207,11 @@ export const getWeeklySummaryDefault = async (user: string) => {
             {
               date: { gte: startDate, lte: endDate },
             },
-            {
-              createdBy: user,
-            },
+            {           
+              creator:{
+                companiesId: company_id
+              } 
+            }
           ],
         },
         select: { totalElpiji: true, date: true },
@@ -236,7 +258,7 @@ export const getWeeklySummaryDefault = async (user: string) => {
   return { weeklySummary, startDate, endDate };
 };
 
-export const getAnnualSummaryData = async (user: string) => {
+export const getAnnualSummaryData = async (company_id: number) => {
   const now = new Date();
   const year = now.getFullYear();
   const startOfYear = new Date(year, 0, 1);
@@ -265,9 +287,11 @@ export const getAnnualSummaryData = async (user: string) => {
                 {
                   giDate: { gte: startDate, lte: endDate },
                 },
-                {
-                  createdBy: user,
-                },
+                {           
+                  creator:{
+                    companiesId: company_id
+                  } 
+                }
               ],
             },
             orderBy: { giDate: "asc" },
@@ -280,9 +304,11 @@ export const getAnnualSummaryData = async (user: string) => {
                 {
                   giDate: { gte: startDate, lte: endDate },
                 },
-                {
-                  createdBy: user,
-                },
+                {           
+                  creator:{
+                    companiesId: company_id
+                  } 
+                }
               ],
             },
             orderBy: { giDate: "asc" },
@@ -293,9 +319,11 @@ export const getAnnualSummaryData = async (user: string) => {
                 {
                   date: { gte: startDate, lte: endDate },
                 },
-                {
-                  createdBy: user,
-                },
+                {           
+                  creator:{
+                    companiesId: company_id
+                  } 
+                }
               ],
             },
             select: { totalElpiji: true, date: true },
@@ -356,34 +384,42 @@ export const getAnnualSummaryData = async (user: string) => {
 
 // Dengan ini, datanya jadi lebih ringkas, langsung teragregasi per bulan, dan kalau nggak ada data, nilainya jadi 0. 🚀
 
-export const allDataDefault = async (user: string) => {
+export const allDataDefault = async (company_id: number) => {
   const [allSummary, allDistributionSummary, allMonthlyData, uniqueDate] =
     await prisma.$transaction([
       prisma.allocations.aggregate({
         _sum: { allocatedQty: true },
         _count: { _all: true },
         where: {
-          createdBy: user,
+          creator: {
+            companiesId: company_id,
+          },
         },
       }),
       prisma.lpgDistributions.aggregate({
         _sum: { distributionQty: true },
         _count: { _all: true },
         where: {
-          createdBy: user,
+          creator: {
+            companiesId: company_id,
+          },
         },
       }),
       prisma.monthlyAllocations.aggregate({
         _sum: { totalElpiji: true },
         _count: { _all: true },
         where: {
-          createdBy: user,
+          creator: {
+            companiesId: company_id,
+          },
         },
       }),
       prisma.lpgDistributions.findMany({
         distinct: ["giDate"], // Ambil tanggal unik
         where: {
-          createdBy: user,
+          creator: {
+            companiesId: company_id,
+          },
         },
         select: {
           giDate: true, // Cuma ambil tanggalnya aja

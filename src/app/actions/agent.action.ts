@@ -15,14 +15,7 @@ export const getAgentsAll = cache(async (users: string, id: number) => {
   }
   return prisma.agents.findMany({
     where: {
-      AND: [
-        // {
-        //   createdBy: users,
-        // },
-        {
-          companyId: id,
-        },
-      ],
+      companyId: id,
     },
   });
 });

@@ -12,7 +12,7 @@ export default async function DownloadPage() {
   if (!session && !user) {
     redirect("/auth/login");
   }
-  const dataBpeDeliveryAgent = await getFilterData(user.id);
+  const dataBpeDeliveryAgent = await getFilterData(user.companiesId);
 
   return (
     <DownloadComponent

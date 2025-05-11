@@ -21,10 +21,10 @@ const SummaryPage = async () => {
   }
 
   const [summaryData, weekly, annually, allData] = await Promise.all([
-    getSummaryToday(user.id),
-    getWeeklySummaryDefault(user.id),
-    getAnnualSummaryData(user.id),
-    allDataDefault(user.id),
+    getSummaryToday(user.companiesId),
+    getWeeklySummaryDefault(user.companiesId),
+    getAnnualSummaryData(user.companiesId),
+    allDataDefault(user.companiesId),
   ]);
 
   return (

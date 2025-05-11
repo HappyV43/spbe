@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
 
     // Cek apakah dateObj valid
     if (isNaN(dateObj.getTime())) {
-      console.error("Invalid date received:", month);
       return NextResponse.json(
         { message: "Invalid date format" },
         { status: 400 }
@@ -25,7 +24,7 @@ export async function POST(req: NextRequest) {
     );
 
     lastDayOfMonth.setUTCDate(lastDayOfMonth.getUTCDate() + 1);
-    lastDayOfMonth.setUTCHours(0, 0, 0, 0);
+    lastDayOfMonth.setUTCHours(17, 0, 0, 0);
 
     if (!month) {
       return NextResponse.json(
@@ -44,7 +43,9 @@ export async function POST(req: NextRequest) {
             },
           },
           {
-            createdBy: user,
+            creator:{
+              companiesId: user
+            }
           },
         ],
       },

@@ -159,7 +159,6 @@ export const getCurrentSession = cache(
         console.log("Session token validation failed or returned null");
       }
 
-      console.log(result.user, "User Session");
       return result;
     } catch (error) {
       console.error("Error during getCurrentSession:", error);

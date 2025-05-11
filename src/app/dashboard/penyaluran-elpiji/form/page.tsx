@@ -24,8 +24,10 @@ const FormLpgPage = async ({
     redirect("/auth/login");
   }
   const query = searchParams?.query || "";
-  const data = await searchDeliveryNumber(query, user.id);
+  const data = await searchDeliveryNumber(query, user.companiesId);
   const bpe = await getNextNumber(user.id);
+
+  console.log(data);
 
   return (
     // <ContentLayout

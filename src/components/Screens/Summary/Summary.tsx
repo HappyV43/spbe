@@ -36,7 +36,6 @@ import {
   getWeeklySummaryDefault,
 } from "@/app/actions/summary.action";
 import { downloadAnnuallyChart, downloadWeeklyChart } from "@/utils/page";
-import { getCurrentSession } from "@/app/actions/auth.actions";
 
 type User = {
   id: string;
@@ -51,7 +50,7 @@ type User = {
 type SummaryProps = {
   defaultdata: Prisma.PromiseReturnType<typeof getSummaryToday>;
   weekly: Prisma.PromiseReturnType<typeof getWeeklySummaryDefault>;
-  annually: any;
+  annually: Prisma.PromiseReturnType<typeof getAnnualSummaryData>;
   allData: any;
   user: User;
 };
@@ -82,12 +81,12 @@ const Summary = ({
 
   const allocationData = weeklySummary.weeklySummary.map((item) => ({
     date: new Date(item.date).toLocaleDateString("id-ID"), // Format jadi YYYY-MM-DD
-    qty: item.dailySummary,
+    qty: Number(item.dailySummary),
   }));
 
   const distributionData = weeklySummary.weeklySummary.map((item) => ({
     date: new Date(item.date).toLocaleDateString("id-ID"),
-    qty: item.distributionSummary,
+    qty: Number(item.distributionSummary),
   }));
 
   const totalElpijiData = weeklySummary.weeklySummary.map((item) => ({
@@ -171,14 +170,14 @@ const Summary = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: userId.id,
+          company_id: userId.companiesId,
           from: tgl.from,
           to: tgl.to,
         }),
       });
 
       if (!response.ok) {
-        throw new Error(`API responded with status ${response.status}`);
+        console.error(`API responded with status ${response.status}`);
       }
 
       const data = await response.json();

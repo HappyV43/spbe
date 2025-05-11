@@ -66,7 +66,7 @@ export default function DownloadComponent({
   dataBpeDeliveryAgent: bpeNumberData[];
   user: User;
 }) {
-  const [userId, setUserId] = useState(user.id);
+  const [userCompanyId, setUserCompanyId] = useState(user.companiesId);
   const [loading, setLoading] = useState(false);
   const [pdf, setPdf] = useState<any>([]);
   const [companyData, setCompanyData] = useState<any>([]);
@@ -92,7 +92,7 @@ export default function DownloadComponent({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: userId,
+          company_id: userCompanyId,
           ...values,
           range: {
             from: from ? format(new Date(from), "yyyy-MM-dd") : null,

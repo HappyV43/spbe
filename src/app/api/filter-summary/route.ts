@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     }
     const body = await req.json();
 
-    const { from, to, id } = body;
+    const { from, to, company_id } = body;
 
     let fromDate = from ? new Date(from) : null;
     let toDate = to ? new Date(to) : null;
@@ -40,7 +40,14 @@ export async function POST(req: NextRequest) {
         _sum: { allocatedQty: true },
         _count: { allocatedQty: true },
         where: {
-          AND: [{ plannedGiDate: dateFilter }, { createdBy: id }],
+          AND: [
+            { plannedGiDate: dateFilter },
+            {
+              creator: {
+                companiesId: company_id,
+              },
+            },
+          ],
         },
         orderBy: { plannedGiDate: "asc" },
       }),
@@ -48,7 +55,14 @@ export async function POST(req: NextRequest) {
         _sum: { allocatedQty: true },
         _count: { allocatedQty: true },
         where: {
-          AND: [{ giDate: dateFilter }, { createdBy: id }],
+          AND: [
+            { giDate: dateFilter },
+            {
+              creator: {
+                companiesId: company_id,
+              },
+            },
+          ],
         },
         orderBy: { giDate: "asc" },
       }),
@@ -56,7 +70,14 @@ export async function POST(req: NextRequest) {
         _sum: { distributionQty: true },
         _count: { distributionQty: true },
         where: {
-          AND: [{ giDate: dateFilter }, { createdBy: id }],
+          AND: [
+            { giDate: dateFilter },
+            {
+              creator: {
+                companiesId: company_id,
+              },
+            },
+          ],
         },
         orderBy: { giDate: "asc" },
       }),
@@ -64,7 +85,14 @@ export async function POST(req: NextRequest) {
         _sum: { totalElpiji: true },
         _count: { totalElpiji: true },
         where: {
-          AND: [{ date: dateFilter }, { createdBy: id }],
+          AND: [
+            { date: dateFilter },
+            {
+              creator: {
+                companiesId: company_id,
+              },
+            },
+          ],
         },
         orderBy: { date: "asc" },
       }),
@@ -74,15 +102,20 @@ export async function POST(req: NextRequest) {
           giDate: true,
         },
         where: {
-          AND: [{ giDate: dateFilter }, { createdBy: id }],
+          AND: [
+            { giDate: dateFilter },
+            {
+              creator: {
+                companiesId: company_id,
+              },
+            },
+          ],
         },
         orderBy: {
           giDate: "asc",
         },
       }),
     ]);
-
-    console.log(dailySummary);
 
     const totalProps = uniqueDate.reduce(
       (a, obj) => a + Object.keys(obj).length,

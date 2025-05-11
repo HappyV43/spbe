@@ -118,7 +118,7 @@ const SignUpForm = () => {
           <CardTitle className="text-2xl font-semibold">
             Selamat Datang Kembali!
           </CardTitle>
-          <div className="w-20 h-20 flex items-center justify-center rounded flex flex-row pe-4">
+          <div className="w-20 h-20 items-center justify-center rounded flex flex-row pe-4">
             <Image
               src="/assets/logo/pkmu.svg"
               width={60}

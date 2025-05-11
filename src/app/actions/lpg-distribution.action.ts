@@ -5,10 +5,9 @@ import { LpgDistributions } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import { getErrorMessage } from "./error.action";
 import { getCurrentSession } from "./auth.actions";
-import { format } from "date-fns";
 import { cache } from "react";
 
-export const searchDeliveryNumber = async (query: string, user: string) => {
+export const searchDeliveryNumber = async (query: string, user: number) => {
   try {
     if (!query) return [];
     const getAllocationData = await prisma.allocations.findMany({
@@ -25,7 +24,9 @@ export const searchDeliveryNumber = async (query: string, user: string) => {
             },
           },
           {
-            createdBy: user,
+            creator: {
+              companiesId: user,
+            },
           },
         ],
       },
@@ -253,19 +254,21 @@ export const getNextNumber = async (user: string) => {
   }
 };
 
-export const getFilterData = cache(async (user: string) => {
+export const getFilterData = cache(async (company_id: number) => {
   return await prisma.agents.findMany({
     select: {
       agentName: true,
     },
     where: {
-      createdBy: user,
+      creator: {
+        companiesId: company_id
+      }
     },
     orderBy: { agentName: "asc" },
   });
 });
 
-export const getLpgDataDefault = async (user: string) => {
+export const getLpgDataDefault = async (company_id: number) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -278,7 +281,9 @@ export const getLpgDataDefault = async (user: string) => {
           },
         },
         {
-          createdBy: user,
+          creator: {
+            companiesId: company_id
+          }
         },
       ],
     },

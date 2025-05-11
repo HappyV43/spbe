@@ -16,8 +16,8 @@ const PenyaluranElpijiPage = async () => {
     redirect("/auth/login");
   }
   const [dataBpeDeliveryAgent, defaultData] = await Promise.all([
-    getFilterData(user.id),
-    getLpgDataDefault(user.id),
+    getFilterData(user.companiesId),
+    getLpgDataDefault(user.companiesId),
   ]);
 
   return (

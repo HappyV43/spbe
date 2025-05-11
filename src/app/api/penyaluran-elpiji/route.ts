@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
-      id,
+      company_id,
       agentName,
       deliveryNumber,
       range,
@@ -56,8 +56,11 @@ export async function POST(req: NextRequest) {
       };
     }
 
-    whereConditions.createdBy = id;
-    console.log("Filtering by createdBy:", id);
+    whereConditions.creator = {
+      companiesId: company_id,
+    };
+
+    console.log("Filtering by company:", company_id);
 
     const skip = (page - 1) * pageSize;
     const take = pageSize;

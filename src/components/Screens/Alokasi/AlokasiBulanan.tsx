@@ -43,7 +43,7 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
   const [filteredData, setFilteredData] = useState<TData[]>(data ?? []);
   const [isFiltered, setIsFiltered] = useState<Boolean>(false);
   const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(user.id);
+  const [userId, setUserId] = useState(user.companiesId);
 
   // console.log(data)
 
@@ -101,8 +101,7 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
       }
 
       const newData = await response.json();
-      setFilteredData(newData.data);
-      // console.log("Response from API:", data);
+      setFilteredData(newData.dataFilter);
     } catch (err) {
       console.error("Error:", err);
     }

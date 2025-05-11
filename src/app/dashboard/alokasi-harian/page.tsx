@@ -18,8 +18,8 @@ const AlokasiPage = async () => {
     redirect("/auth/login");
   }
   const [dataBpeDeliveryAgent, defaultData] = await Promise.all([
-    getFilterDataAllocation(user.id),
-    getAllocationDefault(user.id),
+    getFilterDataAllocation(user.companiesId),
+    getAllocationDefault(user.companiesId),
   ]);
   return (
     <AlokasiHarian

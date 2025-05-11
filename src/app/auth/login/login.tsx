@@ -50,12 +50,11 @@ export function LoginForm() {
       });
       router.push("/auth/login");
     } else {
-      router.push("/summary");
+      setIsLoading(false);
       toast({
         title: "Login berhasil",
-        // duration: 3000,
       });
-      setIsLoading(false);
+      router.push("/summary");
     }
   }
 
@@ -66,7 +65,7 @@ export function LoginForm() {
           <CardTitle className="text-2xl font-semibold">
             Selamat Datang Kembali!
           </CardTitle>
-          <div className="w-20 h-20 flex items-center justify-center rounded flex flex-row pe-4">
+          <div className="w-20 h-20 items-center justify-center rounded flex flex-row pe-4">
             <Image
               src="/assets/logo/pkmu.svg"
               width={60}

@@ -84,7 +84,7 @@ export default function RekapanScreen({
   const formattedTotalBeratQty = totalBeratQty.toLocaleString("id-ID");
 
   const [loading, setLoading] = useState(false);
-  const [userId, setUserId] = useState(user.id);
+  const [userCompanyId, setUserCompanyId] = useState(user.companiesId);
   const [isFiltered, setIsFiltered] = useState(true);
   const [paginationLoading, setPaginationLoading] = useState(false);
   const [tableData, setTableData] = useState(defaultData);
@@ -121,7 +121,7 @@ export default function RekapanScreen({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: userId,
+          company_id: userCompanyId,
           ...values,
           range: {
             from: from ? format(new Date(from), "yyyy-MM-dd") : null,

@@ -1,11 +1,10 @@
 import prisma from "@/lib/db";
-import { endOfMonth, startOfMonth } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { id, agentName, deliveryNumber, range } = body;
+    const { company_id, agentName, deliveryNumber, range } = body;
     const whereConditions: any = {};
     let fromDate = range.from ? new Date(range.from) : null;
     let toDate = range.to ? new Date(range.to) : null;
@@ -53,7 +52,7 @@ export async function POST(req: NextRequest) {
 
     const companyData = await prisma.companies.findMany({
       where: {
-        createdBy: id,
+        id: company_id,
       },
       select: {
         companyName: true,
@@ -68,7 +67,9 @@ export async function POST(req: NextRequest) {
             giDate: dateFilter,
           },
           {
-            createdBy: id,
+            creator: {
+              companiesId: company_id,
+            },
           },
         ],
       },
@@ -97,7 +98,9 @@ export async function POST(req: NextRequest) {
               plannedGiDate: dateFilter,
             },
             {
-              createdBy: id,
+              creator: {
+                companiesId: company_id,
+              },
             },
           ],
         },
@@ -115,7 +118,9 @@ export async function POST(req: NextRequest) {
               date: dateFilter,
             },
             {
-              createdBy: id,
+              creator: {
+                companiesId: company_id,
+              },
             },
           ],
         },
