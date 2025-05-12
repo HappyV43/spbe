@@ -45,6 +45,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { id } from "date-fns/locale";
 import { User } from "../../../../generated/prisma_client";
 import Link from "next/link";
+import { toast } from "@/hooks/use-toast";
 
 type valuesFilter = {
   agentName: string;
@@ -131,7 +132,17 @@ export default function PenyaluranElpiji({
         }),
       });
       const result = await response.json();
-      console.log(result);
+      if (!result.data || result.data.length === 0) {
+        toast({
+          title: "Tidak ada data",
+          description: "Tidak ditemukan data untuk filter yang dipilih.",
+          variant: "destructive",
+          duration: 1000,
+        });
+        setTableData([]); // Kosongkan tabel
+      } else {
+        setTableData(result.data);
+      }
       setData({
         totalTabung: result.cardInfo.totalQty.toLocaleString("id-ID"),
         totalBeratTabung: result.cardInfo.totalBeratQty.toLocaleString("id-ID"),

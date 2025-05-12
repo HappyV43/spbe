@@ -94,7 +94,7 @@ export const getAllocationDefault = async (company_id: number) => {
         },
         {
           status: {
-            equals: "Approved",
+            equals: "Pending",
           },
         },
         {

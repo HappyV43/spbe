@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
-    company_id,
+    id,
     status,
     agentName,
     deliveryNumber,
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     }
 
     whereConditions.creator = {
-      companiesId: company_id,
+      companiesId: id,
     };
 
     if (agentName) {
@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
         mode: "insensitive",
       };
     }
+    console.log(whereConditions);
 
     const skip = (page - 1) * pageSize;
     const take = pageSize;

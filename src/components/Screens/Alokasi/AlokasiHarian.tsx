@@ -38,6 +38,7 @@ import {
 } from "lucide-react";
 import InfoCard from "@/components/InfoCard";
 import { id } from "date-fns/locale";
+import { toast } from "@/hooks/use-toast";
 
 type valuesFilter = {
   status: string;
@@ -131,15 +132,28 @@ const AlokasiHarian = ({
           pageSize: pagination.pageSize,
         }),
       });
+
       const result = await response.json();
+
+      // Cek apakah data kosong
+      if (!result.data || result.data.length === 0) {
+        toast({
+          title: "Tidak ada data",
+          description: "Tidak ditemukan data untuk filter yang dipilih.",
+          variant: "destructive",
+          duration: 1000,
+        });
+        setTableData([]); // Kosongkan tabel
+      } else {
+        setTableData(result.data);
+      }
+
       setData({
         totalTabung: result.cardInfo.totalQty.toLocaleString("id-ID"),
         totalBeratTabung: result.cardInfo.totalBeratQty.toLocaleString("id-ID"),
         totalAgen: result.cardInfo.totalAgenCount,
         totalAlokasiHarian: result.cardInfo.totalAlokasiHarian,
       });
-      // console.log(result.data);
-      setTableData(result.data);
       setPagination((prev) => ({
         ...prev,
         page: pageNumber,

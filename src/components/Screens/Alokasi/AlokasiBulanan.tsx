@@ -80,7 +80,6 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
     if (!newMonth) return;
 
     setCurrentMonth(newMonth);
-
     const formattedMonth = format(newMonth, "yyyy-MM-dd");
 
     try {
@@ -101,7 +100,18 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
       }
 
       const newData = await response.json();
-      setFilteredData(newData.dataFilter);
+
+      if (!newData.data || newData.data.length === 0) {
+        toast({
+          title: "Tidak ada data",
+          description: "Tidak ditemukan data untuk bulan tersebut.",
+          variant: "destructive",
+          duration: 1000,
+        });
+        setFilteredData([]); // Kosongkan jika perlu
+      } else {
+        setFilteredData(newData.data);
+      }
     } catch (err) {
       console.error("Error:", err);
     }
