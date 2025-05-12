@@ -20,18 +20,6 @@ export const getAgentsAll = cache(async (users: string, id: number) => {
   });
 });
 
-export const getAgentsName = cache(async () => {
-  const companiesData = await getCompaniesAll();
-  if (!companiesData) {
-    redirect("/master-data/companies/form");
-  }
-  return prisma.agents.findMany({
-    distinct: ["agentName"],
-    select: {
-      agentName: true,
-    },
-  });
-});
 
 export const postAgentData = async (formData: FormData) => {
   const agentName = formData.get("agentName")?.toString();

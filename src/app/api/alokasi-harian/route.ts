@@ -84,7 +84,6 @@ export async function POST(req: NextRequest) {
         mode: "insensitive",
       };
     }
-    console.log(whereConditions);
 
     const skip = (page - 1) * pageSize;
     const take = pageSize;
