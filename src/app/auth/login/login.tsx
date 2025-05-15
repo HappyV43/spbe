@@ -67,13 +67,13 @@ export function LoginForm() {
           </CardTitle>
           <div className="w-20 h-20 items-center justify-center rounded flex flex-row pe-4">
             <Image
-              src="/assets/logo/pkmu.svg"
+              src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20%281%29-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
               width={60}
               height={60}
               alt="Icon PKMU"
             />
             <Image
-              src="/assets/logo/smg.svg"
+              src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
               width={70}
               height={70}
               alt="Icon SMG"
