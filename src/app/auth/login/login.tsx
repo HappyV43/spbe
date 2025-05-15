@@ -74,8 +74,8 @@ export function LoginForm() {
             />
             <Image
               src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
-              width={60}
-              height={60}
+              width={70}
+              height={70}
               alt="Icon SMG"
             />
           </div>
