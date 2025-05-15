@@ -60,7 +60,6 @@ export async function POST(req: NextRequest) {
       companiesId: company_id,
     };
 
-    console.log("Filtering by company:", company_id);
 
     const skip = (page - 1) * pageSize;
     const take = pageSize;

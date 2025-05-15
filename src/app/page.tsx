@@ -1,9 +1,3 @@
-import { AppSidebar } from "@/components/Sidebar/AppSidebar";
-import {
-  SidebarProvider,
-  SidebarInset,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import { getCurrentSession } from "./actions/auth.actions";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
