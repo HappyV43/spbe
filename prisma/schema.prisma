@@ -11,8 +11,8 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
-  // url      = env("DATABASE_URL_LOCAL")
+  // url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_LOCAL")
 }
 
 model User {
@@ -53,6 +53,7 @@ model Companies {
   companyName String
   address     String
   telephone   String
+  imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   createdBy   String
