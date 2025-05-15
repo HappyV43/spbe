@@ -9,7 +9,7 @@ import {
 } from "../actions/summary.action";
 
 export const metadata = {
-  title: "Data Summary PKMU",
+  title: "Data Summary",
 };
 
 const SummaryPage = async () => {
@@ -28,21 +28,13 @@ const SummaryPage = async () => {
   ]);
 
   return (
-    // <ContentLayout
-    //   home={"summary"}
-    //   children={
-    <>
-      <Summary
-        defaultdata={summaryData}
-        weekly={weekly}
-        annually={annually}
-        allData={allData}
-        user={user}
-      />
-    </>
-
-    // }
-    // />
+    <Summary
+      defaultdata={summaryData}
+      weekly={weekly}
+      annually={annually}
+      allData={allData}
+      user={user}
+    />
   );
 };
 

@@ -5,7 +5,7 @@ import { monthlyAllocationColumns } from "@/lib/Column";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Alokasi Bulanan PKMU",
+  title: "Alokasi Bulanan",
 };
 
 const AlokasiBulananPage = async () => {
@@ -17,17 +17,11 @@ const AlokasiBulananPage = async () => {
   }
   const data = await getDefaultMonthlyData(user.companiesId);
   return (
-    //   <ContentLayout
-    //     home={"dashboard"}
-    //     mainpage={"alokasi-bulanan"}
-    //     children={
     <AlokasiBulanan
       columns={monthlyAllocationColumns}
       user={user}
       data={data}
     />
-    //   }
-    // />
   );
 };
 

@@ -7,7 +7,7 @@ import PenyaluranElpiji from "@/components/Screens/PenyaluranElpiji/PenyaluranEl
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Penyaluran Elpiji PKMU",
+  title: "Penyaluran Elpiji",
 };
 
 const PenyaluranElpijiPage = async () => {
@@ -21,13 +21,11 @@ const PenyaluranElpijiPage = async () => {
   ]);
 
   return (
-    <>
-      <PenyaluranElpiji
-        user={user}
-        dataBpeDeliveryAgent={dataBpeDeliveryAgent}
-        defaultData={defaultData}
-      />
-    </>
+    <PenyaluranElpiji
+      user={user}
+      dataBpeDeliveryAgent={dataBpeDeliveryAgent}
+      defaultData={defaultData}
+    />
   );
 };
 

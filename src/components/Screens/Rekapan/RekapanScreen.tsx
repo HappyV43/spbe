@@ -241,26 +241,6 @@ export default function RekapanScreen({
                     </FormItem>
                   )}
                 />
-                {/* <FormField
-                  control={form.control}
-                  name="deliveryNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-lg">Nomor DO</FormLabel>
-                      <FormControl>
-                        <ComboBoxNelsen
-                          placeholder="Pilih Nomor DO"
-                          data={dataBpeDeliveryAgent}
-                          selectedValue={field.value}
-                          onSelect={field.onChange}
-                          valueKey="deliveryNumber"
-                          displayKey="deliveryNumber"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
                 <FormField
                   control={form.control}
                   name="range"
@@ -381,12 +361,6 @@ export default function RekapanScreen({
             currentPage={pagination.page}
             totalPages={pagination.totalPages}
           />
-          {/* <Pagination
-            currentPage={pagination.page}
-            totalPages={pagination.totalPages}
-            onPageChange={handlePageChange}
-            loading={paginationLoading}
-          /> */}
         </div>
       </div>
     </div>
