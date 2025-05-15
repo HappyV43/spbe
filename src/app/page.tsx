@@ -8,10 +8,6 @@ import { getCurrentSession } from "./actions/auth.actions";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-// // const page = async () => {
-
-// // export default page;
-
 export default async function Page() {
   const cookieStore = cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
@@ -20,11 +16,3 @@ export default async function Page() {
     redirect("/auth/login");
   }
 }
-
-
-//   return (
-//     <SidebarProvider defaultOpen={defaultOpen}>
-//       <AppSidebar user={dataUser.user} />
-//     </SidebarProvider>
-//   );
-// }

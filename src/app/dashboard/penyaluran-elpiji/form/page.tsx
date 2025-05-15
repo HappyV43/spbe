@@ -3,13 +3,12 @@ import {
   getNextNumber,
   searchDeliveryNumber,
 } from "@/app/actions/lpg-distribution.action";
-import { ContentLayout } from "@/components/ContentLayout";
 import DistributionForm from "@/components/Screens/FormComponent/DistributionForm";
 import { redirect } from "next/navigation";
 import React from "react";
 
 export const metadata = {
-  title: "Form PKMU",
+  title: "Form Penyaluran Elpiji",
 };
 
 const FormLpgPage = async ({
@@ -27,16 +26,7 @@ const FormLpgPage = async ({
   const data = await searchDeliveryNumber(query, user.companiesId);
   const bpe = await getNextNumber(user.id);
 
-  return (
-    // <ContentLayout
-    //   home={"dashboard"}
-    //   mainpage={"penyaluran-elpiji"}
-    //   childpage={"form"}
-    //   children={
-    <DistributionForm data={data} bpe={bpe} user={user} />
-    //   }
-    // />
-  );
+  return <DistributionForm data={data} bpe={bpe} user={user} />;
 };
 
 export default FormLpgPage;
