@@ -177,19 +177,12 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({
               Telp/Fax: {companies?.telephone}
             </Text>
           </View>
-          {companies?.id === 1 ? (
-            <Image
-              style={styles.imageSizePKMU}
-              src="
-            https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-            />
-          ) : (
-            <Image
-              style={styles.imageSizeSMG}
-              src="
-            https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
-            />
-          )}
+          <Image
+            style={
+              companies?.id === 1 ? styles.imageSizePKMU : styles.imageSizeSMG
+            }
+            src={companies?.imageUrl}
+          />
         </View>
 
         {/* Details Section */}
@@ -352,19 +345,12 @@ const CetakPenyaluran: React.FC<CetakPenyaluranProps> = ({
               Telp/Fax: {companies?.telephone}
             </Text>
           </View>
-          {companies?.id === 1 ? (
-            <Image
-              style={styles.imageSizePKMU}
-              src="
-           https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-            />
-          ) : (
-            <Image
-              style={styles.imageSizeSMG}
-              src="
-           https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
-            />
-          )}
+          <Image
+            style={
+              companies?.id === 1 ? styles.imageSizePKMU : styles.imageSizeSMG
+            }
+            src={companies?.imageUrl}
+          />
         </View>
 
         {/* Details Section */}

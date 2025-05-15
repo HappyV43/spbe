@@ -4,7 +4,7 @@ import { getFilterData } from "@/app/actions/lpg-distribution.action";
 import DownloadComponent from "@/components/Screens/Download/DownloadComponent";
 
 export const metadata = {
-  title: "Rekap Penyaluran PKMU",
+  title: "Rekap Penyaluran",
 };
 
 export default async function DownloadPage() {

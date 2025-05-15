@@ -109,50 +109,6 @@ const Summary = ({
     qty: item.totalMonthlyElpiji,
   }));
 
-  // useEffect(() => {
-  //   loadDataSummary();
-  // }, []);
-
-  // const loadDataSummary = async () => {
-  //   try {
-  //     const [summaryData, weekly, annually] = await Promise.all([
-  //       getSummaryToday(),
-  //       getWeeklySummaryDefault(),
-  //       getAnnualSummaryData(),
-  //       allDataDefault(),
-  //     ]);
-
-  //     // console.log({ summaryData, weekly, annually, allData });
-
-  //     // setSummaryData(summaryData);
-  //     // setAllDataSummary(allData);
-  //     // setWeeklySummary(weekly);
-  //     // setAnnualSummary(annually);
-  //   } catch (error) {
-  //     console.error("Error fetching data:", error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const [summaryData, weekly, yearly, allData] = await Promise.all([
-  //         getSummaryToday(),
-  //         getWeeklySummaryDefault(),
-  //         getAnnualSummaryData(),
-  //         allDataDefault(),
-  //       ]);
-
-  //       // Handle the retrieved data here
-  //       console.log({ summaryData, weekly, yearly, allData });
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
   const fetchSummary = async (
     tgl: { from: Date | null; to: Date | null } | null
   ) => {
@@ -161,7 +117,6 @@ const Summary = ({
     setDateFilter(tgl);
     setIsFiltered(true);
     setLoading(true);
-    // console.log("Selected Date Range:", tgl);
 
     try {
       const response = await fetch("/api/filter-summary", {
@@ -352,13 +307,6 @@ const Summary = ({
                 ) : (
                   <span>Semua Tanggal</span>
                 )}
-                {/* {dateFilter?.from ? dateFilter?.to
-                  ? `${format(dateFilter.from, "dd MMMM yyyy", {
-                      locale: id,
-                    })} - ${format(dateFilter.to, "dd MMMM yyyy", {
-                      locale: id,
-                    })}`
-                  : } */}
               </span>
             </h1>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-start sm:items-center w-full sm:w-auto">
@@ -400,12 +348,6 @@ const Summary = ({
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4">
-            {/* {loading ? (
-              <div className="col-span-full flex justify-center items-center h-40 sm:h-64">
-                <Loader2 className="h-12 w-12 sm:h-16 sm:w-16 animate-spin text-gray-500" />
-              </div>
-            ) : (
-              <> */}
             <SummaryItems
               icon={
                 <CalendarCheck className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
