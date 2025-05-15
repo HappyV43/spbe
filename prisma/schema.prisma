@@ -53,6 +53,7 @@ model Companies {
   companyName String
   address     String
   telephone   String
+  imageUrl    String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   createdBy   String
