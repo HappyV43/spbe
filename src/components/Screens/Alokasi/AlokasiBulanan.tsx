@@ -23,7 +23,7 @@ import {
 import { id } from "date-fns/locale";
 import { toast } from "@/hooks/use-toast";
 import { MonthlyAllocation } from "@/lib/types";
-import { getMonthlyAllocation } from "@/app/actions/alokasi.action";
+
 import InfoCard from "@/components/InfoCard";
 import { User } from "../../../../generated/prisma_client";
 
@@ -45,37 +45,6 @@ const AlokasiBulanan = <TData extends MonthlyAllocation, TValue>({
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(user.companiesId);
 
-  // console.log(data)
-
-  // useEffect(() => {
-  //   if (currentMonth) {
-  //     const filtered = rawData.filter((item) =>
-  //       item.date ? isSameMonth(new Date(item.date), currentMonth) : false
-  //     );
-  //     setLoading(false);
-
-  //     setIsFiltered(true);
-  //     setFilteredData(filtered);
-  //   } else {
-  //     setLoading(false);
-  //     setIsFiltered(false);
-  //     setFilteredData(rawData);
-  //   }
-  // }, [currentMonth, rawData]);
-
-  // const handleClearSearch = () => {
-  //   setCurrentMonth(new Date());
-  //   setIsFiltered(false);
-  // };
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const data = (await getMonthlyAllocation()) as TData[];
-  //     setRawData(data);
-  //     // console.log(data);
-  //   };
-  //   fetchData();
-  // }, []);
   const handleMonthChange = async (newMonth: Date | null) => {
     if (!newMonth) return;
 

@@ -6,8 +6,6 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { month, user } = body;
 
-    console.log(month, user);
-
     const dateObj = new Date(month);
 
     // Cek apakah dateObj valid
@@ -62,11 +60,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (!data)
-      return NextResponse.json({ message: "Data tidak ada" }, { status: 400 });
 
     return NextResponse.json(
-      { message: "Month received", month, data },
+      {
+        message: data.length ? "Data fetched successfully" : "No data found",
+        month,
+        data,
+      },
       { status: 200 }
     );
   } catch (error) {

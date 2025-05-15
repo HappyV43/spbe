@@ -135,7 +135,6 @@ const AlokasiHarian = ({
 
       const result = await response.json();
 
-      // Cek apakah data kosong
       if (!result.data || result.data.length === 0) {
         toast({
           title: "Tidak ada data",
@@ -143,7 +142,7 @@ const AlokasiHarian = ({
           variant: "destructive",
           duration: 1000,
         });
-        setTableData([]); // Kosongkan tabel
+        setTableData([]); 
       } else {
         setTableData(result.data);
       }
