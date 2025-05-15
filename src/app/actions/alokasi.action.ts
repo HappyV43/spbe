@@ -3,6 +3,8 @@
 import prisma from "@/lib/db";
 import { cache } from "react";
 
+
+
 export const getAllocationDefault = async (company_id: number) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
