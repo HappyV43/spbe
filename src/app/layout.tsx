@@ -8,6 +8,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/Sidebar/AppSidebar";
 import { getCurrentSession } from "./actions/auth.actions";
 import { redirect } from "next/navigation";
+import { getCompaniesImage } from "./actions/companies.action";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,26 +34,16 @@ export default async function RootLayout({
   const cookieStore = cookies();
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
   const dataUser = await getCurrentSession();
-  // if (!dataUser?.session || !dataUser?.user) {
-  //   redirect("/auth/login");
-  // }
-
+  const image = await getCompaniesImage(dataUser.user?.companiesId!);
   return (
     <html lang="en" className="light">
-      <head>
-        {/* <link
-          rel="icon"
-          href="/icon?<generated>"
-          type="image/<generated>"
-          sizes="<generated>"
-        /> */}
-      </head>
+      <head></head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
         <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar user={dataUser.user} />
+          <AppSidebar user={dataUser.user} image={image[0]?.imageUrl} />
           <main className="w-full">
             <SidebarTrigger className="h-20 w-20" />
             {children}

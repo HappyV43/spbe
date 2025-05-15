@@ -38,17 +38,7 @@ const ConfirmCetak = ({ row, type }: any) => {
   const handlePrepareDownload = async () => {
     setLoading(true);
     const result = await getCompaniesMetaData(userId);
-    let url = "";
-
-    if (result[0].id === 1) {
-      url =
-        "https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20(1)-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png";
-      setCompanies({ ...result[0], imageUrl: url });
-    } else if (result[0].id === 2) {
-      url =
-        "https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png";
-      setCompanies({ ...result[0], imageUrl: url });
-    }
+    setCompanies(result[0]);
 
     setLoading(false);
     setIsDataPrepared(true);
@@ -174,11 +164,7 @@ const ConfirmCetak = ({ row, type }: any) => {
                     type === "wrap" ? (
                       <CetakPlastikWrap data={row} companies={companies} />
                     ) : (
-                      <CetakPenyaluran
-                        data={row}
-                        companies={companies}
-                        // imageUrl={}
-                      />
+                      <CetakPenyaluran data={row} companies={companies} />
                     )
                   }
                   fileName={

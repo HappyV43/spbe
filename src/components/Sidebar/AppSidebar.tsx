@@ -21,8 +21,9 @@ import { User } from "../../../generated/prisma_client/default";
 
 export function AppSidebar({
   user,
+  image,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { user: any }) {
+}: React.ComponentProps<typeof Sidebar> & { user: any; image: string }) {
   const handleClick = async () => {
     const result = await logOut();
     if (result?.error) {
@@ -44,19 +45,9 @@ export function AppSidebar({
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader className="flex justify-center items-center">
         {user?.companiesId == 1 ? (
-          <Image
-            src="/assets/logo/pkmu.svg"
-            width={130}
-            height={130}
-            alt="Icon PKMU"
-          />
+          <Image src={image} width={130} height={130} alt="Icon PKMU" />
         ) : user?.companiesId == 2 ? (
-          <Image
-            src="/assets/logo/smg.svg"
-            width={150}
-            height={150}
-            alt="Icon SMG"
-          />
+          <Image src={image} width={150} height={150} alt="Icon SMG" />
         ) : null}
       </SidebarHeader>
       <SidebarContent>
