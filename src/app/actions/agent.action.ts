@@ -39,17 +39,31 @@ export const postAgentData = async (formData: FormData) => {
       error: "User tidak ditemukan. Silakan login kembali.",
     };
   }
-  try {
-    const checkSameAgent = await prisma.agents.findFirst({
-      where: {
-        agentName: agentName,
+
+  if (companyId !== user.companiesId) {
+    return {
+      error: "Anda tidak memiliki akses ke perusahaan ini",
+    };
+  }
+
+  // Cek duplikasi nama agent
+  const checkSameAgent = await prisma.agents.findFirst({
+    where: {
+      companyId: companyId,
+      agentName: {
+        equals: agentName,
+        mode: "insensitive", // PENTING agar "Dewangga" == "dewangga"
       },
-    });
-    if (checkSameAgent) {
-      return {
-        error: "Nama agent sudah digunakan",
-      };
-    }
+    },
+  });
+
+  if (checkSameAgent) {
+    return {
+      error: "Nama agent sudah digunakan",
+    };
+  }
+
+  try {
     const postData: Agents = await prisma.agents.create({
       data: {
         agentName: agentName,
@@ -91,23 +105,44 @@ export const updateAgentData = async (formData: FormData) => {
     };
   }
 
-  try {
-    // Cek duplikasi nama agent
-    const sameAgentName = await prisma.agents.findFirst({
-      where: {
-        agentName: agentNameLabel,
-        id: {
-          not: agentId,
-        },
+  const { user } = await getCurrentSession();
+  if (!user) {
+    return {
+      error: "User tidak ditemukan. Silakan login kembali.",
+    };
+  }
+
+  const existingAgent = await prisma.agents.findUnique({
+    where: { id: agentId },
+  });
+
+  if (!existingAgent || existingAgent.companyId !== user.companiesId) {
+    return {
+      error: "Anda tidak memiliki izin untuk mengubah data agent ini.",
+    };
+  }
+
+  // Cek duplikasi nama agent
+  const sameAgentName = await prisma.agents.findFirst({
+    where: {
+      companyId: user.companiesId,
+      agentName: {
+        equals: agentNameLabel,
+        mode: "insensitive",
       },
-    });
+      id: {
+        not: agentId,
+      },
+    },
+  });
 
-    if (sameAgentName) {
-      return {
-        error: "Terdapat nama agent yang sama",
-      };
-    }
+  if (sameAgentName) {
+    return {
+      error: "Terdapat nama agent yang sama",
+    };
+  }
 
+  try {
     // Update data agent
     const updatedAgent = await prisma.agents.update({
       where: { id: agentId },
