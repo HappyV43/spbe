@@ -62,21 +62,23 @@ export function LoginForm() {
     <Card className="w-screen max-w-lg rounded-lg shadow-lg">
       <CardHeader className="pb-4 flex">
         <div className="flex items-start justify-between">
-          <CardTitle className="text-2xl font-semibold">
+          <CardTitle className="text-xl font-semibold mr-2">
             Selamat Datang Kembali!
           </CardTitle>
-          <div className="w-20 h-20 items-center justify-center rounded flex flex-row pe-4">
+          <div className="flex items-center justify-center space-x-2">
             <Image
               src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/SVG%20to%20PNG%20Conversion%20%281%29-Xec3SuuiyCo71J4ndm3O533x0jWGTb.png"
-              width={60}
-              height={60}
+              width={80}
+              height={80}
               alt="Icon PKMU"
+              className="object-contain max-w-[60%] sm:max-w-[80px]"
             />
             <Image
               src="https://f6oujhgi9dzrtqrk.public.blob.vercel-storage.com/Logo%20Satya%20Mitra%20Gas-ivGydVea6ML0snBVxegT9AGFX3fqmc.png"
-              width={70}
-              height={70}
+              width={90}
+              height={90}
               alt="Icon SMG"
+              className="object-contain max-w-[60%] sm:max-w-[90px]"
             />
           </div>
         </div>

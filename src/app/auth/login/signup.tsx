@@ -115,7 +115,7 @@ const SignUpForm = () => {
     <Card className="w-screen justify-center items-center max-w-lg">
       <CardHeader className="pb-4">
         <div className="flex items-start justify-between">
-          <CardTitle className="text-2xl font-semibold">
+          <CardTitle className="text-xl font-semibold mr-2">
             Selamat Datang Kembali!
           </CardTitle>
           <div className="w-20 h-20 items-center justify-center rounded flex flex-row pe-4">
