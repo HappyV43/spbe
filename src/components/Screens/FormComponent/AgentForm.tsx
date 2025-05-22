@@ -99,12 +99,10 @@ const AgentForm = ({ companyName, user }: FormSubmit) => {
             name="phone"
             type="number"
             value={phone}
-            maxLength={12}
+            maxLength={15}
             onChange={(e) => {
               const value = e.target.value;
-              if (value.length <= 12) {
-                setPhone(value);
-              }
+              setPhone(value);
             }}
             className={noSpinner}
             min={0}
@@ -153,7 +151,7 @@ const AgentForm = ({ companyName, user }: FormSubmit) => {
           {loading ? (
             <Button type="submit" className="px-9" disabled>
               <Loader2 className="animate-spin" />
-              Please wait
+              Menyimpan...
             </Button>
           ) : (
             <Button type="submit" className="px-9">

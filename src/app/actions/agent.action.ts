@@ -20,7 +20,7 @@ export const getAgentsAll = cache(async (users: string, id: number) => {
   });
 });
 export const postAgentData = async (formData: FormData) => {
-  const agentName = formData.get("agentName")?.toString();
+  const agentName = formData.get("agentName")?.toString().toUpperCase();
   const shipTo = formData.get("shipTo")?.toString() || null;
   const companyId = Number(formData.get("companyId"));
   const address = formData.get("address")?.toString();
@@ -50,10 +50,7 @@ export const postAgentData = async (formData: FormData) => {
   const checkSameAgent = await prisma.agents.findFirst({
     where: {
       companyId: companyId,
-      agentName: {
-        equals: agentName,
-        mode: "insensitive", // PENTING agar "Dewangga" == "dewangga"
-      },
+      agentName: agentName,
     },
   });
 
@@ -87,7 +84,7 @@ export const postAgentData = async (formData: FormData) => {
   }
 };
 export const updateAgentData = async (formData: FormData) => {
-  const agentNameLabel = formData.get("agentName")?.toString();
+  const agentNameLabel = formData.get("agentName")?.toString().toUpperCase();
   const shipTo = formData.get("shipTo")?.toString()
     ? formData.get("shipTo")?.toString()
     : null;
@@ -126,10 +123,7 @@ export const updateAgentData = async (formData: FormData) => {
   const sameAgentName = await prisma.agents.findFirst({
     where: {
       companyId: user.companiesId,
-      agentName: {
-        equals: agentNameLabel,
-        mode: "insensitive",
-      },
+      agentName: agentNameLabel,
       id: {
         not: agentId,
       },

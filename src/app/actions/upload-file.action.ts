@@ -4,12 +4,14 @@ import prisma from "@/lib/db";
 import { MonthlyAllocation } from "@/lib/types";
 import { Allocation } from "@/lib/types";
 import { revalidatePath } from "next/cache";
+import { getCurrentSession } from "./auth.actions";
 
 export const uploadBulkExcel = async (
   datas: Omit<Allocation, "createdAt" | "updatedAt">[]
 ) => {
   const missingAgents: string[] = []; // Array to store missing agent names
 
+  // TODO NELSEN: CEK COMPANIES.ID FIRST THEN CEK AGENT NAME THAT IS FROM THAT COMPANY
   try {
     // Step 1: Validate if all agents exist before proceeding with upload
     const agentNames = datas.map((excel) => excel.agentName); // Extract all agent names from data
