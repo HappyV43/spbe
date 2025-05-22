@@ -7,7 +7,8 @@ import { revalidatePath } from "next/cache";
 import { getCurrentSession } from "./auth.actions";
 
 export const uploadBulkExcel = async (
-  datas: Omit<Allocation, "createdAt" | "updatedAt">[]
+  datas: Omit<Allocation, "createdAt" | "updatedAt">[],
+  companyId: number
 ) => {
   const missingAgents: string[] = []; // Array to store missing agent names
 
@@ -15,19 +16,41 @@ export const uploadBulkExcel = async (
   try {
     // Step 1: Validate if all agents exist before proceeding with upload
     const agentNames = datas.map((excel) => excel.agentName); // Extract all agent names from data
-    const findAgentName = await prisma.agents.findMany({
-      where: {
-        agentName: {
-          in: agentNames, // Match against all agent names
-        },
-      },
-      select: {
-        id: true,
-        agentName: true,
-      },
-    });
+    const [checkAgentInDb, checkAgentWithCompaniesId] =
+      await prisma.$transaction([
+        prisma.agents.findMany({
+          where: {
+            agentName: {
+              in: agentNames,
+            },
+          },
+          select: {
+            id: true,
+            agentName: true,
+          },
+        }),
+        prisma.agents.findMany({
+          where: {
+            companyId: companyId,
+          },
+          select: {
+            agentName: true,
+            companyId: true,
+          },
+        }),
+      ]);
 
-    const validAgentNames = findAgentName.map((agent) => agent.agentName); // Extract valid agent names
+    if (checkAgentInDb.length === 0) {
+      return {
+        error: "Data agents tidak ada di penyimpanan",
+      };
+    }
+
+    const validAgentNames = checkAgentInDb.map((agent) => agent.agentName); // Extract valid agent names
+    const validCompanyAgents = checkAgentWithCompaniesId.map(
+      (agent) => agent.agentName
+    );
+
     missingAgents.push(
       ...agentNames.filter((agentName) => !validAgentNames.includes(agentName))
     ); // Add missing agents to the list
@@ -36,6 +59,17 @@ export const uploadBulkExcel = async (
     if (missingAgents.length > 0) {
       return {
         missingAgents, // Return the missing agents so frontend can handle
+      };
+    }
+
+    const invalidCompanyAgents = datas.filter(
+      (excel) => !validCompanyAgents.includes(excel.agentName)
+    );
+
+    if (invalidCompanyAgents.length > 0) {
+      return {
+        error: "Terdapat agent yang belum terdaftar di perusahaan",
+        invalidAgents: invalidCompanyAgents.map((d) => d.agentName),
       };
     }
 
@@ -60,7 +94,7 @@ export const uploadBulkExcel = async (
     await Promise.all(
       datas.map(async (excel) => {
         // Retrieve agent ID
-        const agentId = findAgentName.find(
+        const agentId = checkAgentInDb.find(
           (agent) => agent.agentName === excel.agentName
         )?.id;
 
