@@ -23,7 +23,7 @@ export function AppSidebar({
   user,
   image,
   ...props
-}: React.ComponentProps<typeof Sidebar> & { user: any; image: string }) {
+}: React.ComponentProps<typeof Sidebar> & { user: any; image: any }) {
   const handleClick = async () => {
     const result = await logOut();
     if (result?.error) {

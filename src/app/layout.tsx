@@ -35,6 +35,10 @@ export default async function RootLayout({
   const defaultOpen = cookieStore.get("sidebar:state")?.value === "true";
   const dataUser = await getCurrentSession();
   const image = await getCompaniesImage(dataUser.user?.companiesId!);
+  // if (!dataUser?.session || !dataUser?.user) {
+  //   redirect("/auth/login");
+  // }
+
   return (
     <html lang="en" className="light">
       <head></head>
@@ -43,7 +47,7 @@ export default async function RootLayout({
       >
         {/* <ThemeProvider attribute="class" defaultTheme="system" enableSystem> */}
         <SidebarProvider defaultOpen={defaultOpen}>
-          <AppSidebar user={dataUser.user} image={image[0]?.imageUrl} />
+          <AppSidebar user={dataUser.user} image={image[0].imageUrl} />
           <main className="w-full">
             <SidebarTrigger className="h-20 w-20" />
             {children}

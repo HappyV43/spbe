@@ -10,32 +10,6 @@ export const getCompaniesAll = cache(async () => {
   return await prisma.companies.findMany();
 });
 
-const companyImageCache = new Map<number, { data: any; expires: number }>();
-
-export const getCompaniesImage = async (id: number) => {
-  const now = Date.now();
-  const cached = companyImageCache.get(id);
-
-  if (cached && cached.expires > now) {
-    return cached.data;
-  }
-
-  const data = await prisma.companies.findMany({
-    select: {
-      imageUrl: true,
-    },
-    where: {
-      id: id,
-    },
-  });
-
-  companyImageCache.set(id, {
-    data,
-    expires: now + 120 * 60 * 1000, // 5 menit
-  });
-  return data;
-};
-
 export const getCompaniesNameData = async () => {
   return await prisma.companies.findMany({
     select: {
@@ -138,3 +112,30 @@ export const getCompaniesMetaData = cache(async (id?: string) => {
   });
   return metadata;
 });
+
+const companyImageCache = new Map<number, { data: any; expires: number }>();
+
+export const getCompaniesImage = async (id: number) => {
+  const now = Date.now();
+  const cached = companyImageCache.get(id);
+
+  if (cached && cached.expires > now) {
+    return cached.data;
+  }
+
+  const data = await prisma.companies.findMany({
+    select: {
+      imageUrl: true,
+    },
+    where: {
+      id: id,
+    },
+  });
+
+  companyImageCache.set(id, {
+    data,
+    expires: now + 5 * 60 * 1000, // 5 menit
+  });
+
+  return data;
+};
