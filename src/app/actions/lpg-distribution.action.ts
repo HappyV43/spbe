@@ -83,26 +83,29 @@ export const postLpgData = async (formData: FormData) => {
     return {
       error: "Semua field harus diisi",
     };
+  const { user } = await getCurrentSession();
+  if (!user)
+    return {
+      error: "User tidak ada atau user belum login",
+    };
 
   const checkLpgData = await prisma.lpgDistributions.findMany({
     where: {
       giDate: waktuPengambilan,
       bpeNumber: nomorTransaksi,
+      creator: {
+        companiesId: user.companiesId,
+      },
     },
   });
 
-  // if (checkLpgData.length > 0) {
-  //   return {
-  //     error: "Data penyaluran lpg ini sudah diisi",
-  //   };
-  // }
+  if (checkLpgData.length > 0) {
+    return {
+      error: "Data penyaluran lpg ini sudah diisi",
+    };
+  }
 
   try {
-    const { user } = await getCurrentSession();
-    if (!user)
-      return {
-        error: "User tidak ada atau user belum login",
-      };
     const dataLpg: LpgDistributions = await prisma.lpgDistributions.create({
       data: {
         allocationId: allocationid,
