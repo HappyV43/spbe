@@ -91,11 +91,11 @@ export const postLpgData = async (formData: FormData) => {
     },
   });
 
-  if (checkLpgData.length > 0) {
-    return {
-      error: "Data penyaluran lpg ini sudah diisi",
-    };
-  }
+  // if (checkLpgData.length > 0) {
+  //   return {
+  //     error: "Data penyaluran lpg ini sudah diisi",
+  //   };
+  // }
 
   try {
     const { user } = await getCurrentSession();
@@ -261,8 +261,8 @@ export const getFilterData = cache(async (company_id: number) => {
     },
     where: {
       creator: {
-        companiesId: company_id
-      }
+        companiesId: company_id,
+      },
     },
     orderBy: { agentName: "asc" },
   });
@@ -282,8 +282,8 @@ export const getLpgDataDefault = async (company_id: number) => {
         },
         {
           creator: {
-            companiesId: company_id
-          }
+            companiesId: company_id,
+          },
         },
       ],
     },
