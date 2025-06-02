@@ -136,8 +136,7 @@ const Summary = ({
       }
 
       const data = await response.json();
-      console.log("Response from API route:", data);
-      console.log(data.dailySummary._count);
+
 
       const allData = {
         allSummary: {

@@ -61,7 +61,6 @@ const Register = ({ role }: { role?: string }) => {
     const selectedCompany = companies?.find(
       (company: any) => company.companyName === value
     );
-    console.log(selectedCompany, "ARDINe");
     setSelectedCompanyId(Number(selectedCompany?.id) || 0);
   };
 

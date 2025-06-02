@@ -102,7 +102,9 @@ export const uploadBulkExcel = async (
         const existingRecord = await prisma.allocations.findFirst({
           where: {
             deliveryNumber: excel.deliveryNumber,
-            createdBy: excel.createdBy, // pastikan data per user tidak saling override
+            creator: {
+              companiesId: companyId,
+            },
           },
         });
 
